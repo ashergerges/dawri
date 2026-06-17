@@ -1,7 +1,7 @@
 part of 'home_cubit.dart';
 
 @freezed
-class HomeState with _$HomeState {
+abstract class HomeState with _$HomeState {
   const factory HomeState({
     @Default(HomeStateStatus.initial()) HomeStateStatus currState,
     required RefreshController refreshController,

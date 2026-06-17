@@ -145,7 +145,7 @@ class AuthInterceptor extends Interceptor {
       // TODO: Uncomment when notification service is implemented
       // getIt<NotificationService>().updateFcmTokenToServer(isLogout: true).then((value) {
       return getIt<ILocalPreference>().removeAuthPrefs().then((value) {
-        getIt<AppRouter>().replaceAll([LoginRoute()], updateExistingRoutes: false);
+        getIt<AppRouter>().replaceAll([HomeBottomTabsRoute()], updateExistingRoutes: false);
       });
       // });
     } catch (e) {
