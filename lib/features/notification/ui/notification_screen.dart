@@ -82,7 +82,7 @@ class NotificationListWidget extends StatelessWidget {
       header: PullRefresh.pullRefresh,
 
       child:groups.isEmpty?EmptyWidget(
-        text: LocaleKeys.noNotifications.tr(),
+        text: "LocaleKeys.noNotifications.tr()",
         image:Assets.svg.error.svg() ,
       ): ListView.builder(
         shrinkWrap: true,

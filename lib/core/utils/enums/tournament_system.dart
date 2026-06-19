@@ -1,0 +1,1 @@
+enum TournamentSystem { knockout, groups, league }

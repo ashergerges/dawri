@@ -1,16 +1,49 @@
 # dawri
 
-A new Flutter project.
+# Introduction
+TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project.
 
-## Getting Started
+# Build and Test
 
-This project is a starting point for a Flutter application.
+TODO: Describe and show how to build your code and run the tests.
 
-A few resources to get you started if this is your first Flutter project:
+### build_runner
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Used for generating assets
+- Used for generating immutable classes, JSON serialization, Models and freeze Cubits
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+```bash
+  dart run build_runner build --delete-conflicting-outputs
+  ``` 
+
+## export compliance questionnaire every time you upload a new version of your app (AppStoreConnect)
+
+<key>ITSAppUsesNonExemptEncryption</key>
+<false/>
+
+### Easy Localization
+
+- Library for handling app localization.
+- Command for generating localization keys:
+
+```bash
+  dart run easy_localization:generate --source-dir ./assets/translations -f keys -o locale_keys.g.dart -O lib/gen
+  ```
+
+
+
+# For build dev APK
+
+```bash
+  flutter build apk --flavor dev -t lib/main.dart
+   ```
+
+# For build prod APK --release
+
+```bash
+  flutter build apk --flavor prod -t lib/main.dart --release
+   ```
+
+# Flutter Version
+- 3.38

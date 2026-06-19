@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/services/ui/offline_internet_screen.dart';
 import 'package:dawri/core/services/ui/server_error_screen.dart';
+import 'package:dawri/features/create_championship/ui/create_championship_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:dawri/features/notification/ui/notification_screen.dart';
@@ -36,6 +37,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: NoInternetSplashRoute.page),
     AutoRoute( page: NotificationRoute.page),
     AutoRoute( page: ImageViewerRoute.page),
+    AutoRoute( page: CreateChampionshipRoute.page),
     AutoRoute(path: '*', page: NotFoundRoute.page), // this must be last route
 
   ];

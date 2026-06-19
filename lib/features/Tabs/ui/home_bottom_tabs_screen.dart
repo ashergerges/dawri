@@ -15,26 +15,35 @@ class HomeBottomTabsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => TabBarCubit()..selectScreen(index: index),
-      child: BlocBuilder<TabBarCubit, TabBarState>(
-        builder: (context, state) {
-          return PopScope(
-            canPop: state.activeScreen == 0,
-            onPopInvokedWithResult: (didPop, result) async {
-              if (state.activeScreen != 0) {
-                context.read<TabBarCubit>().selectScreen(index: 0);
-              }
-            },
-            child: Scaffold(
-              backgroundColor: AppColors.background,
-              body: context.read<TabBarCubit>().navScreens[state.activeScreen],
-              bottomNavigationBar: NavigationBarItems(
-                onTap: (i) => context.read<TabBarCubit>().selectScreen(index: i),
-                activeScreen: state.activeScreen,
-              ),
+      child: const _TabsView(),
+    );
+  }
+}
+
+class _TabsView extends StatelessWidget {
+  const _TabsView();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TabBarCubit, TabBarState>(
+      builder: (context, state) {
+        return PopScope(
+          canPop: state.activeScreen == 0,
+          onPopInvokedWithResult: (didPop, result) {
+            if (state.activeScreen != 0) {
+              context.read<TabBarCubit>().selectScreen(index: 0);
+            }
+          },
+          child: Scaffold(
+            backgroundColor: AppColors.pageBg,
+            body: context.read<TabBarCubit>().navScreens[state.activeScreen],
+            bottomNavigationBar: NavigationBarItems(
+              activeScreen: state.activeScreen,
+              onTap: (i) => context.read<TabBarCubit>().selectScreen(index: i),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }

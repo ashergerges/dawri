@@ -11,6 +11,22 @@
 part of 'app_router.dart';
 
 /// generated route for
+/// [CreateChampionshipScreen]
+class CreateChampionshipRoute extends PageRouteInfo<void> {
+  const CreateChampionshipRoute({List<PageRouteInfo>? children})
+    : super(CreateChampionshipRoute.name, initialChildren: children);
+
+  static const String name = 'CreateChampionshipRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const CreateChampionshipScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [HomeBottomTabsScreen]
 class HomeBottomTabsRoute extends PageRouteInfo<HomeBottomTabsRouteArgs> {
   HomeBottomTabsRoute({Key? key, int index = 0, List<PageRouteInfo>? children})

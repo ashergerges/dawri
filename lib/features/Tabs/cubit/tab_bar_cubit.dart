@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:dawri/features/championships/ui/championships_screen.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:dawri/features/home/ui/home_screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,7 +12,7 @@ class TabBarCubit extends Cubit<TabBarState> {
 
   List<Widget> get navScreens => [
     const HomeScreen(),
-    const HomeScreen(), // Tournaments - placeholder
+    const ChampionshipsScreen(),
     const HomeScreen(), // Stadiums - placeholder
     const HomeScreen(), // Store - placeholder
     const HomeScreen(), // Account - placeholder

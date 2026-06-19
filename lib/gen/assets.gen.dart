@@ -37,44 +37,36 @@ class $AssetsAnimationsGen {
 class $AssetsFontsGen {
   const $AssetsFontsGen();
 
-  /// File path: assets/fonts/Inter-Black.ttf
-  String get interBlack => 'assets/fonts/Inter-Black.ttf';
+  /// File path: assets/fonts/Tajawal-Black.ttf
+  String get tajawalBlack => 'assets/fonts/Tajawal-Black.ttf';
 
-  /// File path: assets/fonts/Inter-Bold.ttf
-  String get interBold => 'assets/fonts/Inter-Bold.ttf';
+  /// File path: assets/fonts/Tajawal-Bold.ttf
+  String get tajawalBold => 'assets/fonts/Tajawal-Bold.ttf';
 
-  /// File path: assets/fonts/Inter-ExtraBold.ttf
-  String get interExtraBold => 'assets/fonts/Inter-ExtraBold.ttf';
+  /// File path: assets/fonts/Tajawal-ExtraBold.ttf
+  String get tajawalExtraBold => 'assets/fonts/Tajawal-ExtraBold.ttf';
 
-  /// File path: assets/fonts/Inter-ExtraLight.ttf
-  String get interExtraLight => 'assets/fonts/Inter-ExtraLight.ttf';
+  /// File path: assets/fonts/Tajawal-ExtraLight.ttf
+  String get tajawalExtraLight => 'assets/fonts/Tajawal-ExtraLight.ttf';
 
-  /// File path: assets/fonts/Inter-Light.ttf
-  String get interLight => 'assets/fonts/Inter-Light.ttf';
+  /// File path: assets/fonts/Tajawal-Light.ttf
+  String get tajawalLight => 'assets/fonts/Tajawal-Light.ttf';
 
-  /// File path: assets/fonts/Inter-Medium.ttf
-  String get interMedium => 'assets/fonts/Inter-Medium.ttf';
+  /// File path: assets/fonts/Tajawal-Medium.ttf
+  String get tajawalMedium => 'assets/fonts/Tajawal-Medium.ttf';
 
-  /// File path: assets/fonts/Inter-Regular.ttf
-  String get interRegular => 'assets/fonts/Inter-Regular.ttf';
-
-  /// File path: assets/fonts/Inter-SemiBold.ttf
-  String get interSemiBold => 'assets/fonts/Inter-SemiBold.ttf';
-
-  /// File path: assets/fonts/Inter-Thin.ttf
-  String get interThin => 'assets/fonts/Inter-Thin.ttf';
+  /// File path: assets/fonts/Tajawal-Regular.ttf
+  String get tajawalRegular => 'assets/fonts/Tajawal-Regular.ttf';
 
   /// List of all assets
   List<String> get values => [
-    interBlack,
-    interBold,
-    interExtraBold,
-    interExtraLight,
-    interLight,
-    interMedium,
-    interRegular,
-    interSemiBold,
-    interThin,
+    tajawalBlack,
+    tajawalBold,
+    tajawalExtraBold,
+    tajawalExtraLight,
+    tajawalLight,
+    tajawalMedium,
+    tajawalRegular,
   ];
 }
 
