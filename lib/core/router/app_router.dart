@@ -1,6 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/services/ui/offline_internet_screen.dart';
 import 'package:dawri/core/services/ui/server_error_screen.dart';
+import 'package:dawri/features/championship_add_team/ui/championship_add_team_screen.dart';
+import 'package:dawri/features/championship_control/ui/championship_control_screen.dart';
+import 'package:dawri/features/championship_register/ui/championship_register_screen.dart';
 import 'package:dawri/features/create_championship/ui/create_championship_screen.dart';
 import 'package:dawri/features/reserve/ui/reserve_now_screen.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +43,9 @@ class AppRouter extends RootStackRouter {
     AutoRoute( page: ImageViewerRoute.page),
     AutoRoute( page: CreateChampionshipRoute.page),
     AutoRoute( page: ReserveNowRoute.page),
+    AutoRoute( page: ChampionshipAddTeamRoute.page),
+    AutoRoute( page: ChampionshipRegisterRoute.page),
+    AutoRoute( page: ChampionshipControlRoute.page),
     AutoRoute(path: '*', page: NotFoundRoute.page), // this must be last route
 
   ];

@@ -11,6 +11,54 @@
 part of 'app_router.dart';
 
 /// generated route for
+/// [ChampionshipAddTeamScreen]
+class ChampionshipAddTeamRoute extends PageRouteInfo<void> {
+  const ChampionshipAddTeamRoute({List<PageRouteInfo>? children})
+    : super(ChampionshipAddTeamRoute.name, initialChildren: children);
+
+  static const String name = 'ChampionshipAddTeamRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ChampionshipAddTeamScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [ChampionshipControlScreen]
+class ChampionshipControlRoute extends PageRouteInfo<void> {
+  const ChampionshipControlRoute({List<PageRouteInfo>? children})
+    : super(ChampionshipControlRoute.name, initialChildren: children);
+
+  static const String name = 'ChampionshipControlRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ChampionshipControlScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [ChampionshipRegisterScreen]
+class ChampionshipRegisterRoute extends PageRouteInfo<void> {
+  const ChampionshipRegisterRoute({List<PageRouteInfo>? children})
+    : super(ChampionshipRegisterRoute.name, initialChildren: children);
+
+  static const String name = 'ChampionshipRegisterRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ChampionshipRegisterScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [CreateChampionshipScreen]
 class CreateChampionshipRoute extends PageRouteInfo<void> {
   const CreateChampionshipRoute({List<PageRouteInfo>? children})

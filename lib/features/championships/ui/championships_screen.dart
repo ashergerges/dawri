@@ -2,6 +2,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
+import 'package:dotted_line/dotted_line.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -556,10 +557,11 @@ class _TournamentCard extends StatelessWidget {
                     ],
                   ),
                   15.h.sizedHeight,
-                  Divider(
-                    color: AppColors.slate200,
-                    height: 1,
-                    thickness: 1,
+                  DottedLine(
+                    dashLength: 5,
+                    dashGapLength: 4,
+                    lineThickness: 1,
+                    dashColor: AppColors.slate100,
                   ),
                   15.h.sizedHeight,
                   Row(
@@ -586,29 +588,36 @@ class _TournamentCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: data.isPrimary
-                              ? AppColors.primary
-                              : AppColors.primaryLight.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12.r),
-                          boxShadow: data.isPrimary
-                              ? [
-                            BoxShadow(
-                              color: AppColors.primary.withOpacity(0.2),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ]
-                              : null,
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-                          child: Text(
-                            data.buttonKey.tr(),
-                            style: AppTextTheme.bodyXSmall(context).copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: data.isPrimary ? AppColors.white : AppColors.primaryLight,
+                      OnTap(
+                        onTap: (){
+                          // ChampionshipAddTeamRoute().push(context);
+                          // ChampionshipRegisterRoute().push(context);
+                          ChampionshipControlRoute().push(context);
+                        },
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: data.isPrimary
+                                ? AppColors.primary
+                                : AppColors.primaryLight.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12.r),
+                            boxShadow: data.isPrimary
+                                ? [
+                              BoxShadow(
+                                color: AppColors.primary.withOpacity(0.2),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ]
+                                : null,
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+                            child: Text(
+                              data.buttonKey.tr(),
+                              style: AppTextTheme.bodyXSmall(context).copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: data.isPrimary ? AppColors.white : AppColors.primaryLight,
+                              ),
                             ),
                           ),
                         ),
