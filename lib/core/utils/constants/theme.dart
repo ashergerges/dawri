@@ -16,7 +16,7 @@ ThemeData get appTheme =>
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.black),
       ),
-      scaffoldBackgroundColor: AppColors.white,
+      scaffoldBackgroundColor: AppColors.background,
       visualDensity: VisualDensity.adaptivePlatformDensity,
       textSelectionTheme: TextSelectionThemeData(
         selectionColor: AppColors.primary100, // background

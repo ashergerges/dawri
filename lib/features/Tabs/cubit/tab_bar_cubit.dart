@@ -1,5 +1,8 @@
 import 'package:bloc/bloc.dart';
+import 'package:dawri/features/account/ui/account_screen.dart';
 import 'package:dawri/features/championships/ui/championships_screen.dart';
+import 'package:dawri/features/stadiums/ui/stadiums_screen.dart';
+import 'package:dawri/features/store/ui/store_screen.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:dawri/features/home/ui/home_screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,9 +16,9 @@ class TabBarCubit extends Cubit<TabBarState> {
   List<Widget> get navScreens => [
     const HomeScreen(),
     const ChampionshipsScreen(),
-    const HomeScreen(), // Stadiums - placeholder
-    const HomeScreen(), // Store - placeholder
-    const HomeScreen(), // Account - placeholder
+    const StadiumsScreen(),
+    const StoreScreen(),
+    const AccountScreen(),
   ];
 
   void selectScreen({required int index}) {

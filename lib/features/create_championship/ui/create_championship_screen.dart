@@ -49,31 +49,29 @@ class _CreateChampionshipViewState extends State<_CreateChampionshipView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            const _Header(),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Form(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  key: _formKey,
-                  child: Column(
-                    children: const [
-                      _UploadSection(),
-                      _BasicInfoSection(),
-                      _SystemSection(),
-                      _LocationSection(),
-                      _PrizesSection(),
-                      SizedBox(height: 100),
-                    ],
-                  ),
+      body: Column(
+        children: [
+          const _Header(),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Form(
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                key: _formKey,
+                child: Column(
+                  children: const [
+                    _UploadSection(),
+                    _BasicInfoSection(),
+                    _SystemSection(),
+                    _LocationSection(),
+                    _PrizesSection(),
+                    SizedBox(height: 100),
+                  ],
                 ),
               ),
             ),
-            _BottomActionBar(formKey: _formKey),
-          ],
-        ),
+          ),
+          _BottomActionBar(formKey: _formKey),
+        ],
       ),
     );
   }
@@ -86,7 +84,7 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 15.h),
+      padding: EdgeInsets.fromLTRB(20.w, 50.h, 20.w, 15.h),
       color: AppColors.white,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

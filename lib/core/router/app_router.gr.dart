@@ -218,6 +218,22 @@ class OfflineInternetRouteArgs {
 }
 
 /// generated route for
+/// [ReserveNowScreen]
+class ReserveNowRoute extends PageRouteInfo<void> {
+  const ReserveNowRoute({List<PageRouteInfo>? children})
+    : super(ReserveNowRoute.name, initialChildren: children);
+
+  static const String name = 'ReserveNowRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ReserveNowScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [ServerErrorScreen]
 class ServerErrorRoute extends PageRouteInfo<ServerErrorRouteArgs> {
   ServerErrorRoute({
