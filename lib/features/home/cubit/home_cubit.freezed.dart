@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$HomeState {
 
- HomeStateStatus get currState; RefreshController get refreshController;
+ String get userName; bool get hasNotifications; String get searchQuery;
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $HomeStateCopyWith<HomeState> get copyWith => _$HomeStateCopyWithImpl<HomeState>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeState&&(identical(other.currState, currState) || other.currState == currState)&&(identical(other.refreshController, refreshController) || other.refreshController == refreshController));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeState&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.hasNotifications, hasNotifications) || other.hasNotifications == hasNotifications)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,currState,refreshController);
+int get hashCode => Object.hash(runtimeType,userName,hasNotifications,searchQuery);
 
 @override
 String toString() {
-  return 'HomeState(currState: $currState, refreshController: $refreshController)';
+  return 'HomeState(userName: $userName, hasNotifications: $hasNotifications, searchQuery: $searchQuery)';
 }
 
 
@@ -45,11 +45,11 @@ abstract mixin class $HomeStateCopyWith<$Res>  {
   factory $HomeStateCopyWith(HomeState value, $Res Function(HomeState) _then) = _$HomeStateCopyWithImpl;
 @useResult
 $Res call({
- HomeStateStatus currState, RefreshController refreshController
+ String userName, bool hasNotifications, String searchQuery
 });
 
 
-$HomeStateStatusCopyWith<$Res> get currState;
+
 
 }
 /// @nodoc
@@ -62,23 +62,15 @@ class _$HomeStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? currState = null,Object? refreshController = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? userName = null,Object? hasNotifications = null,Object? searchQuery = null,}) {
   return _then(_self.copyWith(
-currState: null == currState ? _self.currState : currState // ignore: cast_nullable_to_non_nullable
-as HomeStateStatus,refreshController: null == refreshController ? _self.refreshController : refreshController // ignore: cast_nullable_to_non_nullable
-as RefreshController,
+userName: null == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
+as String,hasNotifications: null == hasNotifications ? _self.hasNotifications : hasNotifications // ignore: cast_nullable_to_non_nullable
+as bool,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
-/// Create a copy of HomeState
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$HomeStateStatusCopyWith<$Res> get currState {
-  
-  return $HomeStateStatusCopyWith<$Res>(_self.currState, (value) {
-    return _then(_self.copyWith(currState: value));
-  });
-}
+
 }
 
 
@@ -160,10 +152,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( HomeStateStatus currState,  RefreshController refreshController)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userName,  bool hasNotifications,  String searchQuery)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HomeState() when $default != null:
-return $default(_that.currState,_that.refreshController);case _:
+return $default(_that.userName,_that.hasNotifications,_that.searchQuery);case _:
   return orElse();
 
 }
@@ -181,10 +173,10 @@ return $default(_that.currState,_that.refreshController);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( HomeStateStatus currState,  RefreshController refreshController)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userName,  bool hasNotifications,  String searchQuery)  $default,) {final _that = this;
 switch (_that) {
 case _HomeState():
-return $default(_that.currState,_that.refreshController);case _:
+return $default(_that.userName,_that.hasNotifications,_that.searchQuery);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +193,10 @@ return $default(_that.currState,_that.refreshController);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( HomeStateStatus currState,  RefreshController refreshController)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userName,  bool hasNotifications,  String searchQuery)?  $default,) {final _that = this;
 switch (_that) {
 case _HomeState() when $default != null:
-return $default(_that.currState,_that.refreshController);case _:
+return $default(_that.userName,_that.hasNotifications,_that.searchQuery);case _:
   return null;
 
 }
@@ -216,11 +208,12 @@ return $default(_that.currState,_that.refreshController);case _:
 
 
 class _HomeState implements HomeState {
-  const _HomeState({this.currState = const HomeStateStatus.initial(), required this.refreshController});
+  const _HomeState({this.userName = 'محمد', this.hasNotifications = true, this.searchQuery = ''});
   
 
-@override@JsonKey() final  HomeStateStatus currState;
-@override final  RefreshController refreshController;
+@override@JsonKey() final  String userName;
+@override@JsonKey() final  bool hasNotifications;
+@override@JsonKey() final  String searchQuery;
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
@@ -232,16 +225,16 @@ _$HomeStateCopyWith<_HomeState> get copyWith => __$HomeStateCopyWithImpl<_HomeSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeState&&(identical(other.currState, currState) || other.currState == currState)&&(identical(other.refreshController, refreshController) || other.refreshController == refreshController));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeState&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.hasNotifications, hasNotifications) || other.hasNotifications == hasNotifications)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,currState,refreshController);
+int get hashCode => Object.hash(runtimeType,userName,hasNotifications,searchQuery);
 
 @override
 String toString() {
-  return 'HomeState(currState: $currState, refreshController: $refreshController)';
+  return 'HomeState(userName: $userName, hasNotifications: $hasNotifications, searchQuery: $searchQuery)';
 }
 
 
@@ -252,11 +245,11 @@ abstract mixin class _$HomeStateCopyWith<$Res> implements $HomeStateCopyWith<$Re
   factory _$HomeStateCopyWith(_HomeState value, $Res Function(_HomeState) _then) = __$HomeStateCopyWithImpl;
 @override @useResult
 $Res call({
- HomeStateStatus currState, RefreshController refreshController
+ String userName, bool hasNotifications, String searchQuery
 });
 
 
-@override $HomeStateStatusCopyWith<$Res> get currState;
+
 
 }
 /// @nodoc
@@ -269,24 +262,16 @@ class __$HomeStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? currState = null,Object? refreshController = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? userName = null,Object? hasNotifications = null,Object? searchQuery = null,}) {
   return _then(_HomeState(
-currState: null == currState ? _self.currState : currState // ignore: cast_nullable_to_non_nullable
-as HomeStateStatus,refreshController: null == refreshController ? _self.refreshController : refreshController // ignore: cast_nullable_to_non_nullable
-as RefreshController,
+userName: null == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
+as String,hasNotifications: null == hasNotifications ? _self.hasNotifications : hasNotifications // ignore: cast_nullable_to_non_nullable
+as bool,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 
-/// Create a copy of HomeState
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$HomeStateStatusCopyWith<$Res> get currState {
-  
-  return $HomeStateStatusCopyWith<$Res>(_self.currState, (value) {
-    return _then(_self.copyWith(currState: value));
-  });
-}
+
 }
 
 /// @nodoc

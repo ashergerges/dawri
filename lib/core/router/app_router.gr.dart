@@ -11,6 +11,38 @@
 part of 'app_router.dart';
 
 /// generated route for
+/// [CartScreen]
+class CartRoute extends PageRouteInfo<void> {
+  const CartRoute({List<PageRouteInfo>? children})
+    : super(CartRoute.name, initialChildren: children);
+
+  static const String name = 'CartRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const CartScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [ChallengesScreen]
+class ChallengesRoute extends PageRouteInfo<void> {
+  const ChallengesRoute({List<PageRouteInfo>? children})
+    : super(ChallengesRoute.name, initialChildren: children);
+
+  static const String name = 'ChallengesRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ChallengesScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [ChampionshipAddTeamScreen]
 class ChampionshipAddTeamRoute extends PageRouteInfo<void> {
   const ChampionshipAddTeamRoute({List<PageRouteInfo>? children})
@@ -266,6 +298,22 @@ class OfflineInternetRouteArgs {
 }
 
 /// generated route for
+/// [ProductDetailsScreen]
+class ProductDetailsRoute extends PageRouteInfo<void> {
+  const ProductDetailsRoute({List<PageRouteInfo>? children})
+    : super(ProductDetailsRoute.name, initialChildren: children);
+
+  static const String name = 'ProductDetailsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ProductDetailsScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [ReserveNowScreen]
 class ReserveNowRoute extends PageRouteInfo<void> {
   const ReserveNowRoute({List<PageRouteInfo>? children})
@@ -340,6 +388,22 @@ class SplashRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const SplashScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [TicketsScreen]
+class TicketsRoute extends PageRouteInfo<void> {
+  const TicketsRoute({List<PageRouteInfo>? children})
+    : super(TicketsRoute.name, initialChildren: children);
+
+  static const String name = 'TicketsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const TicketsScreen();
     },
   );
 }

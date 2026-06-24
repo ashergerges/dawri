@@ -41,42 +41,40 @@ class _ChampionshipRegisterViewState extends State<_ChampionshipRegisterView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: BlocConsumer<ChampionshipRegisterCubit, ChampionshipRegisterState>(
-          listenWhen: (p, c) => p.isSuccess != c.isSuccess,
-          listener: (context, state) {
-            if (state.isSuccess) {
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (_) => const _SuccessModal(),
-              );
-            }
-          },
-          builder: (context, state) {
-            return Column(
-              children: [
-                const _SubHeader(),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Form(
-                      key: _formKey,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      child: Column(
-                        children: [
-                          const _TournamentHero(),
-                          _RegisterFormSection(regionKey: _regionKey),
-                          SizedBox(height: 100.h),
-                        ],
-                      ),
+      body: BlocConsumer<ChampionshipRegisterCubit, ChampionshipRegisterState>(
+        listenWhen: (p, c) => p.isSuccess != c.isSuccess,
+        listener: (context, state) {
+          if (state.isSuccess) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) => const _SuccessModal(),
+            );
+          }
+        },
+        builder: (context, state) {
+          return Column(
+            children: [
+              const _SubHeader(),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    child: Column(
+                      children: [
+                        const _TournamentHero(),
+                        _RegisterFormSection(regionKey: _regionKey),
+                        SizedBox(height: 100.h),
+                      ],
                     ),
                   ),
                 ),
-                _BottomActionBar(formKey: _formKey, regionKey: _regionKey),
-              ],
-            );
-          },
-        ),
+              ),
+              _BottomActionBar(formKey: _formKey, regionKey: _regionKey),
+            ],
+          );
+        },
       ),
     );
   }
@@ -89,8 +87,7 @@ class _SubHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(20.w, 15.h, 20.w, 25.h),
-
+      padding: EdgeInsets.fromLTRB(20.w, 50.h, 20.w, 15.h),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.only(

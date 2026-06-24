@@ -320,6 +320,7 @@ class _TournamentsList extends StatelessWidget {
     _TournamentData(
       image: 'https://images.unsplash.com/photo-1622281549424-fd9aaea1fd43?w=500&q=80',
       statusKey: LocaleKeys.championshipsRegisterOpen,
+      status: 1,
       statusIcon: FontAwesomeIcons.lockOpen,
       statusColor: AppColors.primary,
       sportIcon: FontAwesomeIcons.futbol,
@@ -335,6 +336,7 @@ class _TournamentsList extends StatelessWidget {
     _TournamentData(
       image: 'https://images.unsplash.com/photo-1600003014755-ba31aa59c4b6?w=500&q=80',
       statusKey: LocaleKeys.championshipsRegisterOpen,
+      status: 2,
       statusIcon: FontAwesomeIcons.lockOpen,
       statusColor: AppColors.primary,
       sportIcon: FontAwesomeIcons.gamepad,
@@ -350,6 +352,7 @@ class _TournamentsList extends StatelessWidget {
     _TournamentData(
       image: 'https://images.unsplash.com/photo-1622281549424-fd9aaea1fd43?w=500&q=80',
       statusKey: LocaleKeys.championshipsNow,
+      status: 3,
       statusIcon: FontAwesomeIcons.fire,
       statusColor: AppColors.warning,
       sportIcon: FontAwesomeIcons.tableTennisPaddleBall,
@@ -396,6 +399,7 @@ class _TournamentData {
   final String prize;
   final String buttonKey;
   final bool isPrimary;
+  final int status;
 
   const _TournamentData({
     required this.image,
@@ -411,6 +415,7 @@ class _TournamentData {
     required this.prize,
     required this.buttonKey,
     required this.isPrimary,
+    required this.status,
   });
 }
 
@@ -590,9 +595,18 @@ class _TournamentCard extends StatelessWidget {
                       ),
                       OnTap(
                         onTap: (){
-                          // ChampionshipAddTeamRoute().push(context);
-                          // ChampionshipRegisterRoute().push(context);
+                          if(data.status==1){
+                            return ChampionshipRegisterRoute().push(context);
+                          }
+                          else if(data.status==2){
+                            ChampionshipAddTeamRoute().push(context);
+
+                          }
+                          else{
                           ChampionshipControlRoute().push(context);
+
+                          }
+                          //
                         },
                         child: DecoratedBox(
                           decoration: BoxDecoration(

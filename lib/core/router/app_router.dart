@@ -1,11 +1,15 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/services/ui/offline_internet_screen.dart';
 import 'package:dawri/core/services/ui/server_error_screen.dart';
+import 'package:dawri/features/cart/ui/cart_screen.dart';
+import 'package:dawri/features/challenges/ui/challenges_screen.dart';
 import 'package:dawri/features/championship_add_team/ui/championship_add_team_screen.dart';
 import 'package:dawri/features/championship_control/ui/championship_control_screen.dart';
 import 'package:dawri/features/championship_register/ui/championship_register_screen.dart';
 import 'package:dawri/features/create_championship/ui/create_championship_screen.dart';
+import 'package:dawri/features/product_details/ui/product_details_screen.dart';
 import 'package:dawri/features/reserve/ui/reserve_now_screen.dart';
+import 'package:dawri/features/tickets/ui/tickets_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:dawri/features/notification/ui/notification_screen.dart';
@@ -46,6 +50,10 @@ class AppRouter extends RootStackRouter {
     AutoRoute( page: ChampionshipAddTeamRoute.page),
     AutoRoute( page: ChampionshipRegisterRoute.page),
     AutoRoute( page: ChampionshipControlRoute.page),
+    AutoRoute( page: CartRoute.page),
+    AutoRoute( page: ProductDetailsRoute.page),
+    AutoRoute( page: TicketsRoute.page),
+    AutoRoute( page: ChallengesRoute.page),
     AutoRoute(path: '*', page: NotFoundRoute.page), // this must be last route
 
   ];
