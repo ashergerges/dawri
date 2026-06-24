@@ -91,6 +91,22 @@ class ChampionshipRegisterRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ContractsScreen]
+class ContractsRoute extends PageRouteInfo<void> {
+  const ContractsRoute({List<PageRouteInfo>? children})
+    : super(ContractsRoute.name, initialChildren: children);
+
+  static const String name = 'ContractsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ContractsScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [CreateChampionshipScreen]
 class CreateChampionshipRoute extends PageRouteInfo<void> {
   const CreateChampionshipRoute({List<PageRouteInfo>? children})
@@ -295,6 +311,22 @@ class OfflineInternetRouteArgs {
 
   @override
   int get hashCode => key.hashCode ^ currentRoute.hashCode;
+}
+
+/// generated route for
+/// [PartnersScreen]
+class PartnersRoute extends PageRouteInfo<void> {
+  const PartnersRoute({List<PageRouteInfo>? children})
+    : super(PartnersRoute.name, initialChildren: children);
+
+  static const String name = 'PartnersRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const PartnersScreen();
+    },
+  );
 }
 
 /// generated route for

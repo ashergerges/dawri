@@ -259,7 +259,7 @@ class _ServicesSection extends StatelessWidget {
     ),
     _ServiceItem(
       onTap: () {
-        // getIt<AppRouter>().replaceAll([HomeBottomTabsRoute(index: 2)],updateExistingRoutes: false);
+        getIt<AppRouter>().push(PartnersRoute());
       },
       icon: FontAwesomeIcons.users,
       color: AppColors.info,
@@ -285,7 +285,7 @@ class _ServicesSection extends StatelessWidget {
     ),
     _ServiceItem(
       onTap: () {
-        // getIt<AppRouter>().replaceAll([HomeBottomTabsRoute(index: 2)],updateExistingRoutes: false);
+        getIt<AppRouter>().push(ContractsRoute());
       },
       icon: FontAwesomeIcons.fileContract,
       color: AppColors.purple,

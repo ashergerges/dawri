@@ -34,7 +34,8 @@ class AppColors {
   static const Color warning = Color(0xFFF59E0B);
   static const Color error = Color(0xFFEF4444);
   static const Color info = Color(0xFF3B82F6);
-
+  static const Color ratingAmber = Color(0xFFD97706);
+  static const Color ratingAmberBg = Color(0xFFFEF3C7);
   // ─── Accent Colors ────────────────────────────────────────────
   static const Color purple = Color(0xFF8B5CF6);
   static const Color pink = Color(0xFFEC4899);
@@ -60,6 +61,11 @@ class AppColors {
   static const Color navInactive = Color(0xFF94A3B8);
   static const Color navBorder = Color(0xFFF1F5F9);
   static const Color navShadow = Color(0x08000000);
+
+  // ─── Contract  ───────────────────────────────────────────────
+  static const Color contractsReject =  Color(0xFFFEF2F2);
+  static const Color contractsStatusActive = Color(0xFFECFDF5);
+  static const Color chat =  Color(0xFFE0E7FF);
 
   // ─── Gradients ────────────────────────────────────────────────
   static const List<Color> headerGradient = [
