@@ -633,5 +633,24 @@ abstract class  LocaleKeys {
   static const loginVerified = 'loginVerified';
   static const logoutTitle = 'logoutTitle';
   static const logoutBody = 'logoutBody';
+  static const searchTitle = 'searchTitle';
+  static const searchFilterAll = 'searchFilterAll';
+  static const searchFilterTeam = 'searchFilterTeam';
+  static const searchFilterPlayer = 'searchFilterPlayer';
+  static const searchFilterTour = 'searchFilterTour';
+  static const searchResultsFoundPrefix = 'searchResultsFoundPrefix';
+  static const searchResultsFoundSuffix = 'searchResultsFoundSuffix';
+  static const searchBadgeTeam = 'searchBadgeTeam';
+  static const searchBadgePlayer = 'searchBadgePlayer';
+  static const searchBadgeTour = 'searchBadgeTour';
+  static const searchResult1Prefix = 'searchResult1Prefix';
+  static const searchResult1Location = 'searchResult1Location';
+  static const searchResult2Prefix = 'searchResult2Prefix';
+  static const searchResult2Rating = 'searchResult2Rating';
+  static const searchResult3Prefix = 'searchResult3Prefix';
+  static const searchResult3Suffix = 'searchResult3Suffix';
+  static const searchResult3Teams = 'searchResult3Teams';
+  static const searchEmptyTitle = 'searchEmptyTitle';
+  static const searchEmptyDesc = 'searchEmptyDesc';
 
 }

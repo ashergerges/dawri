@@ -202,40 +202,45 @@ class _SearchBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(20.r),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withOpacity(0.08),
-            blurRadius: 25,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
-        child: Row(
-          children: [
-            const FaIcon(
-              FontAwesomeIcons.magnifyingGlass,
-              color: AppColors.primaryLight,
-              size: 18,
-            ),
-            12.w.sizedWidth,
-            Expanded(
-              child: Text(
-                LocaleKeys.homeSearchHint.tr(),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppTextTheme.bodySmall(context).copyWith(
-                  color: AppColors.textHint,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+    return OnTap(
+      onTap: (){
+        SearchRoute().push(context);
+      },
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(20.r),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withOpacity(0.08),
+              blurRadius: 25,
+              offset: const Offset(0, 8),
             ),
           ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
+          child: Row(
+            children: [
+              const FaIcon(
+                FontAwesomeIcons.magnifyingGlass,
+                color: AppColors.primaryLight,
+                size: 18,
+              ),
+              12.w.sizedWidth,
+              Expanded(
+                child: Text(
+                  LocaleKeys.homeSearchHint.tr(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextTheme.bodySmall(context).copyWith(
+                    color: AppColors.textHint,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

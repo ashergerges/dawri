@@ -19,6 +19,7 @@ import 'package:dawri/features/partners/ui/partners_screen.dart';
 import 'package:dawri/features/product_details/ui/product_details_screen.dart';
 import 'package:dawri/features/purchase_history/ui/purchase_history_screen.dart';
 import 'package:dawri/features/reserve/ui/reserve_now_screen.dart';
+import 'package:dawri/features/search/ui/search_screen.dart';
 import 'package:dawri/features/tickets/ui/tickets_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
@@ -73,6 +74,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute( page: PurchaseHistoryRoute.page),
     AutoRoute( page: CreateContractRoute.page),
     AutoRoute( page: LanguageRoute.page),
+    AutoRoute( page: SearchRoute.page),
     AutoRoute( page: LoginRoute.page),
     AutoRoute(path: '*', page: NotFoundRoute.page), // this must be last route
 
