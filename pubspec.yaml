@@ -27,6 +27,9 @@ dependencies:
   # iOS icons
   cupertino_icons: ^1.0.8
 
+  file_picker: ^8.1.2
+  video_player: ^2.9.2
+
   # Firebase core setup
   firebase_core: ^4.11.0
   # Push notifications

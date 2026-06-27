@@ -1,5 +1,7 @@
 // lib/features/partners/ui/partners_screen.dart
 import 'package:auto_route/auto_route.dart';
+import 'package:dawri/core/router/app_router.dart';
+import 'package:dawri/core/utils/common_widgets/on_tap.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -320,150 +322,155 @@ class _ParticipantCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: AppColors.black.withOpacity(0.01)),
-        boxShadow: [
-          BoxShadow(color: AppColors.black.withOpacity(0.02), blurRadius: 15, offset: const Offset(0, 4)),
-        ],
-      ),
-      child: Padding(
-        padding: 15.w.padAll,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16.r),
-              child: Container(
-                decoration: BoxDecoration(border: Border.all(color: AppColors.slate100, width: 2)),
-                child: Image.network(
-                  participant.imageUrl,
-                  width: 75.w,
-                  height: 75.w,
-                  fit: BoxFit.cover,
+    return OnTap(
+      onTap: (){
+        PartnerDetailsRoute().push(context);
+      },
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(18.r),
+          border: Border.all(color: AppColors.black.withOpacity(0.01)),
+          boxShadow: [
+            BoxShadow(color: AppColors.black.withOpacity(0.02), blurRadius: 15, offset: const Offset(0, 4)),
+          ],
+        ),
+        child: Padding(
+          padding: 15.w.padAll,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16.r),
+                child: Container(
+                  decoration: BoxDecoration(border: Border.all(color: AppColors.slate100, width: 2)),
+                  child: Image.network(
+                    participant.imageUrl,
+                    width: 75.w,
+                    height: 75.w,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-            ),
-            15.w.sizedWidth,
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          participant.nameKey.tr(),
-                          style: AppTextTheme.bodyLargeSemiBold(context).copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textDark,
+              15.w.sizedWidth,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            participant.nameKey.tr(),
+                            style: AppTextTheme.bodyLargeSemiBold(context).copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textDark,
+                            ),
                           ),
                         ),
-                      ),
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: AppColors.ratingAmberBg,
-                          borderRadius: BorderRadius.circular(10.r),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
-                          child: Row(
-                            children: [
-                              FaIcon(FontAwesomeIcons.star, size: 11.sp, color: AppColors.ratingAmber),
-                              4.w.sizedWidth,
-                              Text(
-                                participant.rating.toString(),
-                                style: AppTextTheme.bodyXSmall(context).copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.ratingAmber,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  4.h.sizedHeight,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween ,
-                    children: [
-                      Text(
-                        participant.roleKey.tr(),
-                        style: AppTextTheme.bodyXSmall(context).copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                      10.w.sizedWidth,
-                      GestureDetector(
-                        onTap: () {},
-                        child: DecoratedBox(
+                        DecoratedBox(
                           decoration: BoxDecoration(
-                            color: participant.actionColor,
+                            color: AppColors.ratingAmberBg,
                             borderRadius: BorderRadius.circular(10.r),
-                            boxShadow: [
-                              BoxShadow(color: participant.actionColor.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4)),
-                            ],
                           ),
-                          child: SizedBox(
-                            width: 36.w,
-                            height: 36.w,
-                            child: Center(
-                              child: FaIcon(participant.actionIcon, size: 14.sp, color: AppColors.white),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                            child: Row(
+                              children: [
+                                FaIcon(FontAwesomeIcons.star, size: 11.sp, color: AppColors.ratingAmber),
+                                4.w.sizedWidth,
+                                Text(
+                                  participant.rating.toString(),
+                                  style: AppTextTheme.bodyXSmall(context).copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.ratingAmber,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  8.h.sizedHeight,
-                  Wrap(
-                    spacing: 6.w,
-                    runSpacing: 6.h,
-                    children: [
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: participant.sportTag.color.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8.r),
+                      ],
+                    ),
+                    4.h.sizedHeight,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween ,
+                      children: [
+                        Text(
+                          participant.roleKey.tr(),
+                          style: AppTextTheme.bodyXSmall(context).copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textMuted,
+                          ),
                         ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                          child: Text(
-                            participant.sportTag.labelKey.tr(),
-                            style: AppTextTheme.bodyXXSmall(context).copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: participant.sportTag.color,
+                        10.w.sizedWidth,
+                        GestureDetector(
+                          onTap: () {},
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: participant.actionColor,
+                              borderRadius: BorderRadius.circular(10.r),
+                              boxShadow: [
+                                BoxShadow(color: participant.actionColor.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4)),
+                              ],
+                            ),
+                            child: SizedBox(
+                              width: 36.w,
+                              height: 36.w,
+                              child: Center(
+                                child: FaIcon(participant.actionIcon, size: 14.sp, color: AppColors.white),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: AppColors.slate100,
-                          borderRadius: BorderRadius.circular(8.r),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                          child: Text(
-                            participant.statusKey.tr(),
-                            style: AppTextTheme.bodyXXSmall(context).copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textMuted,
+                      ],
+                    ),
+                    8.h.sizedHeight,
+                    Wrap(
+                      spacing: 6.w,
+                      runSpacing: 6.h,
+                      children: [
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: participant.sportTag.color.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                            child: Text(
+                              participant.sportTag.labelKey.tr(),
+                              style: AppTextTheme.bodyXXSmall(context).copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: participant.sportTag.color,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: AppColors.slate100,
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                            child: Text(
+                              participant.statusKey.tr(),
+                              style: AppTextTheme.bodyXXSmall(context).copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textMuted,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-
-          ],
+      
+            ],
+          ),
         ),
       ),
     );

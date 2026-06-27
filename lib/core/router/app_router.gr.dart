@@ -216,6 +216,38 @@ class ImageViewerRouteArgs {
 }
 
 /// generated route for
+/// [InvitePlayerScreen]
+class InvitePlayerRoute extends PageRouteInfo<void> {
+  const InvitePlayerRoute({List<PageRouteInfo>? children})
+    : super(InvitePlayerRoute.name, initialChildren: children);
+
+  static const String name = 'InvitePlayerRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const InvitePlayerScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [ManageTeamScreen]
+class ManageTeamRoute extends PageRouteInfo<void> {
+  const ManageTeamRoute({List<PageRouteInfo>? children})
+    : super(ManageTeamRoute.name, initialChildren: children);
+
+  static const String name = 'ManageTeamRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ManageTeamScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [NoInternetSplashScreen]
 class NoInternetSplashRoute extends PageRouteInfo<void> {
   const NoInternetSplashRoute({List<PageRouteInfo>? children})
@@ -311,6 +343,38 @@ class OfflineInternetRouteArgs {
 
   @override
   int get hashCode => key.hashCode ^ currentRoute.hashCode;
+}
+
+/// generated route for
+/// [PartnerChatScreen]
+class PartnerChatRoute extends PageRouteInfo<void> {
+  const PartnerChatRoute({List<PageRouteInfo>? children})
+    : super(PartnerChatRoute.name, initialChildren: children);
+
+  static const String name = 'PartnerChatRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const PartnerChatScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [PartnerDetailsScreen]
+class PartnerDetailsRoute extends PageRouteInfo<void> {
+  const PartnerDetailsRoute({List<PageRouteInfo>? children})
+    : super(PartnerDetailsRoute.name, initialChildren: children);
+
+  static const String name = 'PartnerDetailsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const PartnerDetailsScreen();
+    },
+  );
 }
 
 /// generated route for

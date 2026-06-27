@@ -299,7 +299,7 @@ class _AccountMenuSection extends StatelessWidget {
       offset: Offset(0, -10.h),
       child: _MenuCard(
         items: AccountMockData.accountMenu,
-        onTap: (_) {},
+
       ),
     );
   }
@@ -320,7 +320,6 @@ class _SettingsMenuSection extends StatelessWidget {
             items: AccountMockData.settingsMenu,
             notificationsEnabled: state.notificationsEnabled,
             onToggleNotifications: context.read<AccountCubit>().toggleNotifications,
-            onTap: (_) {},
           );
         },
       ),
@@ -333,11 +332,9 @@ class _MenuCard extends StatelessWidget {
   final List<MenuItemModel> items;
   final bool notificationsEnabled;
   final ValueChanged<bool>? onToggleNotifications;
-  final ValueChanged<int> onTap;
 
   const _MenuCard({
     required this.items,
-    required this.onTap,
     this.notificationsEnabled = false,
     this.onToggleNotifications,
   });
@@ -365,7 +362,7 @@ class _MenuCard extends StatelessWidget {
           return Column(
             children: [
               GestureDetector(
-                onTap: item.type == MenuItemType.toggle ? null : () => onTap(i),
+                onTap: item.type == MenuItemType.toggle ? null : () => item.onTap(i),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
                   child: Row(

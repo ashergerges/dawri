@@ -40,6 +40,7 @@ class AppColors {
   static const Color purple = Color(0xFF8B5CF6);
   static const Color pink = Color(0xFFEC4899);
   static const Color teal = Color(0xFF14B8A6);
+  static const Color whatsappGreen = Color(0xFF25D366);
 
   // ─── Banner Colors ────────────────────────────────────────────
   static const Color bannerStart = Color(0xFF1E293B);

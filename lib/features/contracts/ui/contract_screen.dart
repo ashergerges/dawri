@@ -1,5 +1,6 @@
 // lib/features/contracts/ui/contracts_screen.dart
 import 'package:auto_route/auto_route.dart';
+import 'package:dawri/core/router/app_router.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -583,7 +584,9 @@ class _ActiveContractCard extends StatelessWidget {
                 icon: FontAwesomeIcons.commentDots,
                 bg: AppColors.chat,
                 fg: AppColors.blue500,
-                onTap: () {},
+                onTap: () {
+                  PartnerChatRoute().push(context);
+                },
                 iconOnly: true,
               ),
             ),
