@@ -41,6 +41,11 @@ class AppColors {
   static const Color pink = Color(0xFFEC4899);
   static const Color teal = Color(0xFF14B8A6);
   static const Color whatsappGreen = Color(0xFF25D366);
+  static const Color accentLime = Color(0xFF95C11F);
+
+  // ─── Login Hero ───────────────────────────────────────────────
+  static const Color heroDarkGreen = Color(0xFF03443A);
+  static const Color heroLightGreen = Color(0xFF0B6C5D);
 
   // ─── Banner Colors ────────────────────────────────────────────
   static const Color bannerStart = Color(0xFF1E293B);

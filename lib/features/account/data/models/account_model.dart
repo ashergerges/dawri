@@ -52,7 +52,7 @@ class AccountMockData {
       iconBg: AppColors.secondary50,
       labelKey: LocaleKeys.accountPurchaseHistory,
   onTap: (_){
-  //
+    getIt<AppRouter>().push(PurchaseHistoryRoute());
   }
     ),
   ];
@@ -83,8 +83,8 @@ class AccountMockData {
       iconBg: AppColors.slate100,
       labelKey: LocaleKeys.accountLanguage,
   onTap: (_){
-  //
-  }
+    getIt<AppRouter>().push(LanguageRoute());
+      }
     ),
   ];
 }

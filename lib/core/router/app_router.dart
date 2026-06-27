@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/services/ui/offline_internet_screen.dart';
 import 'package:dawri/core/services/ui/server_error_screen.dart';
+import 'package:dawri/features/account/ui/language_screen.dart';
 import 'package:dawri/features/cart/ui/cart_screen.dart';
 import 'package:dawri/features/challenges/ui/challenges_screen.dart';
 import 'package:dawri/features/championship_add_team/ui/championship_add_team_screen.dart';
@@ -8,12 +9,15 @@ import 'package:dawri/features/championship_control/ui/championship_control_scre
 import 'package:dawri/features/championship_register/ui/championship_register_screen.dart';
 import 'package:dawri/features/contracts/ui/contract_screen.dart';
 import 'package:dawri/features/create_championship/ui/create_championship_screen.dart';
+import 'package:dawri/features/create_contract/ui/create_contract_screen.dart';
 import 'package:dawri/features/invite_player/ui/invite_player_screen.dart';
+import 'package:dawri/features/login/ui/login_screen.dart';
 import 'package:dawri/features/manage_team/ui/manage_team_screen.dart';
 import 'package:dawri/features/partner_chat/ui/partner_chat_screen.dart';
 import 'package:dawri/features/partner_details/ui/partner_details_screen.dart';
 import 'package:dawri/features/partners/ui/partners_screen.dart';
 import 'package:dawri/features/product_details/ui/product_details_screen.dart';
+import 'package:dawri/features/purchase_history/ui/purchase_history_screen.dart';
 import 'package:dawri/features/reserve/ui/reserve_now_screen.dart';
 import 'package:dawri/features/tickets/ui/tickets_screen.dart';
 import 'package:flutter/material.dart';
@@ -66,6 +70,10 @@ class AppRouter extends RootStackRouter {
     AutoRoute( page: PartnerDetailsRoute.page),
     AutoRoute( page: ManageTeamRoute.page),
     AutoRoute( page: InvitePlayerRoute.page),
+    AutoRoute( page: PurchaseHistoryRoute.page),
+    AutoRoute( page: CreateContractRoute.page),
+    AutoRoute( page: LanguageRoute.page),
+    AutoRoute( page: LoginRoute.page),
     AutoRoute(path: '*', page: NotFoundRoute.page), // this must be last route
 
   ];

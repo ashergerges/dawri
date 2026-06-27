@@ -1,7 +1,14 @@
 
 // lib/features/account/ui/account_screen.dart
 import 'package:auto_route/auto_route.dart';
+import 'package:dawri/core/interfaces/i_local_preference.dart';
+import 'package:dawri/core/router/app_router.dart';
+import 'package:dawri/core/services/dialogs/message_service.dart';
+import 'package:dawri/core/utils/common_widgets/app_button.dart';
+import 'package:dawri/core/utils/common_widgets/on_tap.dart';
+import 'package:dawri/main_common.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -428,8 +435,66 @@ class _LogoutButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 20.h),
-      child: GestureDetector(
-        onTap: () => context.read<AccountCubit>().logout(),
+      child: OnTap(
+        onTap: (){
+          MessageService.showNewCustomDialog(
+            context,
+            child: Padding(
+              padding: 16.padAll,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  30.verticalSpace,
+                  Text(
+                    LocaleKeys.logoutTitle.tr(),
+                    style: AppTextTheme.bodyLarge(context).copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  8.verticalSpace,
+                  Text(
+                    LocaleKeys.logoutBody.tr(),
+                    style: AppTextTheme.bodyXSmall(context).copyWith(
+                      color: AppColors.neutral400,
+                    ),
+                  ),
+                  15.verticalSpace,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AppButton(
+                          text: LocaleKeys.accountLogout.tr(),
+                          background: AppColors.white,
+                          textColor: AppColors.error,
+                          onTap: () {
+                            // FirebaseMessaging.instance.deleteToken();
+                            getIt<ILocalPreference>()
+                                .removeAuthPrefs()
+                                .then((onValue) {
+                              context.router.replaceAll([
+                                LoginRoute(),
+                              ], updateExistingRoutes: false);
+                            });
+                          },
+                        ),
+                      ),
+                      10.horizontalSpace,
+                      Expanded(
+                        child: AppButton(
+                          text: LocaleKeys.championshipControlCancel.tr(),
+                          onTap: () {
+                            context.router.back();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  20.verticalSpace,
+                ],
+              ),
+            ),
+          );
+        },
         child: Container(
           width: double.infinity,
           padding: EdgeInsets.symmetric(vertical: 15.h),

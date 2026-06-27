@@ -123,6 +123,22 @@ class CreateChampionshipRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [CreateContractScreen]
+class CreateContractRoute extends PageRouteInfo<void> {
+  const CreateContractRoute({List<PageRouteInfo>? children})
+    : super(CreateContractRoute.name, initialChildren: children);
+
+  static const String name = 'CreateContractRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const CreateContractScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [HomeBottomTabsScreen]
 class HomeBottomTabsRoute extends PageRouteInfo<HomeBottomTabsRouteArgs> {
   HomeBottomTabsRoute({Key? key, int index = 0, List<PageRouteInfo>? children})
@@ -227,6 +243,38 @@ class InvitePlayerRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const InvitePlayerScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [LanguageScreen]
+class LanguageRoute extends PageRouteInfo<void> {
+  const LanguageRoute({List<PageRouteInfo>? children})
+    : super(LanguageRoute.name, initialChildren: children);
+
+  static const String name = 'LanguageRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const LanguageScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [LoginScreen]
+class LoginRoute extends PageRouteInfo<void> {
+  const LoginRoute({List<PageRouteInfo>? children})
+    : super(LoginRoute.name, initialChildren: children);
+
+  static const String name = 'LoginRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const LoginScreen();
     },
   );
 }
@@ -405,6 +453,22 @@ class ProductDetailsRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const ProductDetailsScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [PurchaseHistoryScreen]
+class PurchaseHistoryRoute extends PageRouteInfo<void> {
+  const PurchaseHistoryRoute({List<PageRouteInfo>? children})
+    : super(PurchaseHistoryRoute.name, initialChildren: children);
+
+  static const String name = 'PurchaseHistoryRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const PurchaseHistoryScreen();
     },
   );
 }

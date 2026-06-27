@@ -597,8 +597,10 @@ class _ActionBottomBar extends StatelessWidget {
             ),
             12.w.sizedWidth,
             Expanded(
-              child: GestureDetector(
-                onTap: () {},
+              child: OnTap(
+                onTap: () {
+                  CreateContractRoute().push(context);
+                },
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: AppColors.primary,

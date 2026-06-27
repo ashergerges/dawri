@@ -52,7 +52,7 @@ class SplashCubit extends Cubit<SplashState> {
       return getIt<AppRouter>().replaceAll([const NoInternetSplashRoute()], updateExistingRoutes: false);
     }
     getIt<AppRouter>().replaceAll([
- HomeBottomTabsRoute()
+      LoginRoute()
     ], updateExistingRoutes: false);
   }
 }
