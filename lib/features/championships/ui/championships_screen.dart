@@ -431,217 +431,222 @@ class _TournamentCard extends StatelessWidget {
     final isOpenStatus = data.statusKey == LocaleKeys.championshipsRegisterOpen;
     final isOngoing = data.statusKey == LocaleKeys.championshipsNow;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: AppColors.slate200),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withOpacity(0.03),
-            blurRadius: 15,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20.r),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ─── Image & Badges ────────────────────────────────────────────
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                CustomNetworkImage(
-                  imageUrl: data.image,
-                  width: double.infinity,
-                  height: 140.h,
-                  fit: BoxFit.cover,
-                ),
-                // Status badge (top right)
-                Positioned(
-                  top: 15.h,
-                  right: 15.w,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-                    decoration: BoxDecoration(
-                      color: isOpenStatus
-                          ? AppColors.white.withOpacity(0.9)
-                          : AppColors.warning.withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        FaIcon(
-                          data.statusIcon,
-                          size: 10.sp,
-                          color: data.statusColor,
-                        ),
-                        4.w.sizedWidth,
-                        Text(
-                          data.statusKey.tr(),
-                          style: AppTextTheme.bodyXXSmall(context).copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: isOpenStatus
-                                ? AppColors.primary
-                                : AppColors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                // Sport icon (bottom left - VISIBLE AT END)
-                Positioned(
-                  bottom: -15.h,
-                  left: 20.w,
-                  child: Container(
-                    width: 45.w,
-                    height: 45.w,
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      borderRadius: BorderRadius.circular(12.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: FaIcon(
-                        data.sportIcon,
-                        size: 20.sp,
-                        color: data.sportColor,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+    return OnTap(
+      onTap: (){
+        ChampProfileRoute().push(context);
+      },
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(color: AppColors.slate200),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withOpacity(0.03),
+              blurRadius: 15,
+              offset: const Offset(0, 4),
             ),
-            // ─── Info ──────────────────────────────────────────────────────
-            Padding(
-              padding: EdgeInsets.fromLTRB(15.w, 20.h + 8.h, 15.w, 15.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20.r),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ─── Image & Badges ────────────────────────────────────────────
+              Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  Text(
-                    data.title,
-                    style: AppTextTheme.bodySmallSemiBold(context).copyWith(
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.textDark,
-                      fontSize: 16.sp,
-                    ),
+                  CustomNetworkImage(
+                    imageUrl: data.image,
+                    width: double.infinity,
+                    height: 140.h,
+                    fit: BoxFit.cover,
                   ),
-                  12.h.sizedHeight,
-                  Column(
-                    children: [
-                      _DetailRow(
-                        icon: FontAwesomeIcons.calendar,
-                        text: '${LocaleKeys.championshipsStarts.tr()} ${data.date}',
+                  // Status badge (top right)
+                  Positioned(
+                    top: 15.h,
+                    right: 15.w,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                      decoration: BoxDecoration(
+                        color: isOpenStatus
+                            ? AppColors.white.withOpacity(0.9)
+                            : AppColors.warning.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(10.r),
                       ),
-                      6.h.sizedHeight,
-                      _DetailRow(
-                        icon: FontAwesomeIcons.locationDot,
-                        text: data.location,
-                      ),
-                      if (data.teams.isNotEmpty) ...[
-                        6.h.sizedHeight,
-                        _DetailRow(
-                          icon: isOngoing
-                              ? FontAwesomeIcons.clock
-                              : FontAwesomeIcons.users,
-                          text: isOngoing
-                              ? '${LocaleKeys.championshipsCurrentRound.tr()} ${data.teams}'
-                              : '${LocaleKeys.championshipsTeams.tr()} ${data.teams}',
-                        ),
-                      ],
-                    ],
-                  ),
-                  15.h.sizedHeight,
-                  DottedLine(
-                    dashLength: 5,
-                    dashGapLength: 4,
-                    lineThickness: 1,
-                    dashColor: AppColors.slate100,
-                  ),
-                  15.h.sizedHeight,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            isOngoing
-                                ? LocaleKeys.championshipsPrizeFirst.tr()
-                                : LocaleKeys.championshipsPrize.tr(),
-                            style: AppTextTheme.bodyXXSmall(context).copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textMuted,
-                            ),
+                          FaIcon(
+                            data.statusIcon,
+                            size: 10.sp,
+                            color: data.statusColor,
                           ),
+                          4.w.sizedWidth,
                           Text(
-                            data.prize,
-                            style: AppTextTheme.bodySmallSemiBold(context).copyWith(
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.textDark,
+                            data.statusKey.tr(),
+                            style: AppTextTheme.bodyXXSmall(context).copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: isOpenStatus
+                                  ? AppColors.primary
+                                  : AppColors.white,
                             ),
                           ),
                         ],
                       ),
-                      OnTap(
-                        onTap: (){
-                          if(data.status==1){
-                            return ChampionshipRegisterRoute().push(context);
-                          }
-                          else if(data.status==2){
-                            ChampionshipAddTeamRoute().push(context);
-
-                          }
-                          else{
-                          ChampionshipControlRoute().push(context);
-
-                          }
-                          //
-                        },
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: data.isPrimary
-                                ? AppColors.primary
-                                : AppColors.primaryLight.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12.r),
-                            boxShadow: data.isPrimary
-                                ? [
-                              BoxShadow(
-                                color: AppColors.primary.withOpacity(0.2),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ]
-                                : null,
+                    ),
+                  ),
+                  // Sport icon (bottom left - VISIBLE AT END)
+                  Positioned(
+                    bottom: -15.h,
+                    left: 20.w,
+                    child: Container(
+                      width: 45.w,
+                      height: 45.w,
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(12.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
                           ),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-                            child: Text(
-                              data.buttonKey.tr(),
-                              style: AppTextTheme.bodyXSmall(context).copyWith(
-                                fontWeight: FontWeight.w800,
-                                color: data.isPrimary ? AppColors.white : AppColors.primaryLight,
+                        ],
+                      ),
+                      child: Center(
+                        child: FaIcon(
+                          data.sportIcon,
+                          size: 20.sp,
+                          color: data.sportColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              // ─── Info ──────────────────────────────────────────────────────
+              Padding(
+                padding: EdgeInsets.fromLTRB(15.w, 20.h + 8.h, 15.w, 15.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data.title,
+                      style: AppTextTheme.bodySmallSemiBold(context).copyWith(
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.textDark,
+                        fontSize: 16.sp,
+                      ),
+                    ),
+                    12.h.sizedHeight,
+                    Column(
+                      children: [
+                        _DetailRow(
+                          icon: FontAwesomeIcons.calendar,
+                          text: '${LocaleKeys.championshipsStarts.tr()} ${data.date}',
+                        ),
+                        6.h.sizedHeight,
+                        _DetailRow(
+                          icon: FontAwesomeIcons.locationDot,
+                          text: data.location,
+                        ),
+                        if (data.teams.isNotEmpty) ...[
+                          6.h.sizedHeight,
+                          _DetailRow(
+                            icon: isOngoing
+                                ? FontAwesomeIcons.clock
+                                : FontAwesomeIcons.users,
+                            text: isOngoing
+                                ? '${LocaleKeys.championshipsCurrentRound.tr()} ${data.teams}'
+                                : '${LocaleKeys.championshipsTeams.tr()} ${data.teams}',
+                          ),
+                        ],
+                      ],
+                    ),
+                    15.h.sizedHeight,
+                    DottedLine(
+                      dashLength: 5,
+                      dashGapLength: 4,
+                      lineThickness: 1,
+                      dashColor: AppColors.slate100,
+                    ),
+                    15.h.sizedHeight,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isOngoing
+                                  ? LocaleKeys.championshipsPrizeFirst.tr()
+                                  : LocaleKeys.championshipsPrize.tr(),
+                              style: AppTextTheme.bodyXXSmall(context).copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textMuted,
+                              ),
+                            ),
+                            Text(
+                              data.prize,
+                              style: AppTextTheme.bodySmallSemiBold(context).copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.textDark,
+                              ),
+                            ),
+                          ],
+                        ),
+                        OnTap(
+                          onTap: (){
+                            if(data.status==1){
+                              return ChampionshipRegisterRoute().push(context);
+                            }
+                            else if(data.status==2){
+                              ChampionshipAddTeamRoute().push(context);
+
+                            }
+                            else{
+                            ChampionshipControlRoute().push(context);
+
+                            }
+                            //
+                          },
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: data.isPrimary
+                                  ? AppColors.primary
+                                  : AppColors.primaryLight.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12.r),
+                              boxShadow: data.isPrimary
+                                  ? [
+                                BoxShadow(
+                                  color: AppColors.primary.withOpacity(0.2),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ]
+                                  : null,
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+                              child: Text(
+                                data.buttonKey.tr(),
+                                style: AppTextTheme.bodyXSmall(context).copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: data.isPrimary ? AppColors.white : AppColors.primaryLight,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

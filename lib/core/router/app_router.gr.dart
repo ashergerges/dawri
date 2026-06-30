@@ -43,6 +43,22 @@ class ChallengesRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ChampProfileScreen]
+class ChampProfileRoute extends PageRouteInfo<void> {
+  const ChampProfileRoute({List<PageRouteInfo>? children})
+    : super(ChampProfileRoute.name, initialChildren: children);
+
+  static const String name = 'ChampProfileRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ChampProfileScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [ChampionshipAddTeamScreen]
 class ChampionshipAddTeamRoute extends PageRouteInfo<void> {
   const ChampionshipAddTeamRoute({List<PageRouteInfo>? children})
@@ -344,6 +360,22 @@ class NotificationRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [NotificationsScreen]
+class NotificationsRoute extends PageRouteInfo<void> {
+  const NotificationsRoute({List<PageRouteInfo>? children})
+    : super(NotificationsRoute.name, initialChildren: children);
+
+  static const String name = 'NotificationsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const NotificationsScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [OfflineInternetScreen]
 class OfflineInternetRoute extends PageRouteInfo<OfflineInternetRouteArgs> {
   OfflineInternetRoute({
@@ -569,6 +601,22 @@ class SplashRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [StadiumProfileScreen]
+class StadiumProfileRoute extends PageRouteInfo<void> {
+  const StadiumProfileRoute({List<PageRouteInfo>? children})
+    : super(StadiumProfileRoute.name, initialChildren: children);
+
+  static const String name = 'StadiumProfileRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const StadiumProfileScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [TicketsScreen]
 class TicketsRoute extends PageRouteInfo<void> {
   const TicketsRoute({List<PageRouteInfo>? children})
@@ -580,6 +628,22 @@ class TicketsRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const TicketsScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [UpdateProfileScreen]
+class UpdateProfileRoute extends PageRouteInfo<void> {
+  const UpdateProfileRoute({List<PageRouteInfo>? children})
+    : super(UpdateProfileRoute.name, initialChildren: children);
+
+  static const String name = 'UpdateProfileRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const UpdateProfileScreen();
     },
   );
 }

@@ -34,7 +34,8 @@ class AccountMockData {
       iconBg: AppColors.slate100,
       labelKey: LocaleKeys.accountEditProfile,
       onTap: (_){
-      //
+        getIt<AppRouter>().push(UpdateProfileRoute());
+
       }
     ),
     MenuItemModel(

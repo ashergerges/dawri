@@ -161,36 +161,41 @@ class _NotificationButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 45.w,
-      height: 45.w,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.white.withOpacity(0.15),
-          border: Border.all(color: AppColors.white.withOpacity(0.2)),
-          shape: BoxShape.circle,
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            const FaIcon(
-              FontAwesomeIcons.bell,
-              color: AppColors.white,
-              size: 20,
-            ),
-            Positioned(
-              top: 10,
-              right: 10,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: AppColors.error,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.primary, width: 1.5),
-                ),
-                child: SizedBox(width: 8.w, height: 8.w),
+    return OnTap(
+      onTap: (){
+        NotificationsRoute().push(context);
+      },
+      child: SizedBox(
+        width: 45.w,
+        height: 45.w,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.white.withOpacity(0.15),
+            border: Border.all(color: AppColors.white.withOpacity(0.2)),
+            shape: BoxShape.circle,
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              const FaIcon(
+                FontAwesomeIcons.bell,
+                color: AppColors.white,
+                size: 20,
               ),
-            ),
-          ],
+              Positioned(
+                top: 10,
+                right: 10,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.error,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.primary, width: 1.5),
+                  ),
+                  child: SizedBox(width: 8.w, height: 8.w),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

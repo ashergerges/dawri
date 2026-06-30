@@ -4,6 +4,7 @@ import 'package:dawri/core/services/ui/server_error_screen.dart';
 import 'package:dawri/features/account/ui/language_screen.dart';
 import 'package:dawri/features/cart/ui/cart_screen.dart';
 import 'package:dawri/features/challenges/ui/challenges_screen.dart';
+import 'package:dawri/features/champ_profile/ui/champ_profile_screen.dart';
 import 'package:dawri/features/championship_add_team/ui/championship_add_team_screen.dart';
 import 'package:dawri/features/championship_control/ui/championship_control_screen.dart';
 import 'package:dawri/features/championship_register/ui/championship_register_screen.dart';
@@ -13,6 +14,7 @@ import 'package:dawri/features/create_contract/ui/create_contract_screen.dart';
 import 'package:dawri/features/invite_player/ui/invite_player_screen.dart';
 import 'package:dawri/features/login/ui/login_screen.dart';
 import 'package:dawri/features/manage_team/ui/manage_team_screen.dart';
+import 'package:dawri/features/notifications/ui/notifications_screen.dart';
 import 'package:dawri/features/partner_chat/ui/partner_chat_screen.dart';
 import 'package:dawri/features/partner_details/ui/partner_details_screen.dart';
 import 'package:dawri/features/partners/ui/partners_screen.dart';
@@ -20,7 +22,9 @@ import 'package:dawri/features/product_details/ui/product_details_screen.dart';
 import 'package:dawri/features/purchase_history/ui/purchase_history_screen.dart';
 import 'package:dawri/features/reserve/ui/reserve_now_screen.dart';
 import 'package:dawri/features/search/ui/search_screen.dart';
+import 'package:dawri/features/stadium_profile/ui/stadium_profile_screen.dart';
 import 'package:dawri/features/tickets/ui/tickets_screen.dart';
+import 'package:dawri/features/update_profile/ui/update_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:dawri/features/notification/ui/notification_screen.dart';
@@ -76,6 +80,10 @@ class AppRouter extends RootStackRouter {
     AutoRoute( page: LanguageRoute.page),
     AutoRoute( page: SearchRoute.page),
     AutoRoute( page: LoginRoute.page),
+    AutoRoute( page: UpdateProfileRoute.page),
+    AutoRoute( page: StadiumProfileRoute.page),
+    AutoRoute( page: ChampProfileRoute.page),
+    AutoRoute( page: NotificationsRoute.page),
     AutoRoute(path: '*', page: NotFoundRoute.page), // this must be last route
 
   ];

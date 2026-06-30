@@ -266,132 +266,137 @@ class _StadiumCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(22.r),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withOpacity(0.04),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _StadiumImage(stadium: stadium),
-          Padding(
-            padding: 16.w.padAll,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            stadium.title,
-                            style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.textDark,
-                            ),
-                          ),
-                          6.h.sizedHeight,
-                          Row(
-                            children: [
-                              FaIcon(FontAwesomeIcons.locationDot,
-                                  size: 11.sp, color: AppColors.textMuted),
-                              4.w.sizedWidth,
-                              Expanded(
-                                child: Text(
-                                  stadium.location,
-                                  style: AppTextTheme.bodyXSmall(context).copyWith(
-                                    color: AppColors.textMuted,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+    return OnTap(
+      onTap: (){
+        StadiumProfileRoute().push(context);
+      },
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(22.r),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withOpacity(0.04),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _StadiumImage(stadium: stadium),
+            Padding(
+              padding: 16.w.padAll,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              stadium.title,
+                              style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.textDark,
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    8.w.sizedWidth,
-                    _RatingBadge(rating: stadium.rating),
-                  ],
-                ),
-                12.h.sizedHeight,
-                _AmenitiesRow(amenities: stadium.amenities),
-                14.h.sizedHeight,
-                DottedLine(
-                  dashLength: 5,
-                  dashGapLength: 4,
-                  lineThickness: 1,
-                  dashColor: AppColors.slate100,
-                ),
-                14.h.sizedHeight,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          LocaleKeys.stadiumsPriceFrom.tr(),
-                          style: AppTextTheme.bodyXXSmall(context).copyWith(
-                            color: AppColors.textMuted,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        2.h.sizedHeight,
-                        Text(
-                          stadium.price,
-                          style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    OnTap(
-                      onTap: () {ReserveNowRoute().push(context);},
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(14.r),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary.withOpacity(0.2),
-                              blurRadius: 15,
-                              offset: const Offset(0, 6),
+                            ),
+                            6.h.sizedHeight,
+                            Row(
+                              children: [
+                                FaIcon(FontAwesomeIcons.locationDot,
+                                    size: 11.sp, color: AppColors.textMuted),
+                                4.w.sizedWidth,
+                                Expanded(
+                                  child: Text(
+                                    stadium.location,
+                                    style: AppTextTheme.bodyXSmall(context).copyWith(
+                                      color: AppColors.textMuted,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 22.w, vertical: 12.h),
-                          child: Text(
-                            LocaleKeys.stadiumsBookNow.tr(),
-                            style: AppTextTheme.bodyXSmall(context).copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.white,
+                      ),
+                      8.w.sizedWidth,
+                      _RatingBadge(rating: stadium.rating),
+                    ],
+                  ),
+                  12.h.sizedHeight,
+                  _AmenitiesRow(amenities: stadium.amenities),
+                  14.h.sizedHeight,
+                  DottedLine(
+                    dashLength: 5,
+                    dashGapLength: 4,
+                    lineThickness: 1,
+                    dashColor: AppColors.slate100,
+                  ),
+                  14.h.sizedHeight,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            LocaleKeys.stadiumsPriceFrom.tr(),
+                            style: AppTextTheme.bodyXXSmall(context).copyWith(
+                              color: AppColors.textMuted,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          2.h.sizedHeight,
+                          Text(
+                            stadium.price,
+                            style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      OnTap(
+                        onTap: () {ReserveNowRoute().push(context);},
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(14.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withOpacity(0.2),
+                                blurRadius: 15,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 22.w, vertical: 12.h),
+                            child: Text(
+                              LocaleKeys.stadiumsBookNow.tr(),
+                              style: AppTextTheme.bodyXSmall(context).copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.white,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
