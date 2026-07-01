@@ -42,6 +42,7 @@ class AppColors {
   static const Color teal = Color(0xFF14B8A6);
   static const Color whatsappGreen = Color(0xFF25D366);
   static const Color accentLime = Color(0xFF95C11F);
+  static const Color visaBlue = Color(0xFF1D4ED8);
 
   // ─── Login Hero ───────────────────────────────────────────────
   static const Color heroDarkGreen = Color(0xFF03443A);

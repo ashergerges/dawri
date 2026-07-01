@@ -107,6 +107,38 @@ class ChampionshipRegisterRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ChargeWalletScreen]
+class ChargeWalletRoute extends PageRouteInfo<void> {
+  const ChargeWalletRoute({List<PageRouteInfo>? children})
+    : super(ChargeWalletRoute.name, initialChildren: children);
+
+  static const String name = 'ChargeWalletRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ChargeWalletScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [ContractDetailsScreen]
+class ContractDetailsRoute extends PageRouteInfo<void> {
+  const ContractDetailsRoute({List<PageRouteInfo>? children})
+    : super(ContractDetailsRoute.name, initialChildren: children);
+
+  static const String name = 'ContractDetailsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ContractDetailsScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [ContractsScreen]
 class ContractsRoute extends PageRouteInfo<void> {
   const ContractsRoute({List<PageRouteInfo>? children})
@@ -150,6 +182,22 @@ class CreateContractRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const CreateContractScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [HelpCenterScreen]
+class HelpCenterRoute extends PageRouteInfo<void> {
+  const HelpCenterRoute({List<PageRouteInfo>? children})
+    : super(HelpCenterRoute.name, initialChildren: children);
+
+  static const String name = 'HelpCenterRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const HelpCenterScreen();
     },
   );
 }

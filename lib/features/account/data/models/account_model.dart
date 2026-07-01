@@ -75,7 +75,7 @@ class AccountMockData {
       iconBg: AppColors.slate100,
       labelKey: LocaleKeys.accountHelpCenter,
   onTap: (_){
-  //
+    getIt<AppRouter>().push(HelpCenterRoute());
   }
     ),
     MenuItemModel(

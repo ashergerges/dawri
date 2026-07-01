@@ -8,9 +8,12 @@ import 'package:dawri/features/champ_profile/ui/champ_profile_screen.dart';
 import 'package:dawri/features/championship_add_team/ui/championship_add_team_screen.dart';
 import 'package:dawri/features/championship_control/ui/championship_control_screen.dart';
 import 'package:dawri/features/championship_register/ui/championship_register_screen.dart';
+import 'package:dawri/features/charge_wallet/ui/charge_wallet_screen.dart';
+import 'package:dawri/features/contract_details/ui/contract_details_screen.dart';
 import 'package:dawri/features/contracts/ui/contract_screen.dart';
 import 'package:dawri/features/create_championship/ui/create_championship_screen.dart';
 import 'package:dawri/features/create_contract/ui/create_contract_screen.dart';
+import 'package:dawri/features/help_center/ui/help_center_screen.dart';
 import 'package:dawri/features/invite_player/ui/invite_player_screen.dart';
 import 'package:dawri/features/login/ui/login_screen.dart';
 import 'package:dawri/features/manage_team/ui/manage_team_screen.dart';
@@ -84,6 +87,9 @@ class AppRouter extends RootStackRouter {
     AutoRoute( page: StadiumProfileRoute.page),
     AutoRoute( page: ChampProfileRoute.page),
     AutoRoute( page: NotificationsRoute.page),
+    AutoRoute( page: ContractDetailsRoute.page),
+    AutoRoute( page: ChargeWalletRoute.page),
+    AutoRoute( page: HelpCenterRoute.page),
     AutoRoute(path: '*', page: NotFoundRoute.page), // this must be last route
 
   ];

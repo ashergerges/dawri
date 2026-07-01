@@ -262,8 +262,10 @@ class _WalletCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                GestureDetector(
-                  onTap: () {},
+                OnTap(
+                  onTap: () {
+                    ChargeWalletRoute().push(context);
+                  },
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: AppColors.secondary50,

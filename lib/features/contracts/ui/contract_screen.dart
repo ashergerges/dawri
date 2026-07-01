@@ -571,7 +571,9 @@ class _ActiveContractCard extends StatelessWidget {
               icon: FontAwesomeIcons.fileInvoice,
               bg: AppColors.slate100,
               fg: AppColors.textDark,
-              onTap: () {},
+              onTap: () {
+                ContractDetailsRoute().push(context);
+              },
               flex: contract.hasChat ? 1 : 0,
               fillWidth: !contract.hasChat,
             ),
