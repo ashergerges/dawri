@@ -1,8 +1,10 @@
 // lib/features/home/ui/home_screen.dart
+import 'dart:developer';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
-import 'package:dawri/features/home/data/models/home_model.dart';
+import 'package:dawri/features/home/data/models/service_model.dart';
 import 'package:dawri/main_common.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -16,13 +18,14 @@ import 'package:dawri/core/utils/extensions/padding_extensions.dart';
 import 'package:dawri/core/utils/common_widgets/custom_network_image.dart';
 import 'package:dawri/features/home/cubit/home_cubit.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(create: (_) => HomeCubit(), child: const _HomeView());
+    return BlocProvider(create: (_) => HomeCubit()..getHome(), child: const _HomeView());
   }
 }
 
@@ -444,93 +447,123 @@ class _ServiceCell extends StatelessWidget {
 class _ProductsSection extends StatelessWidget {
   const _ProductsSection();
 
-  static const _products = [
-    (
-      url:
-          'https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=300&q=80',
-      title: 'تيشيرت رياضي أبيض',
-      price: '120 رس',
-    ),
-    (
-      url:
-          'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&q=80',
-      title: 'حذاء رياضي Pro',
-      price: '420 رس',
-    ),
-    (
-      url:
-          'https://images.unsplash.com/photo-1614632537190-23e4146777db?w=300&q=80',
-      title: 'كرة قدم أصلية',
-      price: '180 رس',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(
-            right: 20.w,
-            left: 20.w,
-            top: 28.h,
-            bottom: 15.h,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'أفضل المنتجات',
-                style: AppTextTheme.headingSmall(context).copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.textDark,
-                ),
-              ),
-              OnTap(
-                onTap: () {
-                  context.router.replaceAll([
-                    HomeBottomTabsRoute(index: 3),
-                  ], updateExistingRoutes: false);
-                },
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AppColors.secondary50,
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
-                      vertical: 4.h,
+    return BlocBuilder<HomeCubit, HomeState>(
+      buildWhen: (p, c) => p.status != c.status || p.products != c.products,
+      builder: (context, state) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(right: 20.w, left: 20.w, top: 28.h, bottom: 15.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'أفضل المنتجات',
+                    style: AppTextTheme.headingSmall(context).copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textDark,
                     ),
-                    child: Text(
-                      'عرض المتجر',
-                      style: AppTextTheme.bodyXSmall(context).copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.secondary,
+                  ),
+                  OnTap(
+                    onTap: () {
+                      context.router.replaceAll(
+                        [HomeBottomTabsRoute(index: 3)],
+                        updateExistingRoutes: false,
+                      );
+                    },
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppColors.secondary50,
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                        child: Text(
+                          'عرض المتجر',
+                          style: AppTextTheme.bodyXSmall(context).copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.secondary,
+                          ),
+                        ),
                       ),
                     ),
                   ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 200.h,
+              child: state.status == HomeStateStatus.loading()
+                  ? ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: 20.w.padHorizontal,
+                itemCount: 3,
+                separatorBuilder: (_, __) => 15.w.sizedWidth,
+                itemBuilder: (_, __) => const _ProductCardShimmer(),
+              )
+                  : ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: 20.w.padHorizontal,
+                itemCount: state.products.length,
+                separatorBuilder: (_, __) => 15.w.sizedWidth,
+                itemBuilder: (_, i) => _ProductCard(
+                  onTapAddedToCart: (){
+                    log("HIII");
+                    context.read<HomeCubit>().addedToCart(id:state.products[i].id??0);
+                  },
+                  imageUrl: state.products[i].image??"",
+                  title: state.products[i].name??"",
+                  price: '${state.products[i].price} ${LocaleKeys.walletSar.tr()}',
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ProductCardShimmer extends StatelessWidget {
+  const _ProductCardShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: AppColors.slate300.withOpacity(0.4),
+      highlightColor: AppColors.slate300.withOpacity(0.1),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(20.r),
         ),
-        SizedBox(
-          height: 200.h,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: 20.w.padHorizontal,
-            itemCount: _products.length,
-            separatorBuilder: (_, __) => 15.w.sizedWidth,
-            itemBuilder: (_, i) => _ProductCard(
-              imageUrl: _products[i].url,
-              title: _products[i].title,
-              price: _products[i].price,
+        child: SizedBox(
+          width: 145.w,
+          child: Padding(
+            padding: 10.w.padAll,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14.r),
+                  child: Container(
+                    width: double.infinity,
+                    height: 110.h,
+                    color: AppColors.white,
+                  ),
+                ),
+                10.h.sizedHeight,
+                Container(width: 90.w, height: 12.h, color: AppColors.white),
+                8.h.sizedHeight,
+                Container(width: 60.w, height: 12.h, color: AppColors.white),
+              ],
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }
@@ -539,11 +572,12 @@ class _ProductCard extends StatelessWidget {
   final String imageUrl;
   final String title;
   final String price;
+  final Function() onTapAddedToCart;
 
   const _ProductCard({
     required this.imageUrl,
     required this.title,
-    required this.price,
+    required this.price, required this.onTapAddedToCart,
   });
 
   @override
@@ -601,26 +635,29 @@ class _ProductCard extends StatelessWidget {
                         color: AppColors.primary,
                       ),
                     ),
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(10.r),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withOpacity(0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: SizedBox(
-                        width: 30.w,
-                        height: 30.w,
-                        child: Center(
-                          child: const FaIcon(
-                            FontAwesomeIcons.plus,
-                            color: AppColors.white,
-                            size: 14,
+                    OnTap(
+                      onTap: onTapAddedToCart,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(10.r),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: SizedBox(
+                          width: 30.w,
+                          height: 30.w,
+                          child: Center(
+                            child: const FaIcon(
+                              FontAwesomeIcons.plus,
+                              color: AppColors.white,
+                              size: 14,
+                            ),
                           ),
                         ),
                       ),
@@ -637,95 +674,124 @@ class _ProductCard extends StatelessWidget {
 }
 
 // ─── TICKETS ───────────────────────────────────────────────────────────────
-// ─── TICKETS ───────────────────────────────────────────────────────────────
 class _TicketsSection extends StatelessWidget {
   const _TicketsSection();
 
-  static const _tickets = [
-    (
-      teams: 'أكاديمية المجد vs نجوم الرياض',
-      date: 'اليوم، 8:00 م',
-      venue: 'ملعب الجوهرة',
-      price: '45 رس',
-      color: AppColors.primary,
-    ),
-    (
-      teams: 'نهائي بطولة البادل',
-      date: 'غداً، 6:30 م',
-      venue: 'ملاعب أرينا',
-      price: '80 رس',
-      color: AppColors.info,
-    ),
-  ];
+  static const _colors = [AppColors.primary, AppColors.info];
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(
-            right: 20.w,
-            left: 20.w,
-            top: 28.h,
-            bottom: 15.h,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'تذاكر المباريات',
-                style: AppTextTheme.headingSmall(context).copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.textDark,
-                ),
-              ),
-              OnTap(
-                onTap: () {
-                  TicketsRoute().push(context);
-                },
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AppColors.secondary50,
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
-                      vertical: 4.h,
+    return BlocBuilder<HomeCubit, HomeState>(
+      buildWhen: (p, c) => p.status != c.status || p.tickets != c.tickets,
+      builder: (context, state) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(right: 20.w, left: 20.w, top: 28.h, bottom: 15.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'تذاكر المباريات',
+                    style: AppTextTheme.headingSmall(context).copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textDark,
                     ),
-                    child: Text(
-                      'عرض الكل',
-                      style: AppTextTheme.bodyXSmall(context).copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.secondary,
+                  ),
+                  OnTap(
+                    onTap: () => TicketsRoute().push(context),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppColors.secondary50,
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                        child: Text(
+                          'عرض الكل',
+                          style: AppTextTheme.bodyXSmall(context).copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.secondary,
+                          ),
+                        ),
                       ),
                     ),
                   ),
+                ],
+              ),
+            ),
+            if (state.status == HomeStateStatus.loading())
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: 20.w.padHorizontal,
+                itemCount: 2,
+                separatorBuilder: (_, __) => 15.h.sizedHeight,
+                itemBuilder: (_, __) => const _TicketCardShimmer(),
+              )
+            else
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: 20.w.padHorizontal,
+                itemCount: state.tickets.length,
+                separatorBuilder: (_, __) => 15.h.sizedHeight,
+                itemBuilder: (_, i) => _TicketCard(
+                  teams: state.tickets[i].title??"",
+                  date: '${state.tickets[i].dateText}، ${state.tickets[i].time}',
+                  venue: state.tickets[i].stadium??"",
+                  price: '${state.tickets[i].price} ${state.tickets[i].currency}',
+                  accentColor: _colors[i % _colors.length],
                 ),
               ),
-            ],
-          ),
-        ),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: 20.w.padHorizontal,
-          itemCount: _tickets.length,
-          separatorBuilder: (_, __) => 15.h.sizedHeight,
-          itemBuilder: (_, i) => _TicketCard(
-            teams: _tickets[i].teams,
-            date: _tickets[i].date,
-            venue: _tickets[i].venue,
-            price: _tickets[i].price,
-            accentColor: _tickets[i].color,
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 }
 
+class _TicketCardShimmer extends StatelessWidget {
+  const _TicketCardShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: AppColors.slate300.withOpacity(0.4),
+      highlightColor: AppColors.slate300.withOpacity(0.1),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: SizedBox(
+          height: 80.h,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 15.h),
+            child: Row(
+              children: [
+                Container(width: 60.w, height: 50.h, color: AppColors.white),
+                16.w.sizedWidth,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(width: 150.w, height: 12.h, color: AppColors.white),
+                      8.h.sizedHeight,
+                      Container(width: 100.w, height: 10.h, color: AppColors.white),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 class _TicketCard extends StatelessWidget {
   final String teams;
   final String date;

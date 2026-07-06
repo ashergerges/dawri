@@ -620,7 +620,7 @@
   "loginWelcomeTitle": "مرحباً بك في دوري!",
   "loginWelcomeDesc": "أدخل رقم جوالك للمتابعة، سنرسل لك رمز تحقق (OTP) في خطوة واحدة سريعة وآمنة.",
   "loginPhoneLabel": "رقم الجوال",
-  "loginPhoneHint": "5X XXX XXXX",
+  "loginPhoneHint": "05X XXX XXXX",
   "loginOrContinueWith": "أو الدخول بواسطة",
   "loginGoogle": "جوجل",
   "loginApple": "آبل",
@@ -844,5 +844,11 @@
   "helpContactTitle": "لم تجد ما تبحث عنه؟",
   "helpContactDesc": "فريق الدعم الفني متواجد لمساعدتك على مدار الساعة.",
   "helpContactChat": "محادثة مباشرة",
-  "helpContactWhatsapp": "واتساب"
+  "helpContactWhatsapp": "واتساب",
+  "loginPhoneRequired": "من فضلك أدخل رقم الجوال",
+  "loginPhoneInvalid": "رقم الجوال غير صحيح، تأكد أنه يبدأ بـ 05 ومكوّن من 10 أرقام",
+  "loginOtpIncomplete": "من فضلك أدخل الرمز كاملاً",
+  "loginOtpInvalid": "الرمز غير صحيح، حاول مرة أخرى",
+  "errorGeneric": "حدث خطأ، حاول مرة أخرى"
+
 }

@@ -1,133 +1,103 @@
-// lib/features/home/data/home_model.dart
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter/material.dart';
-import 'package:dawri/core/utils/constants/app_colors.dart';
-import 'package:dawri/gen/locale_keys.g.dart';
+// lib/features/home/data/models/home_model.dart
+import 'package:json_annotation/json_annotation.dart';
 
-class ServiceItemData {
-  final IconData icon;
-  final Color color;
-  final String labelKey;
-  final String route;
+part 'home_model.g.dart';
 
-  const ServiceItemData({
-    required this.icon,
-    required this.color,
-    required this.labelKey,
-    required this.route,
+@JsonSerializable()
+class HomeModel {
+  @JsonKey(name: 'latest_products')
+  final List<ProductModel>? latestProducts;
+  @JsonKey(name: 'matches_tickets')
+  final List<TicketModel>? matchesTickets;
+
+  HomeModel({this.latestProducts, this.matchesTickets});
+
+  factory HomeModel.fromJson(Map<String, dynamic> json) => _$HomeModelFromJson(json);
+  Map<String, dynamic> toJson() => _$HomeModelToJson(this);
+}
+
+@JsonSerializable()
+class ProductModel {
+  final int? id;
+  final String? name;
+  final String? description;
+  final String? image;
+  final num? price;
+  final List<ProductVariantModel>? variants;
+
+  ProductModel({
+    this.id,
+    this.name,
+    this.description,
+    this.image,
+    this.price,
+    this.variants,
   });
+
+  factory ProductModel.fromJson(Map<String, dynamic> json) => _$ProductModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductModelToJson(this);
 }
 
-class ProductData {
-  final String imageUrl;
-  final String titleKey;
-  final double price;
+@JsonSerializable()
+class ProductVariantModel {
+  final int? id;
+  final num? price;
+  final int? stock;
+  final ProductSizeModel? size;
+  final ProductColorModel? color;
 
-  const ProductData({required this.imageUrl, required this.titleKey, required this.price});
+  ProductVariantModel({this.id, this.price, this.stock, this.size, this.color});
+
+  factory ProductVariantModel.fromJson(Map<String, dynamic> json) =>
+      _$ProductVariantModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductVariantModelToJson(this);
 }
 
-class TicketData {
-  final double price;
-  final Color priceButtonColor;
-  final String teamsKey;
-  final String dateKey;
-  final String locationKey;
+@JsonSerializable()
+class ProductSizeModel {
+  final int? id;
+  final String? value;
 
-  const TicketData({
-    required this.price,
-    required this.priceButtonColor,
-    required this.teamsKey,
-    required this.dateKey,
-    required this.locationKey,
+  ProductSizeModel({this.id, this.value});
+
+  factory ProductSizeModel.fromJson(Map<String, dynamic> json) =>
+      _$ProductSizeModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductSizeModelToJson(this);
+}
+
+@JsonSerializable()
+class ProductColorModel {
+  final int? id;
+  final String? value;
+
+  ProductColorModel({this.id, this.value});
+
+  factory ProductColorModel.fromJson(Map<String, dynamic> json) =>
+      _$ProductColorModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductColorModelToJson(this);
+}
+
+@JsonSerializable()
+class TicketModel {
+  final int? id;
+  final String? title;
+  final String? time;
+  @JsonKey(name: 'date_text')
+  final String? dateText;
+  final String? stadium;
+  final num? price;
+  final String? currency;
+
+  TicketModel({
+    this.id,
+    this.title,
+    this.time,
+    this.dateText,
+    this.stadium,
+    this.price,
+    this.currency,
   });
-}
 
-class HomeMockData {
-  static const userName = 'دوري Dawri';
-
-  static const services = [
-    ServiceItemData(
-      icon: FontAwesomeIcons.mapLocationDot,
-      color: AppColors.success,
-      labelKey: LocaleKeys.homeServiceReserve,
-      route: 'reserve',
-    ),
-    ServiceItemData(
-      icon: FontAwesomeIcons.users,
-      color: AppColors.info,
-      labelKey: LocaleKeys.homeServicePartners,
-      route: 'partners',
-    ),
-    ServiceItemData(
-      icon: FontAwesomeIcons.trophy,
-      color: AppColors.warning,
-      labelKey: LocaleKeys.homeServiceChampionships,
-      route: 'championships',
-    ),
-    ServiceItemData(
-      icon: FontAwesomeIcons.fire,
-      color: AppColors.error,
-      labelKey: LocaleKeys.homeServiceChallenges,
-      route: 'challenges',
-    ),
-    ServiceItemData(
-      icon: FontAwesomeIcons.fileContract,
-      color: AppColors.purple,
-      labelKey: LocaleKeys.homeServiceContracts,
-      route: 'contracts',
-    ),
-    ServiceItemData(
-      icon: FontAwesomeIcons.shop,
-      color: AppColors.pink,
-      labelKey: LocaleKeys.homeServiceShop,
-      route: 'shop',
-    ),
-    ServiceItemData(
-      icon: FontAwesomeIcons.ticket,
-      color: AppColors.teal,
-      labelKey: LocaleKeys.homeServiceTickets,
-      route: 'tickets',
-    ),
-    ServiceItemData(
-      icon: FontAwesomeIcons.ellipsis,
-      color: AppColors.textMuted,
-      labelKey: LocaleKeys.homeServiceMore,
-      route: 'more',
-    ),
-  ];
-
-  static const products = [
-    ProductData(
-      imageUrl: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=300&q=80',
-      titleKey: LocaleKeys.homeProductTshirt,
-      price: 120,
-    ),
-    ProductData(
-      imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&q=80',
-      titleKey: LocaleKeys.homeProductShoes,
-      price: 420,
-    ),
-    ProductData(
-      imageUrl: 'https://images.unsplash.com/photo-1614632537190-23e4146777db?w=300&q=80',
-      titleKey: LocaleKeys.homeProductBall,
-      price: 180,
-    ),
-  ];
-
-  static const tickets = [
-    TicketData(
-      price: 45,
-      priceButtonColor: AppColors.primary,
-      teamsKey: LocaleKeys.homeTicketMatch1Teams,
-      dateKey: LocaleKeys.homeTicketMatch1Date,
-      locationKey: LocaleKeys.homeTicketMatch1Location,
-    ),
-    TicketData(
-      price: 80,
-      priceButtonColor: AppColors.info,
-      teamsKey: LocaleKeys.homeTicketMatch2Teams,
-      dateKey: LocaleKeys.homeTicketMatch2Date,
-      locationKey: LocaleKeys.homeTicketMatch2Location,
-    ),
-  ];
+  factory TicketModel.fromJson(Map<String, dynamic> json) => _$TicketModelFromJson(json);
+  Map<String, dynamic> toJson() => _$TicketModelToJson(this);
 }

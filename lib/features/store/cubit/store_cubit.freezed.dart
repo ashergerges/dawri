@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$StoreState {
 
- int get selectedCategoryIndex; int get cartCount;
+ int get cartCount; RefreshController get refreshController; bool get isCategoriesLoading; List<CategoryModel> get categories; int? get selectedCategoryId; String get search; bool get isProductsLoading; List<ProductModel> get products; int get currentPage; bool get hasMore; String? get generalErrorKey;
 /// Create a copy of StoreState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $StoreStateCopyWith<StoreState> get copyWith => _$StoreStateCopyWithImpl<StoreSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StoreState&&(identical(other.selectedCategoryIndex, selectedCategoryIndex) || other.selectedCategoryIndex == selectedCategoryIndex)&&(identical(other.cartCount, cartCount) || other.cartCount == cartCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is StoreState&&(identical(other.cartCount, cartCount) || other.cartCount == cartCount)&&(identical(other.refreshController, refreshController) || other.refreshController == refreshController)&&(identical(other.isCategoriesLoading, isCategoriesLoading) || other.isCategoriesLoading == isCategoriesLoading)&&const DeepCollectionEquality().equals(other.categories, categories)&&(identical(other.selectedCategoryId, selectedCategoryId) || other.selectedCategoryId == selectedCategoryId)&&(identical(other.search, search) || other.search == search)&&(identical(other.isProductsLoading, isProductsLoading) || other.isProductsLoading == isProductsLoading)&&const DeepCollectionEquality().equals(other.products, products)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.hasMore, hasMore) || other.hasMore == hasMore)&&(identical(other.generalErrorKey, generalErrorKey) || other.generalErrorKey == generalErrorKey));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,selectedCategoryIndex,cartCount);
+int get hashCode => Object.hash(runtimeType,cartCount,refreshController,isCategoriesLoading,const DeepCollectionEquality().hash(categories),selectedCategoryId,search,isProductsLoading,const DeepCollectionEquality().hash(products),currentPage,hasMore,generalErrorKey);
 
 @override
 String toString() {
-  return 'StoreState(selectedCategoryIndex: $selectedCategoryIndex, cartCount: $cartCount)';
+  return 'StoreState(cartCount: $cartCount, refreshController: $refreshController, isCategoriesLoading: $isCategoriesLoading, categories: $categories, selectedCategoryId: $selectedCategoryId, search: $search, isProductsLoading: $isProductsLoading, products: $products, currentPage: $currentPage, hasMore: $hasMore, generalErrorKey: $generalErrorKey)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $StoreStateCopyWith<$Res>  {
   factory $StoreStateCopyWith(StoreState value, $Res Function(StoreState) _then) = _$StoreStateCopyWithImpl;
 @useResult
 $Res call({
- int selectedCategoryIndex, int cartCount
+ int cartCount, RefreshController refreshController, bool isCategoriesLoading, List<CategoryModel> categories, int? selectedCategoryId, String search, bool isProductsLoading, List<ProductModel> products, int currentPage, bool hasMore, String? generalErrorKey
 });
 
 
@@ -62,11 +62,20 @@ class _$StoreStateCopyWithImpl<$Res>
 
 /// Create a copy of StoreState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? selectedCategoryIndex = null,Object? cartCount = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? cartCount = null,Object? refreshController = null,Object? isCategoriesLoading = null,Object? categories = null,Object? selectedCategoryId = freezed,Object? search = null,Object? isProductsLoading = null,Object? products = null,Object? currentPage = null,Object? hasMore = null,Object? generalErrorKey = freezed,}) {
   return _then(_self.copyWith(
-selectedCategoryIndex: null == selectedCategoryIndex ? _self.selectedCategoryIndex : selectedCategoryIndex // ignore: cast_nullable_to_non_nullable
-as int,cartCount: null == cartCount ? _self.cartCount : cartCount // ignore: cast_nullable_to_non_nullable
-as int,
+cartCount: null == cartCount ? _self.cartCount : cartCount // ignore: cast_nullable_to_non_nullable
+as int,refreshController: null == refreshController ? _self.refreshController : refreshController // ignore: cast_nullable_to_non_nullable
+as RefreshController,isCategoriesLoading: null == isCategoriesLoading ? _self.isCategoriesLoading : isCategoriesLoading // ignore: cast_nullable_to_non_nullable
+as bool,categories: null == categories ? _self.categories : categories // ignore: cast_nullable_to_non_nullable
+as List<CategoryModel>,selectedCategoryId: freezed == selectedCategoryId ? _self.selectedCategoryId : selectedCategoryId // ignore: cast_nullable_to_non_nullable
+as int?,search: null == search ? _self.search : search // ignore: cast_nullable_to_non_nullable
+as String,isProductsLoading: null == isProductsLoading ? _self.isProductsLoading : isProductsLoading // ignore: cast_nullable_to_non_nullable
+as bool,products: null == products ? _self.products : products // ignore: cast_nullable_to_non_nullable
+as List<ProductModel>,currentPage: null == currentPage ? _self.currentPage : currentPage // ignore: cast_nullable_to_non_nullable
+as int,hasMore: null == hasMore ? _self.hasMore : hasMore // ignore: cast_nullable_to_non_nullable
+as bool,generalErrorKey: freezed == generalErrorKey ? _self.generalErrorKey : generalErrorKey // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -151,10 +160,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int selectedCategoryIndex,  int cartCount)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int cartCount,  RefreshController refreshController,  bool isCategoriesLoading,  List<CategoryModel> categories,  int? selectedCategoryId,  String search,  bool isProductsLoading,  List<ProductModel> products,  int currentPage,  bool hasMore,  String? generalErrorKey)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _StoreState() when $default != null:
-return $default(_that.selectedCategoryIndex,_that.cartCount);case _:
+return $default(_that.cartCount,_that.refreshController,_that.isCategoriesLoading,_that.categories,_that.selectedCategoryId,_that.search,_that.isProductsLoading,_that.products,_that.currentPage,_that.hasMore,_that.generalErrorKey);case _:
   return orElse();
 
 }
@@ -172,10 +181,10 @@ return $default(_that.selectedCategoryIndex,_that.cartCount);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int selectedCategoryIndex,  int cartCount)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int cartCount,  RefreshController refreshController,  bool isCategoriesLoading,  List<CategoryModel> categories,  int? selectedCategoryId,  String search,  bool isProductsLoading,  List<ProductModel> products,  int currentPage,  bool hasMore,  String? generalErrorKey)  $default,) {final _that = this;
 switch (_that) {
 case _StoreState():
-return $default(_that.selectedCategoryIndex,_that.cartCount);case _:
+return $default(_that.cartCount,_that.refreshController,_that.isCategoriesLoading,_that.categories,_that.selectedCategoryId,_that.search,_that.isProductsLoading,_that.products,_that.currentPage,_that.hasMore,_that.generalErrorKey);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -192,10 +201,10 @@ return $default(_that.selectedCategoryIndex,_that.cartCount);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int selectedCategoryIndex,  int cartCount)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int cartCount,  RefreshController refreshController,  bool isCategoriesLoading,  List<CategoryModel> categories,  int? selectedCategoryId,  String search,  bool isProductsLoading,  List<ProductModel> products,  int currentPage,  bool hasMore,  String? generalErrorKey)?  $default,) {final _that = this;
 switch (_that) {
 case _StoreState() when $default != null:
-return $default(_that.selectedCategoryIndex,_that.cartCount);case _:
+return $default(_that.cartCount,_that.refreshController,_that.isCategoriesLoading,_that.categories,_that.selectedCategoryId,_that.search,_that.isProductsLoading,_that.products,_that.currentPage,_that.hasMore,_that.generalErrorKey);case _:
   return null;
 
 }
@@ -207,11 +216,32 @@ return $default(_that.selectedCategoryIndex,_that.cartCount);case _:
 
 
 class _StoreState implements StoreState {
-  const _StoreState({this.selectedCategoryIndex = 0, this.cartCount = 0});
+  const _StoreState({this.cartCount = 0, required this.refreshController, this.isCategoriesLoading = false, final  List<CategoryModel> categories = const [], this.selectedCategoryId = null, this.search = '', this.isProductsLoading = true, final  List<ProductModel> products = const [], this.currentPage = 1, this.hasMore = false, this.generalErrorKey = null}): _categories = categories,_products = products;
   
 
-@override@JsonKey() final  int selectedCategoryIndex;
 @override@JsonKey() final  int cartCount;
+@override final  RefreshController refreshController;
+@override@JsonKey() final  bool isCategoriesLoading;
+ final  List<CategoryModel> _categories;
+@override@JsonKey() List<CategoryModel> get categories {
+  if (_categories is EqualUnmodifiableListView) return _categories;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_categories);
+}
+
+@override@JsonKey() final  int? selectedCategoryId;
+@override@JsonKey() final  String search;
+@override@JsonKey() final  bool isProductsLoading;
+ final  List<ProductModel> _products;
+@override@JsonKey() List<ProductModel> get products {
+  if (_products is EqualUnmodifiableListView) return _products;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_products);
+}
+
+@override@JsonKey() final  int currentPage;
+@override@JsonKey() final  bool hasMore;
+@override@JsonKey() final  String? generalErrorKey;
 
 /// Create a copy of StoreState
 /// with the given fields replaced by the non-null parameter values.
@@ -223,16 +253,16 @@ _$StoreStateCopyWith<_StoreState> get copyWith => __$StoreStateCopyWithImpl<_Sto
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StoreState&&(identical(other.selectedCategoryIndex, selectedCategoryIndex) || other.selectedCategoryIndex == selectedCategoryIndex)&&(identical(other.cartCount, cartCount) || other.cartCount == cartCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StoreState&&(identical(other.cartCount, cartCount) || other.cartCount == cartCount)&&(identical(other.refreshController, refreshController) || other.refreshController == refreshController)&&(identical(other.isCategoriesLoading, isCategoriesLoading) || other.isCategoriesLoading == isCategoriesLoading)&&const DeepCollectionEquality().equals(other._categories, _categories)&&(identical(other.selectedCategoryId, selectedCategoryId) || other.selectedCategoryId == selectedCategoryId)&&(identical(other.search, search) || other.search == search)&&(identical(other.isProductsLoading, isProductsLoading) || other.isProductsLoading == isProductsLoading)&&const DeepCollectionEquality().equals(other._products, _products)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.hasMore, hasMore) || other.hasMore == hasMore)&&(identical(other.generalErrorKey, generalErrorKey) || other.generalErrorKey == generalErrorKey));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,selectedCategoryIndex,cartCount);
+int get hashCode => Object.hash(runtimeType,cartCount,refreshController,isCategoriesLoading,const DeepCollectionEquality().hash(_categories),selectedCategoryId,search,isProductsLoading,const DeepCollectionEquality().hash(_products),currentPage,hasMore,generalErrorKey);
 
 @override
 String toString() {
-  return 'StoreState(selectedCategoryIndex: $selectedCategoryIndex, cartCount: $cartCount)';
+  return 'StoreState(cartCount: $cartCount, refreshController: $refreshController, isCategoriesLoading: $isCategoriesLoading, categories: $categories, selectedCategoryId: $selectedCategoryId, search: $search, isProductsLoading: $isProductsLoading, products: $products, currentPage: $currentPage, hasMore: $hasMore, generalErrorKey: $generalErrorKey)';
 }
 
 
@@ -243,7 +273,7 @@ abstract mixin class _$StoreStateCopyWith<$Res> implements $StoreStateCopyWith<$
   factory _$StoreStateCopyWith(_StoreState value, $Res Function(_StoreState) _then) = __$StoreStateCopyWithImpl;
 @override @useResult
 $Res call({
- int selectedCategoryIndex, int cartCount
+ int cartCount, RefreshController refreshController, bool isCategoriesLoading, List<CategoryModel> categories, int? selectedCategoryId, String search, bool isProductsLoading, List<ProductModel> products, int currentPage, bool hasMore, String? generalErrorKey
 });
 
 
@@ -260,11 +290,20 @@ class __$StoreStateCopyWithImpl<$Res>
 
 /// Create a copy of StoreState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? selectedCategoryIndex = null,Object? cartCount = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? cartCount = null,Object? refreshController = null,Object? isCategoriesLoading = null,Object? categories = null,Object? selectedCategoryId = freezed,Object? search = null,Object? isProductsLoading = null,Object? products = null,Object? currentPage = null,Object? hasMore = null,Object? generalErrorKey = freezed,}) {
   return _then(_StoreState(
-selectedCategoryIndex: null == selectedCategoryIndex ? _self.selectedCategoryIndex : selectedCategoryIndex // ignore: cast_nullable_to_non_nullable
-as int,cartCount: null == cartCount ? _self.cartCount : cartCount // ignore: cast_nullable_to_non_nullable
-as int,
+cartCount: null == cartCount ? _self.cartCount : cartCount // ignore: cast_nullable_to_non_nullable
+as int,refreshController: null == refreshController ? _self.refreshController : refreshController // ignore: cast_nullable_to_non_nullable
+as RefreshController,isCategoriesLoading: null == isCategoriesLoading ? _self.isCategoriesLoading : isCategoriesLoading // ignore: cast_nullable_to_non_nullable
+as bool,categories: null == categories ? _self._categories : categories // ignore: cast_nullable_to_non_nullable
+as List<CategoryModel>,selectedCategoryId: freezed == selectedCategoryId ? _self.selectedCategoryId : selectedCategoryId // ignore: cast_nullable_to_non_nullable
+as int?,search: null == search ? _self.search : search // ignore: cast_nullable_to_non_nullable
+as String,isProductsLoading: null == isProductsLoading ? _self.isProductsLoading : isProductsLoading // ignore: cast_nullable_to_non_nullable
+as bool,products: null == products ? _self._products : products // ignore: cast_nullable_to_non_nullable
+as List<ProductModel>,currentPage: null == currentPage ? _self.currentPage : currentPage // ignore: cast_nullable_to_non_nullable
+as int,hasMore: null == hasMore ? _self.hasMore : hasMore // ignore: cast_nullable_to_non_nullable
+as bool,generalErrorKey: freezed == generalErrorKey ? _self.generalErrorKey : generalErrorKey // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

@@ -16,7 +16,7 @@ class Endpoints {
   //categories
   String get categoriesUrl => r'api/app/categories';
   //venues
-  String get venuesUrl => r'api/app/products/all';
+  String get productsUrl => r'api/app/products/all';
   //vendor details
   String get vendorDetailsUrl => r'api/app/products/details';
   String get wishlistToggleUrl => r'api/app/user/wishlist/toggle';
@@ -48,5 +48,8 @@ class Endpoints {
 
   // support
   String get supportUrl => r'api/app/support-data';
+
+  //cart
+  String get addedToCartUrl => r'api/app/cart/add';
 
 }

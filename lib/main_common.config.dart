@@ -36,6 +36,9 @@ import 'features/common/data/repositories/remote/main_repository.dart' as _i210;
 import 'features/home/data/repositories/interfaces/i_home_repository.dart'
     as _i185;
 import 'features/home/data/repositories/remote/home_repository.dart' as _i975;
+import 'features/login/data/repository/interface/i_login_repository.dart'
+    as _i772;
+import 'features/login/data/repository/remote/login_repository.dart' as _i413;
 import 'features/notification/data/repositories/interfaces/i_notification_repository.dart'
     as _i493;
 import 'features/notification/data/repositories/remote/notification_repository.dart'
@@ -49,6 +52,9 @@ import 'features/splash/data/repositories/interfaces/i_splash_repository.dart'
     as _i561;
 import 'features/splash/data/repositories/remote/splash_repository.dart'
     as _i120;
+import 'features/store/data/repository/interface/i_store_repository.dart'
+    as _i255;
+import 'features/store/data/repository/remote/store_repository.dart' as _i77;
 
 // initializes the registration of main-scope dependencies inside of GetIt
 _i174.GetIt $initGetIt(
@@ -104,8 +110,14 @@ _i174.GetIt $initGetIt(
       networkService: gh<_i969.NetworkService>(),
     ),
   );
+  gh.factory<_i255.IStoreRepository>(
+    () => _i77.StoreRepository(networkService: gh<_i969.NetworkService>()),
+  );
   gh.factory<_i967.IMainRepository>(
     () => _i210.MainRepository(networkService: gh<_i969.NetworkService>()),
+  );
+  gh.factory<_i772.IAuthRepo>(
+    () => _i413.AuthRepo(networkService: gh<_i969.NetworkService>()),
   );
   gh.singleton<_i402.NotificationService>(
     () => _i402.NotificationService(

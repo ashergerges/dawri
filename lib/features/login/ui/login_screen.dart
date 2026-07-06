@@ -139,7 +139,7 @@ class _PhoneStep extends StatefulWidget {
 }
 
 class _PhoneStepState extends State<_PhoneStep> {
-  final _phoneController = TextEditingController();
+  late final _phoneController = TextEditingController(text: context.read<LoginCubit>().state.phone);
 
   @override
   void dispose() {
@@ -225,7 +225,9 @@ class _PhoneStepState extends State<_PhoneStep> {
                             controller: _phoneController,
                             keyboardType: TextInputType.phone,
                             maxLength: LoginConstants.phoneMaxLength,
+                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                             onChanged: (v) => context.read<LoginCubit>().updatePhone(v),
+                            onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               isCollapsed: true,
@@ -248,43 +250,69 @@ class _PhoneStepState extends State<_PhoneStep> {
             );
           },
         ),
-        20.h.sizedHeight,
-        Row(
-          children: [
-            Expanded(child: Divider(color: AppColors.slate200)),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.w),
+        BlocBuilder<LoginCubit, LoginState>(
+          buildWhen: (prev, curr) => prev.hasPhoneError != curr.hasPhoneError || prev.phoneErrorKey != curr.phoneErrorKey,
+          builder: (context, state) {
+            if (!state.hasPhoneError || state.phoneErrorKey == null) return const SizedBox.shrink();
+            return Padding(
+              padding: EdgeInsets.only(top: 6.h, right: 4.w),
               child: Text(
-                LocaleKeys.loginOrContinueWith.tr(),
-                style: AppTextTheme.bodyXSmall(context).copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textMuted,
-                ),
+                state.phoneErrorKey!.tr(),
+                style: AppTextTheme.bodyXSmall(context).copyWith(color: AppColors.error, fontWeight: FontWeight.w700),
               ),
-            ),
-            Expanded(child: Divider(color: AppColors.slate200)),
-          ],
+            );
+          },
         ),
-        15.h.sizedHeight,
-        Row(
-          children: [
-            Expanded(
-              child: _SocialButton(
-                icon: FontAwesomeIcons.google,
-                labelKey: LocaleKeys.loginGoogle,
-                onTap: () {},
+        BlocBuilder<LoginCubit, LoginState>(
+          buildWhen: (prev, curr) => prev.generalErrorKey != curr.generalErrorKey,
+          builder: (context, state) {
+            if (state.generalErrorKey == null) return const SizedBox.shrink();
+            return Padding(
+              padding: EdgeInsets.only(top: 6.h, right: 4.w),
+              child: Text(
+                state.generalErrorKey!.tr(),
+                style: AppTextTheme.bodyXSmall(context).copyWith(color: AppColors.error, fontWeight: FontWeight.w700),
               ),
-            ),
-            15.w.sizedWidth,
-            Expanded(
-              child: _SocialButton(
-                icon: FontAwesomeIcons.apple,
-                labelKey: LocaleKeys.loginApple,
-                onTap: () {},
-              ),
-            ),
-          ],
+            );
+          },
         ),
+        // 20.h.sizedHeight,
+        // Row(
+        //   children: [
+        //     Expanded(child: Divider(color: AppColors.slate200)),
+        //     Padding(
+        //       padding: EdgeInsets.symmetric(horizontal: 15.w),
+        //       child: Text(
+        //         LocaleKeys.loginOrContinueWith.tr(),
+        //         style: AppTextTheme.bodyXSmall(context).copyWith(
+        //           fontWeight: FontWeight.w700,
+        //           color: AppColors.textMuted,
+        //         ),
+        //       ),
+        //     ),
+        //     Expanded(child: Divider(color: AppColors.slate200)),
+        //   ],
+        // ),
+        // 15.h.sizedHeight,
+        // Row(
+        //   children: [
+        //     Expanded(
+        //       child: _SocialButton(
+        //         icon: FontAwesomeIcons.google,
+        //         labelKey: LocaleKeys.loginGoogle,
+        //         onTap: () {},
+        //       ),
+        //     ),
+        //     15.w.sizedWidth,
+        //     Expanded(
+        //       child: _SocialButton(
+        //         icon: FontAwesomeIcons.apple,
+        //         labelKey: LocaleKeys.loginApple,
+        //         onTap: () {},
+        //       ),
+        //     ),
+        //   ],
+        // ),
         20.h.sizedHeight,
         BlocBuilder<LoginCubit, LoginState>(
           builder: (context, state) {
@@ -442,210 +470,240 @@ class _OtpStepState extends State<_OtpStep> {
   Widget build(BuildContext context) {
     final cubit = context.read<LoginCubit>();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        GestureDetector(
-          onTap: () => context.read<LoginCubit>().backToPhone(),
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.h),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                FaIcon(FontAwesomeIcons.arrowRight, size: 13.sp, color: AppColors.textMuted),
-                6.w.sizedWidth,
-                Text(
-                  LocaleKeys.loginEditNumber.tr(),
-                  style: AppTextTheme.bodySmall(context).copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textMuted,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Text(
-          LocaleKeys.loginOtpTitle.tr(),
-          style: AppTextTheme.headingSmall(context).copyWith(
-            fontWeight: FontWeight.w900,
-            color: AppColors.textDark,
-          ),
-        ),
-        8.h.sizedHeight,
-        BlocBuilder<LoginCubit, LoginState>(
-          buildWhen: (prev, curr) => prev.phone != curr.phone,
-          builder: (context, state) {
-            return RichText(
-              text: TextSpan(
-                style: AppTextTheme.bodySmall(context).copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textMuted,
-                  height: 1.5,
-                ),
+    return BlocListener<LoginCubit, LoginState>(
+      listenWhen: (prev, curr) => prev.otpDigits != curr.otpDigits,
+      listener: (context, state) {
+        for (var i = 0; i < _controllers.length; i++) {
+          if (_controllers[i].text != state.otpDigits[i]) {
+            _controllers[i].text = state.otpDigits[i];
+          }
+        }
+        if (state.otpDigits.every((d) => d.isEmpty)) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _focusNodes[0].requestFocus();
+          });
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          GestureDetector(
+            onTap: () => context.read<LoginCubit>().backToPhone(),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.h),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextSpan(text: LocaleKeys.loginOtpDesc.tr()),
-                  const TextSpan(text: '\n'),
-                  TextSpan(
-                    text: '${LoginConstants.countryCode} ${state.phone}',
-                    style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w900),
+                  FaIcon(FontAwesomeIcons.arrowRight, size: 13.sp, color: AppColors.textMuted),
+                  6.w.sizedWidth,
+                  Text(
+                    LocaleKeys.loginEditNumber.tr(),
+                    style: AppTextTheme.bodySmall(context).copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textMuted,
+                    ),
                   ),
                 ],
               ),
-            );
-          },
-        ),
-        25.h.sizedHeight,
-        Directionality(
-          textDirection: dir.TextDirection.ltr,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(LoginConstants.otpLength, (index) {
-              return SizedBox(
-                width: 60.w,
-                height: 65.h,
-                child: TextField(
-                  controller: _controllers[index],
-                  focusNode: _focusNodes[index],
-                  textAlign: TextAlign.center,
-                  keyboardType: TextInputType.number,
-                  maxLength: 1,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  style: AppTextTheme.headingMedium(context).copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.textDark,
-                  ),
-                  decoration: InputDecoration(
-                    counterText: '',
-                    filled: true,
-                    fillColor: AppColors.slate50,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(color: AppColors.slate200, width: 1.5),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(color: AppColors.primary, width: 1.5),
-                    ),
-                  ),
-                  onChanged: (v) {
-                    if (v.length > 1) {
-                      _handlePaste(v, cubit);
-                    } else {
-                      _onChanged(index, v, cubit);
-                    }
-                  },
-                  onTapOutside: (_) {},
-                ),
-              );
-            }),
+            ),
           ),
-        ),
-        25.h.sizedHeight,
-        BlocBuilder<LoginCubit, LoginState>(
-          builder: (context, state) {
-            return Center(
-              child: state.secondsLeft > 0
-                  ? Text.rich(
-                TextSpan(
+          Text(
+            LocaleKeys.loginOtpTitle.tr(),
+            style: AppTextTheme.headingSmall(context).copyWith(
+              fontWeight: FontWeight.w900,
+              color: AppColors.textDark,
+            ),
+          ),
+          8.h.sizedHeight,
+          BlocBuilder<LoginCubit, LoginState>(
+            buildWhen: (prev, curr) => prev.phone != curr.phone,
+            builder: (context, state) {
+              return RichText(
+                text: TextSpan(
                   style: AppTextTheme.bodySmall(context).copyWith(
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textMuted,
+                    height: 1.5,
                   ),
                   children: [
-                    TextSpan(text: LocaleKeys.loginResendIn.tr()),
+                    TextSpan(text: LocaleKeys.loginOtpDesc.tr()),
+                    const TextSpan(text: '\n'),
                     TextSpan(
-                      text: ' ${_formatTime(state.secondsLeft)} ',
+                      text: state.phone,
                       style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w900),
                     ),
                   ],
                 ),
-              )
-                  : GestureDetector(
-                onTap: () => context.read<LoginCubit>().resendCode(),
-                child: Text(
-                  LocaleKeys.loginResendNow.tr(),
-                  style: AppTextTheme.bodySmall(context).copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
-                    decoration: TextDecoration.underline,
+              );
+            },
+          ),
+          25.h.sizedHeight,
+          Directionality(
+            textDirection: dir.TextDirection.ltr,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(LoginConstants.otpLength, (index) {
+                return SizedBox(
+                  width: 60.w,
+                  height: 65.h,
+                  child: TextField(
+                    controller: _controllers[index],
+                    focusNode: _focusNodes[index],
+                    textAlign: TextAlign.center,
+                    keyboardType: TextInputType.number,
+                    maxLength: 1,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    style: AppTextTheme.headingMedium(context).copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textDark,
+                    ),
+                    decoration: InputDecoration(
+                      counterText: '',
+                      filled: true,
+                      fillColor: AppColors.slate50,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14.r),
+                        borderSide: BorderSide(color: AppColors.slate200, width: 1.5),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14.r),
+                        borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+                      ),
+                    ),
+                    onChanged: (v) {
+                      if (v.length > 1) {
+                        _handlePaste(v, cubit);
+                      } else {
+                        _onChanged(index, v, cubit);
+                      }
+                    },
+                    onTapOutside: (_) {},
+                  ),
+                );
+              }),
+            ),
+          ),
+          BlocBuilder<LoginCubit, LoginState>(
+            buildWhen: (prev, curr) => prev.hasOtpError != curr.hasOtpError || prev.otpErrorKey != curr.otpErrorKey,
+            builder: (context, state) {
+              if (!state.hasOtpError || state.otpErrorKey == null) return const SizedBox.shrink();
+              return Padding(
+                padding: EdgeInsets.only(top: 10.h),
+                child: Center(
+                  child: Text(
+                    state.otpErrorKey!.tr(),
+                    style: AppTextTheme.bodyXSmall(context).copyWith(color: AppColors.error, fontWeight: FontWeight.w700),
                   ),
                 ),
-              ),
-            );
-          },
-        ),
-        20.h.sizedHeight,
-        BlocBuilder<LoginCubit, LoginState>(
-          builder: (context, state) {
-            final isComplete = state.otpDigits.every((d) => d.isNotEmpty);
-            final canTap = isComplete && !state.isVerifying && !state.isVerified;
-
-            return GestureDetector(
-              onTap: canTap ? () => context.read<LoginCubit>().verifyOtp() : null,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                decoration: BoxDecoration(
-                  color: state.isVerified
-                      ? AppColors.success
-                      : isComplete
-                      ? AppColors.primary
-                      : AppColors.slate200,
-                  borderRadius: BorderRadius.circular(16.r),
-                  boxShadow: isComplete && !state.isVerified
-                      ? [BoxShadow(color: AppColors.primary.withOpacity(0.25), blurRadius: 20, offset: const Offset(0, 8))]
-                      : state.isVerified
-                      ? [BoxShadow(color: AppColors.success.withOpacity(0.25), blurRadius: 20, offset: const Offset(0, 8))]
-                      : null,
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                  child: Center(
-                    child: state.isVerifying
-                        ? Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          width: 16.sp,
-                          height: 16.sp,
-                          child: const CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
-                        ),
-                        10.w.sizedWidth,
-                        Text(
-                          LocaleKeys.loginVerifying.tr(),
-                          style: AppTextTheme.bodyLargeSemiBold(context).copyWith(
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.white,
-                          ),
-                        ),
-                      ],
-                    )
-                        : Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          state.isVerified ? LocaleKeys.loginVerified.tr() : LocaleKeys.loginVerify.tr(),
-                          style: AppTextTheme.bodyLargeSemiBold(context).copyWith(
-                            fontWeight: FontWeight.w900,
-                            color: isComplete || state.isVerified ? AppColors.white : AppColors.textHint,
-                          ),
-                        ),
-                        10.w.sizedWidth,
-                        FaIcon(
-                          state.isVerified ? FontAwesomeIcons.check : FontAwesomeIcons.circleCheck,
-                          size: 16.sp,
-                          color: isComplete || state.isVerified ? AppColors.white : AppColors.textHint,
-                        ),
-                      ],
+              );
+            },
+          ),
+          25.h.sizedHeight,
+          BlocBuilder<LoginCubit, LoginState>(
+            builder: (context, state) {
+              return Center(
+                child: state.secondsLeft > 0
+                    ? Text.rich(
+                  TextSpan(
+                    style: AppTextTheme.bodySmall(context).copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textMuted,
+                    ),
+                    children: [
+                      TextSpan(text: LocaleKeys.loginResendIn.tr()),
+                      TextSpan(
+                        text: ' ${_formatTime(state.secondsLeft)} ',
+                        style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w900),
+                      ),
+                    ],
+                  ),
+                )
+                    : GestureDetector(
+                  onTap: () => context.read<LoginCubit>().resendCode(),
+                  child: Text(
+                    LocaleKeys.loginResendNow.tr(),
+                    style: AppTextTheme.bodySmall(context).copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                      decoration: TextDecoration.underline,
                     ),
                   ),
                 ),
-              ),
-            );
-          },
-        ),
-      ],
+              );
+            },
+          ),
+          20.h.sizedHeight,
+          BlocBuilder<LoginCubit, LoginState>(
+            builder: (context, state) {
+              final isComplete = state.otpDigits.every((d) => d.isNotEmpty);
+              final canTap = isComplete && !state.isVerifying && !state.isVerified;
+
+              return GestureDetector(
+                onTap: canTap ? () => context.read<LoginCubit>().verifyOtp() : null,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  decoration: BoxDecoration(
+                    color: state.isVerified
+                        ? AppColors.success
+                        : isComplete
+                        ? AppColors.primary
+                        : AppColors.slate200,
+                    borderRadius: BorderRadius.circular(16.r),
+                    boxShadow: isComplete && !state.isVerified
+                        ? [BoxShadow(color: AppColors.primary.withOpacity(0.25), blurRadius: 20, offset: const Offset(0, 8))]
+                        : state.isVerified
+                        ? [BoxShadow(color: AppColors.success.withOpacity(0.25), blurRadius: 20, offset: const Offset(0, 8))]
+                        : null,
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.h),
+                    child: Center(
+                      child: state.isVerifying
+                          ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: 16.sp,
+                            height: 16.sp,
+                            child: const CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
+                          ),
+                          10.w.sizedWidth,
+                          Text(
+                            LocaleKeys.loginVerifying.tr(),
+                            style: AppTextTheme.bodyLargeSemiBold(context).copyWith(
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.white,
+                            ),
+                          ),
+                        ],
+                      )
+                          : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            state.isVerified ? LocaleKeys.loginVerified.tr() : LocaleKeys.loginVerify.tr(),
+                            style: AppTextTheme.bodyLargeSemiBold(context).copyWith(
+                              fontWeight: FontWeight.w900,
+                              color: isComplete || state.isVerified ? AppColors.white : AppColors.textHint,
+                            ),
+                          ),
+                          10.w.sizedWidth,
+                          FaIcon(
+                            state.isVerified ? FontAwesomeIcons.check : FontAwesomeIcons.circleCheck,
+                            size: 16.sp,
+                            color: isComplete || state.isVerified ? AppColors.white : AppColors.textHint,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 

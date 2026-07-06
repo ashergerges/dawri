@@ -619,7 +619,7 @@
   "loginWelcomeTitle": "Welcome to Dawri!",
   "loginWelcomeDesc": "Enter your phone number to continue, we'll send you a verification code (OTP) in one quick and secure step.",
   "loginPhoneLabel": "Phone Number",
-  "loginPhoneHint": "5X XXX XXXX",
+  "loginPhoneHint": "05X XXX XXXX",
   "loginOrContinueWith": "Or continue with",
   "loginGoogle": "Google",
   "loginApple": "Apple",
@@ -843,5 +843,11 @@
   "helpContactTitle": "Didn't find what you're looking for?",
   "helpContactDesc": "Our technical support team is available around the clock.",
   "helpContactChat": "Live Chat",
-  "helpContactWhatsapp": "WhatsApp"
+  "helpContactWhatsapp": "WhatsApp",
+  "loginPhoneRequired": "Please enter your phone number",
+  "loginPhoneInvalid": "Invalid phone number, it must start with 05 and be 10 digits",
+  "loginOtpIncomplete": "Please enter the full code",
+  "loginOtpInvalid": "Invalid code, please try again",
+  "errorGeneric": "Something went wrong, please try again"
+
 }

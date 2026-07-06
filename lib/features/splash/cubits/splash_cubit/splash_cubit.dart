@@ -32,14 +32,14 @@ class SplashCubit extends Cubit<SplashState> {
   }
 
   Future<void> support() async {
-    var support = await _splashRepository.support();
-    if (support.isError) {
-      MessageService.showToast(
-        msg: support.asError?.error.toString() ?? "",
-        state: ToastStates.error,
-      );
-    }
-    _localPreference.saveSupport(support.asValue?.value);
+    // var support = await _splashRepository.support();
+    // if (support.isError) {
+    //   MessageService.showToast(
+    //     msg: support.asError?.error.toString() ?? "",
+    //     state: ToastStates.error,
+    //   );
+    // }
+    // _localPreference.saveSupport(support.asValue?.value);
   }
 
 

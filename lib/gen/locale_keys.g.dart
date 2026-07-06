@@ -842,5 +842,10 @@ abstract class  LocaleKeys {
   static const helpContactDesc = 'helpContactDesc';
   static const helpContactChat = 'helpContactChat';
   static const helpContactWhatsapp = 'helpContactWhatsapp';
+  static const loginPhoneRequired = 'loginPhoneRequired';
+  static const loginPhoneInvalid = 'loginPhoneInvalid';
+  static const loginOtpIncomplete = 'loginOtpIncomplete';
+  static const loginOtpInvalid = 'loginOtpInvalid';
+  static const errorGeneric = 'errorGeneric';
 
 }

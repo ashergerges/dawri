@@ -2,6 +2,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
+import 'package:dawri/core/utils/constants/pull_refresh.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +13,8 @@ import 'package:dawri/core/utils/constants/app_colors.dart';
 import 'package:dawri/core/utils/constants/app_text_them.dart';
 import 'package:dawri/core/utils/extensions/padding_extensions.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../cubit/store_cubit.dart';
 import '../data/models/store_model.dart';
@@ -21,10 +24,7 @@ class StoreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => StoreCubit(),
-      child: const _StoreView(),
-    );
+    return BlocProvider(create: (_) => StoreCubit(), child: const _StoreView());
   }
 }
 
@@ -35,15 +35,31 @@ class _StoreView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
-          const SliverToBoxAdapter(child: _StoreHeader()),
-          const SliverToBoxAdapter(child: _SearchBox()),
-          const SliverToBoxAdapter(child: _PromoBanner()),
-          const SliverToBoxAdapter(child: _CategoryTabs()),
-          const _ProductsGrid(),
-          SliverToBoxAdapter(child: 20.h.sizedHeight),
-        ],
+      body: BlocBuilder<StoreCubit, StoreState>(
+        buildWhen: (p, c) => p.refreshController != c.refreshController,
+        builder: (context, state) {
+          return SmartRefresher(
+            controller: state.refreshController,
+            enablePullDown: true,
+            enablePullUp: true,
+            physics: const BouncingScrollPhysics(),
+            header: PullRefresh.pullRefresh,
+            footer: PullRefresh.loadMoreRefresh,
+            onRefresh: () =>
+                context.read<StoreCubit>().getProducts(isPull: true),
+            onLoading: () => context.read<StoreCubit>().getProductsMore(),
+            child: CustomScrollView(
+              slivers: [
+                const SliverToBoxAdapter(child: _StoreHeader()),
+                const SliverToBoxAdapter(child: _SearchBox()),
+                const SliverToBoxAdapter(child: _PromoBanner()),
+                const SliverToBoxAdapter(child: _CategoryTabs()),
+                const _ProductsGrid(),
+                SliverToBoxAdapter(child: 20.h.sizedHeight),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -63,10 +79,9 @@ class _StoreHeader extends StatelessWidget {
         children: [
           Text(
             LocaleKeys.storeTitle.tr(),
-            style: AppTextTheme.headingSmall(context).copyWith(
-              fontWeight: FontWeight.w900,
-              color: AppColors.textDark,
-            ),
+            style: AppTextTheme.headingSmall(
+              context,
+            ).copyWith(fontWeight: FontWeight.w900, color: AppColors.textDark),
           ),
           const _CartButton(),
         ],
@@ -88,14 +103,21 @@ class _CartButton extends StatelessWidget {
             CartRoute().push(context);
           },
           child: DecoratedBox(
-            decoration: const BoxDecoration(color: AppColors.slate100, shape: BoxShape.circle),
+            decoration: const BoxDecoration(
+              color: AppColors.slate100,
+              shape: BoxShape.circle,
+            ),
             child: SizedBox(
               width: 45.w,
               height: 45.w,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  FaIcon(FontAwesomeIcons.bagShopping, size: 20.sp, color: AppColors.textDark),
+                  FaIcon(
+                    FontAwesomeIcons.bagShopping,
+                    size: 20.sp,
+                    color: AppColors.textDark,
+                  ),
                   if (state.cartCount > 0)
                     Positioned(
                       top: -2,
@@ -107,7 +129,10 @@ class _CartButton extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: AppColors.danger,
                             shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.white, width: 2),
+                            border: Border.all(
+                              color: AppColors.white,
+                              width: 2,
+                            ),
                           ),
                           child: SizedBox(
                             width: 20.w,
@@ -115,10 +140,11 @@ class _CartButton extends StatelessWidget {
                             child: Center(
                               child: Text(
                                 '${state.cartCount}',
-                                style: AppTextTheme.bodyXXSmall(context).copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.white,
-                                ),
+                                style: AppTextTheme.bodyXXSmall(context)
+                                    .copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.white,
+                                    ),
                               ),
                             ),
                           ),
@@ -167,11 +193,15 @@ class _SearchBox extends StatelessWidget {
             children: [
               Padding(
                 padding: EdgeInsets.only(right: 18.w),
-                child: FaIcon(FontAwesomeIcons.magnifyingGlass,
-                    size: 14.sp, color: AppColors.textMuted),
+                child: FaIcon(
+                  FontAwesomeIcons.magnifyingGlass,
+                  size: 14.sp,
+                  color: AppColors.textMuted,
+                ),
               ),
               Expanded(
                 child: TextFormField(
+                  onChanged: (v) => context.read<StoreCubit>().updateSearch(v),
                   onTapOutside: (_) => FocusScope.of(context).unfocus(),
                   decoration: InputDecoration(
                     hintText: LocaleKeys.storeSearchHint.tr(),
@@ -180,7 +210,7 @@ class _SearchBox extends StatelessWidget {
                       color: AppColors.textHint,
                     ),
                     border: InputBorder.none,
-                    contentPadding: 8.padHorizontal+4.padTop
+                    contentPadding: 8.padHorizontal + 4.padTop,
                   ),
                   style: AppTextTheme.bodySmall(context).copyWith(
                     fontWeight: FontWeight.w600,
@@ -190,7 +220,11 @@ class _SearchBox extends StatelessWidget {
               ),
               Padding(
                 padding: EdgeInsets.only(left: 18.w),
-                child: FaIcon(FontAwesomeIcons.sliders, size: 14.sp, color: AppColors.primary),
+                child: FaIcon(
+                  FontAwesomeIcons.sliders,
+                  size: 14.sp,
+                  color: AppColors.primary,
+                ),
               ),
             ],
           ),
@@ -213,7 +247,7 @@ class _PromoBanner extends StatelessWidget {
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [AppColors.slate800, AppColors.slate900, ],
+            colors: [AppColors.slate800, AppColors.slate900],
           ),
           borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
@@ -231,7 +265,11 @@ class _PromoBanner extends StatelessWidget {
               top: 10.h,
               child: Opacity(
                 opacity: 0.06,
-                child: FaIcon(FontAwesomeIcons.shirt, size: 110.sp, color: AppColors.white),
+                child: FaIcon(
+                  FontAwesomeIcons.shirt,
+                  size: 110.sp,
+                  color: AppColors.white,
+                ),
               ),
             ),
             Padding(
@@ -240,7 +278,7 @@ class _PromoBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding:6.padVertical+10.padHorizontal,
+                    padding: 6.padVertical + 10.padHorizontal,
 
                     decoration: BoxDecoration(
                       color: AppColors.primaryLight,
@@ -265,9 +303,9 @@ class _PromoBanner extends StatelessWidget {
                   6.h.sizedHeight,
                   Text(
                     LocaleKeys.storePromoDesc.tr(),
-                    style: AppTextTheme.bodyXSmall(context).copyWith(
-                      color: AppColors.white.withOpacity(0.85),
-                    ),
+                    style: AppTextTheme.bodyXSmall(
+                      context,
+                    ).copyWith(color: AppColors.white.withOpacity(0.85)),
                   ),
                 ],
               ),
@@ -286,40 +324,39 @@ class _CategoryTabs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<StoreCubit, StoreState>(
-      buildWhen: (p, c) => p.selectedCategoryIndex != c.selectedCategoryIndex,
+      buildWhen: (p, c) =>
+          p.selectedCategoryId != c.selectedCategoryId ||
+          p.categories != c.categories,
       builder: (context, state) {
+        final itemCount = state.categories.length + 1;
         return SizedBox(
           height: 53.h,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.only(right: 20.w, left: 20.w, bottom: 15.h),
-            itemCount: StoreMockData.categoryKeys.length,
+            itemCount: itemCount,
             separatorBuilder: (_, __) => 10.w.sizedWidth,
             itemBuilder: (_, i) {
-              final isActive = i == state.selectedCategoryIndex;
+              final categoryId = i == 0 ? null : state.categories[i - 1].id;
+              final label = i == 0
+                  ? LocaleKeys.allKey.tr()
+                  : (state.categories[i - 1].nameAr ?? '');
+              final isActive = state.selectedCategoryId == categoryId;
               return OnTap(
-                onTap: () => context.read<StoreCubit>().selectCategory(i),
+                onTap: () =>
+                    context.read<StoreCubit>().selectCategory(categoryId),
                 child: Container(
-                  padding:20.padHorizontal,
+                  padding: 20.padHorizontal,
                   decoration: BoxDecoration(
                     color: isActive ? AppColors.primary : AppColors.white,
                     borderRadius: BorderRadius.circular(20.r),
                     border: Border.all(
                       color: isActive ? AppColors.primary : AppColors.slate200,
                     ),
-                    boxShadow: isActive
-                        ? [
-                      BoxShadow(
-                        color: AppColors.primary.withOpacity(0.2),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ]
-                        : null,
                   ),
                   child: Center(
                     child: Text(
-                      StoreMockData.categoryKeys[i].tr(),
+                      label,
                       style: AppTextTheme.bodyXSmall(context).copyWith(
                         fontWeight: FontWeight.w700,
                         color: isActive ? AppColors.white : AppColors.textMuted,
@@ -342,32 +379,43 @@ class _ProductsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverPadding(
-      padding: 20.w.padHorizontal,
-      sliver: SliverGrid(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 15.h,
-          crossAxisSpacing: 15.w,
-          childAspectRatio: 0.65,
-        ),
-        delegate: SliverChildBuilderDelegate(
-              (context, i) => _ProductCard(product: StoreMockData.products[i]),
-          childCount: StoreMockData.products.length,
-        ),
-      ),
+    return BlocBuilder<StoreCubit, StoreState>(
+      buildWhen: (p, c) =>
+          p.isProductsLoading != c.isProductsLoading ||
+          p.products != c.products,
+      builder: (context, state) {
+        final itemCount = state.isProductsLoading ? 6 : state.products.length;
+        return SliverPadding(
+          padding: 20.w.padHorizontal,
+          sliver: SliverGrid(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 15.h,
+              crossAxisSpacing: 15.w,
+              childAspectRatio: 0.65,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (context, i) => state.isProductsLoading
+                  ? const _ProductCardShimmer()
+                  : _ProductCard(product: state.products[i]),
+              childCount: itemCount,
+            ),
+          ),
+        );
+      },
     );
   }
 }
 
 class _ProductCard extends StatelessWidget {
   final ProductModel product;
+
   const _ProductCard({required this.product});
 
   @override
   Widget build(BuildContext context) {
     return OnTap(
-      onTap: (){
+      onTap: () {
         ProductDetailsRoute().push(context);
       },
       child: DecoratedBox(
@@ -392,38 +440,41 @@ class _ProductCard extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(14.r),
                     child: CustomNetworkImage(
-                      imageUrl: product.imageUrl,
+                      imageUrl: product.image ?? "",
                       width: double.infinity,
                       height: 130.h,
                       fit: BoxFit.cover,
                     ),
                   ),
-                  if (product.hasDiscount)
-                    Positioned(
-                      top: 8.h,
-                      right: 8.w,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: AppColors.danger,
-                          borderRadius: BorderRadius.circular(6.r),
+                  // if (product.hasDiscount)
+                  Positioned(
+                    top: 8.h,
+                    right: 8.w,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppColors.danger,
+                        borderRadius: BorderRadius.circular(6.r),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 3.h,
                         ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
-                          child: Text(
-                            LocaleKeys.storeDiscount.tr(),
-                            style: AppTextTheme.bodyXXSmall(context).copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.white,
-                            ),
+                        child: Text(
+                          LocaleKeys.storeDiscount.tr(),
+                          style: AppTextTheme.bodyXXSmall(context).copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.white,
                           ),
                         ),
                       ),
                     ),
+                  ),
                 ],
               ),
               10.h.sizedHeight,
               Text(
-                product.categoryKey.tr(),
+                product.category?.name ?? '',
                 style: AppTextTheme.bodyXXSmall(context).copyWith(
                   fontWeight: FontWeight.w700,
                   color: AppColors.textMuted,
@@ -433,7 +484,7 @@ class _ProductCard extends StatelessWidget {
               SizedBox(
                 height: 38.h,
                 child: Text(
-                  product.titleKey.tr(),
+                  product.name ?? "",
                   style: AppTextTheme.bodyXSmall(context).copyWith(
                     fontWeight: FontWeight.w800,
                     color: AppColors.textDark,
@@ -448,13 +499,13 @@ class _ProductCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    product.price,
+                    '${product.price}',
                     style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
                       fontWeight: FontWeight.w900,
                       color: AppColors.primary,
                     ),
                   ),
-                  _AddToCartButton(),
+                  _AddToCartButton(product.id??0),
                 ],
               ),
             ],
@@ -465,13 +516,54 @@ class _ProductCard extends StatelessWidget {
   }
 }
 
-class _AddToCartButton extends StatelessWidget {
-  const _AddToCartButton();
+class _ProductCardShimmer extends StatelessWidget {
+  const _ProductCardShimmer();
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => context.read<StoreCubit>().addToCart(),
+    return Shimmer.fromColors(
+      baseColor: AppColors.slate300.withOpacity(0.4),
+      highlightColor: AppColors.slate300.withOpacity(0.1),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        child: SizedBox(
+          width: 145.w,
+          child: Padding(
+            padding: 10.w.padAll,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14.r),
+                  child: Container(
+                    width: double.infinity,
+                    height: 110.h,
+                    color: AppColors.white,
+                  ),
+                ),
+                10.h.sizedHeight,
+                Container(width: 90.w, height: 12.h, color: AppColors.white),
+                8.h.sizedHeight,
+                Container(width: 60.w, height: 12.h, color: AppColors.white),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AddToCartButton extends StatelessWidget {
+  const _AddToCartButton(this.id);
+  final int id;
+  @override
+  Widget build(BuildContext context) {
+    return OnTap(
+      onTap: () => context.read<StoreCubit>().addToCart(id:id ),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.slate100,
@@ -481,7 +573,11 @@ class _AddToCartButton extends StatelessWidget {
           width: 34.w,
           height: 34.w,
           child: Center(
-            child: FaIcon(FontAwesomeIcons.plus, size: 13.sp, color: AppColors.textDark),
+            child: FaIcon(
+              FontAwesomeIcons.plus,
+              size: 13.sp,
+              color: AppColors.textDark,
+            ),
           ),
         ),
       ),

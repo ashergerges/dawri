@@ -1,62 +1,122 @@
 import 'package:json_annotation/json_annotation.dart';
 
-
 part 'app_user.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class AppUser {
   final int id;
-  final String? name;
-  final String? email;
   final String? phone;
-  final String? address;
-  final String? image;
   final int? status;
+
+  @JsonKey(name: 'status_text')
+  final String? statusText;
+
+  final Profile? profile;
+
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
+
+  /// Stored locally only.
+  @JsonKey(includeFromJson: false, includeToJson: true)
   final String? token;
+
+  /// Stored locally only.
+  @JsonKey(includeFromJson: false, includeToJson: true)
   final String? refreshToken;
-  @JsonKey(name: "is_vendor")
-  final bool? isVendor;
-  @JsonKey(name: "dashboard_url")
-  final String? dashboardUrl;
 
-
-  AppUser( {
+  const AppUser({
     required this.id,
-     this.email,
-     this.name,  this.phone,  this.address,  this.image,  this.status,
-     this.token,
-     this.refreshToken,
-     this.isVendor,
-     this.dashboardUrl,
+    this.phone,
+    this.status,
+    this.statusText,
+    this.profile,
+    this.createdAt,
+    this.token,
+    this.refreshToken,
   });
 
   AppUser copyWith({
     int? id,
-    String? email,
-    String? name,
     String? phone,
-    String? token,
-    String? image,
-    String? address,
-    String? refreshToken,
     int? status,
-    bool? isVendor,
-    String? dashboardUrl,
-  }) => AppUser(
-    id: id ?? this.id,
-    email: email ?? this.email,
-    name: name ?? this.name,
-    phone: phone ?? this.phone,
-    image: image ?? this.image,
-    address: address ?? this.address,
+    String? statusText,
+    Profile? profile,
+    String? createdAt,
+    String? token,
+    String? refreshToken,
+  }) {
+    return AppUser(
+      id: id ?? this.id,
+      phone: phone ?? this.phone,
       status: status ?? this.status,
-    token: token ?? this.token,
-    refreshToken: refreshToken ?? this.refreshToken,
-    isVendor: isVendor ?? this.isVendor,
-    dashboardUrl: dashboardUrl ?? this.dashboardUrl,
-  );
+      statusText: statusText ?? this.statusText,
+      profile: profile ?? this.profile,
+      createdAt: createdAt ?? this.createdAt,
+      token: token ?? this.token,
+      refreshToken: refreshToken ?? this.refreshToken,
+    );
+  }
 
-  factory AppUser.fromJson(Map<String, dynamic> json) => _$AppUserFromJson(json);
+  factory AppUser.fromJson(Map<String, dynamic> json) =>
+      _$AppUserFromJson(json);
 
   Map<String, dynamic> toJson() => _$AppUserToJson(this);
+
+  /// Update from API while preserving tokens.
+  AppUser mergeFromResponse(Map<String, dynamic> json) {
+    return AppUser.fromJson(json).copyWith(
+      token: token,
+      refreshToken: refreshToken,
+    );
+  }
+}
+
+@JsonSerializable()
+class Profile {
+  final int id;
+
+  @JsonKey(name: 'full_name')
+  final String? fullName;
+
+  @JsonKey(name: 'birth_date')
+  final String? birthDate;
+
+  @JsonKey(name: 'city_id')
+  final int? cityId;
+
+  final String? avatar;
+  final String? type;
+  final String? title;
+  final String? license;
+
+  @JsonKey(name: 'is_available_for_contract')
+  final bool? isAvailableForContract;
+
+  final num? rating;
+
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
+
+  @JsonKey(name: 'updated_at')
+  final String? updatedAt;
+
+  const Profile({
+    required this.id,
+    this.fullName,
+    this.birthDate,
+    this.cityId,
+    this.avatar,
+    this.type,
+    this.title,
+    this.license,
+    this.isAvailableForContract,
+    this.rating,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory Profile.fromJson(Map<String, dynamic> json) =>
+      _$ProfileFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ProfileToJson(this);
 }

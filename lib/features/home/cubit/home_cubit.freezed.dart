@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$HomeState {
 
- String get userName; bool get hasNotifications; String get searchQuery;
+ HomeStateStatus get status; String get userName; List<ProductModel> get products; List<TicketModel> get tickets;
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $HomeStateCopyWith<HomeState> get copyWith => _$HomeStateCopyWithImpl<HomeState>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeState&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.hasNotifications, hasNotifications) || other.hasNotifications == hasNotifications)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeState&&(identical(other.status, status) || other.status == status)&&(identical(other.userName, userName) || other.userName == userName)&&const DeepCollectionEquality().equals(other.products, products)&&const DeepCollectionEquality().equals(other.tickets, tickets));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,userName,hasNotifications,searchQuery);
+int get hashCode => Object.hash(runtimeType,status,userName,const DeepCollectionEquality().hash(products),const DeepCollectionEquality().hash(tickets));
 
 @override
 String toString() {
-  return 'HomeState(userName: $userName, hasNotifications: $hasNotifications, searchQuery: $searchQuery)';
+  return 'HomeState(status: $status, userName: $userName, products: $products, tickets: $tickets)';
 }
 
 
@@ -45,11 +45,11 @@ abstract mixin class $HomeStateCopyWith<$Res>  {
   factory $HomeStateCopyWith(HomeState value, $Res Function(HomeState) _then) = _$HomeStateCopyWithImpl;
 @useResult
 $Res call({
- String userName, bool hasNotifications, String searchQuery
+ HomeStateStatus status, String userName, List<ProductModel> products, List<TicketModel> tickets
 });
 
 
-
+$HomeStateStatusCopyWith<$Res> get status;
 
 }
 /// @nodoc
@@ -62,15 +62,25 @@ class _$HomeStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? userName = null,Object? hasNotifications = null,Object? searchQuery = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? userName = null,Object? products = null,Object? tickets = null,}) {
   return _then(_self.copyWith(
-userName: null == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
-as String,hasNotifications: null == hasNotifications ? _self.hasNotifications : hasNotifications // ignore: cast_nullable_to_non_nullable
-as bool,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
-as String,
+status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as HomeStateStatus,userName: null == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
+as String,products: null == products ? _self.products : products // ignore: cast_nullable_to_non_nullable
+as List<ProductModel>,tickets: null == tickets ? _self.tickets : tickets // ignore: cast_nullable_to_non_nullable
+as List<TicketModel>,
   ));
 }
-
+/// Create a copy of HomeState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$HomeStateStatusCopyWith<$Res> get status {
+  
+  return $HomeStateStatusCopyWith<$Res>(_self.status, (value) {
+    return _then(_self.copyWith(status: value));
+  });
+}
 }
 
 
@@ -152,10 +162,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userName,  bool hasNotifications,  String searchQuery)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( HomeStateStatus status,  String userName,  List<ProductModel> products,  List<TicketModel> tickets)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HomeState() when $default != null:
-return $default(_that.userName,_that.hasNotifications,_that.searchQuery);case _:
+return $default(_that.status,_that.userName,_that.products,_that.tickets);case _:
   return orElse();
 
 }
@@ -173,10 +183,10 @@ return $default(_that.userName,_that.hasNotifications,_that.searchQuery);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userName,  bool hasNotifications,  String searchQuery)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( HomeStateStatus status,  String userName,  List<ProductModel> products,  List<TicketModel> tickets)  $default,) {final _that = this;
 switch (_that) {
 case _HomeState():
-return $default(_that.userName,_that.hasNotifications,_that.searchQuery);case _:
+return $default(_that.status,_that.userName,_that.products,_that.tickets);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -193,10 +203,10 @@ return $default(_that.userName,_that.hasNotifications,_that.searchQuery);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userName,  bool hasNotifications,  String searchQuery)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( HomeStateStatus status,  String userName,  List<ProductModel> products,  List<TicketModel> tickets)?  $default,) {final _that = this;
 switch (_that) {
 case _HomeState() when $default != null:
-return $default(_that.userName,_that.hasNotifications,_that.searchQuery);case _:
+return $default(_that.status,_that.userName,_that.products,_that.tickets);case _:
   return null;
 
 }
@@ -208,12 +218,25 @@ return $default(_that.userName,_that.hasNotifications,_that.searchQuery);case _:
 
 
 class _HomeState implements HomeState {
-  const _HomeState({this.userName = 'محمد', this.hasNotifications = true, this.searchQuery = ''});
+  const _HomeState({this.status = const HomeStateStatus.initial(), this.userName = '', final  List<ProductModel> products = const [], final  List<TicketModel> tickets = const []}): _products = products,_tickets = tickets;
   
 
+@override@JsonKey() final  HomeStateStatus status;
 @override@JsonKey() final  String userName;
-@override@JsonKey() final  bool hasNotifications;
-@override@JsonKey() final  String searchQuery;
+ final  List<ProductModel> _products;
+@override@JsonKey() List<ProductModel> get products {
+  if (_products is EqualUnmodifiableListView) return _products;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_products);
+}
+
+ final  List<TicketModel> _tickets;
+@override@JsonKey() List<TicketModel> get tickets {
+  if (_tickets is EqualUnmodifiableListView) return _tickets;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_tickets);
+}
+
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
@@ -225,16 +248,16 @@ _$HomeStateCopyWith<_HomeState> get copyWith => __$HomeStateCopyWithImpl<_HomeSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeState&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.hasNotifications, hasNotifications) || other.hasNotifications == hasNotifications)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeState&&(identical(other.status, status) || other.status == status)&&(identical(other.userName, userName) || other.userName == userName)&&const DeepCollectionEquality().equals(other._products, _products)&&const DeepCollectionEquality().equals(other._tickets, _tickets));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,userName,hasNotifications,searchQuery);
+int get hashCode => Object.hash(runtimeType,status,userName,const DeepCollectionEquality().hash(_products),const DeepCollectionEquality().hash(_tickets));
 
 @override
 String toString() {
-  return 'HomeState(userName: $userName, hasNotifications: $hasNotifications, searchQuery: $searchQuery)';
+  return 'HomeState(status: $status, userName: $userName, products: $products, tickets: $tickets)';
 }
 
 
@@ -245,11 +268,11 @@ abstract mixin class _$HomeStateCopyWith<$Res> implements $HomeStateCopyWith<$Re
   factory _$HomeStateCopyWith(_HomeState value, $Res Function(_HomeState) _then) = __$HomeStateCopyWithImpl;
 @override @useResult
 $Res call({
- String userName, bool hasNotifications, String searchQuery
+ HomeStateStatus status, String userName, List<ProductModel> products, List<TicketModel> tickets
 });
 
 
-
+@override $HomeStateStatusCopyWith<$Res> get status;
 
 }
 /// @nodoc
@@ -262,16 +285,26 @@ class __$HomeStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? userName = null,Object? hasNotifications = null,Object? searchQuery = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? userName = null,Object? products = null,Object? tickets = null,}) {
   return _then(_HomeState(
-userName: null == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
-as String,hasNotifications: null == hasNotifications ? _self.hasNotifications : hasNotifications // ignore: cast_nullable_to_non_nullable
-as bool,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
-as String,
+status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as HomeStateStatus,userName: null == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
+as String,products: null == products ? _self._products : products // ignore: cast_nullable_to_non_nullable
+as List<ProductModel>,tickets: null == tickets ? _self._tickets : tickets // ignore: cast_nullable_to_non_nullable
+as List<TicketModel>,
   ));
 }
 
-
+/// Create a copy of HomeState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$HomeStateStatusCopyWith<$Res> get status {
+  
+  return $HomeStateStatusCopyWith<$Res>(_self.status, (value) {
+    return _then(_self.copyWith(status: value));
+  });
+}
 }
 
 /// @nodoc

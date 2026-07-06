@@ -8,28 +8,52 @@ part of 'app_user.dart';
 
 AppUser _$AppUserFromJson(Map<String, dynamic> json) => AppUser(
   id: (json['id'] as num).toInt(),
-  email: json['email'] as String?,
-  name: json['name'] as String?,
   phone: json['phone'] as String?,
-  address: json['address'] as String?,
-  image: json['image'] as String?,
   status: (json['status'] as num?)?.toInt(),
-  token: json['token'] as String?,
-  refreshToken: json['refreshToken'] as String?,
-  isVendor: json['is_vendor'] as bool?,
-  dashboardUrl: json['dashboard_url'] as String?,
+  statusText: json['status_text'] as String?,
+  profile: json['profile'] == null
+      ? null
+      : Profile.fromJson(json['profile'] as Map<String, dynamic>),
+  createdAt: json['created_at'] as String?,
 );
 
 Map<String, dynamic> _$AppUserToJson(AppUser instance) => <String, dynamic>{
   'id': instance.id,
-  'name': instance.name,
-  'email': instance.email,
   'phone': instance.phone,
-  'address': instance.address,
-  'image': instance.image,
   'status': instance.status,
+  'status_text': instance.statusText,
+  'profile': instance.profile?.toJson(),
+  'created_at': instance.createdAt,
   'token': instance.token,
   'refreshToken': instance.refreshToken,
-  'is_vendor': instance.isVendor,
-  'dashboard_url': instance.dashboardUrl,
+};
+
+Profile _$ProfileFromJson(Map<String, dynamic> json) => Profile(
+  id: (json['id'] as num).toInt(),
+  fullName: json['full_name'] as String?,
+  birthDate: json['birth_date'] as String?,
+  cityId: (json['city_id'] as num?)?.toInt(),
+  avatar: json['avatar'] as String?,
+  type: json['type'] as String?,
+  title: json['title'] as String?,
+  license: json['license'] as String?,
+  isAvailableForContract: json['is_available_for_contract'] as bool?,
+  rating: json['rating'] as num?,
+  createdAt: json['created_at'] as String?,
+  updatedAt: json['updated_at'] as String?,
+);
+
+Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
+  'id': instance.id,
+  'full_name': instance.fullName,
+  'birth_date': instance.birthDate,
+  'city_id': instance.cityId,
+  'avatar': instance.avatar,
+  'type': instance.type,
+  'title': instance.title,
+  'license': instance.license,
+  'is_available_for_contract': instance.isAvailableForContract,
+  'rating': instance.rating,
+  'created_at': instance.createdAt,
+  'updated_at': instance.updatedAt,
 };

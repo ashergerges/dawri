@@ -1,55 +1,133 @@
-import 'package:dawri/gen/locale_keys.g.dart';
+// lib/features/store/data/models/store_model.dart
+import 'package:json_annotation/json_annotation.dart';
 
-class ProductModel {
-  final String titleKey;
-  final String categoryKey;
-  final String imageUrl;
-  final String price;
-  final bool hasDiscount;
+part 'store_model.g.dart';
 
-  const ProductModel({
-    required this.titleKey,
-    required this.categoryKey,
-    required this.imageUrl,
-    required this.price,
-    this.hasDiscount = false,
-  });
+@JsonSerializable()
+class CategoryModel {
+  final int? id;
+  final String? name;
+  @JsonKey(name: 'name_ar')
+  final String? nameAr;
+  @JsonKey(name: 'name_en')
+  final String? nameEn;
+  final String? image;
+  final bool? status;
+
+  CategoryModel({this.id, this.name, this.nameAr, this.nameEn, this.image, this.status});
+
+  factory CategoryModel.fromJson(Map<String, dynamic> json) => _$CategoryModelFromJson(json);
+  Map<String, dynamic> toJson() => _$CategoryModelToJson(this);
 }
 
-class StoreMockData {
-  static const categoryKeys = [
-    LocaleKeys.allKey,
-    LocaleKeys.storeCategorySportswear,
-    LocaleKeys.storeCategoryEquipment,
-    LocaleKeys.storeCategoryTickets,
-    LocaleKeys.storeCategoryEsports,
-  ];
+@JsonSerializable()
+class CategoriesResponseModel {
+  final List<CategoryModel>? categories;
 
-  static const products = [
-    ProductModel(
-      titleKey: LocaleKeys.storeProduct1Title,
-      categoryKey: LocaleKeys.storeCategorySportswear,
-      imageUrl: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=300&q=80',
-      price: '140 ر.س',
-      hasDiscount: true,
-    ),
-    ProductModel(
-      titleKey: LocaleKeys.storeProduct2Title,
-      categoryKey: LocaleKeys.storeCategoryEquipment,
-      imageUrl: 'https://images.unsplash.com/photo-1622281549424-fd9aaea1fd43?w=300&q=80',
-      price: '450 ر.س',
-    ),
-    ProductModel(
-      titleKey: LocaleKeys.storeProduct3Title,
-      categoryKey: LocaleKeys.storeCategoryEsports,
-      imageUrl: 'https://images.unsplash.com/photo-1600003014755-ba31aa59c4b6?w=300&q=80',
-      price: '280 ر.س',
-    ),
-    ProductModel(
-      titleKey: LocaleKeys.storeProduct4Title,
-      categoryKey: LocaleKeys.storeCategoryTickets,
-      imageUrl: 'https://images.unsplash.com/photo-1614632537190-23e4146777db?w=300&q=80',
-      price: '75 ر.س',
-    ),
-  ];
+  CategoriesResponseModel({this.categories});
+
+  factory CategoriesResponseModel.fromJson(Map<String, dynamic> json) =>
+      _$CategoriesResponseModelFromJson(json);
+  Map<String, dynamic> toJson() => _$CategoriesResponseModelToJson(this);
+}
+
+@JsonSerializable()
+class ProductCategoryModel {
+  final int? id;
+  final String? name;
+
+  ProductCategoryModel({this.id, this.name});
+
+  factory ProductCategoryModel.fromJson(Map<String, dynamic> json) =>
+      _$ProductCategoryModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductCategoryModelToJson(this);
+}
+
+@JsonSerializable()
+class ProductModel {
+  final int? id;
+  final String? name;
+  final String? description;
+  final String? image;
+  final num? price;
+  final ProductCategoryModel? category;
+  final List<ProductVariantModel>? variants;
+
+  ProductModel({
+    this.id,
+    this.name,
+    this.description,
+    this.image,
+    this.price,
+    this.category,
+    this.variants,
+  });
+
+  factory ProductModel.fromJson(Map<String, dynamic> json) => _$ProductModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductModelToJson(this);
+}
+
+@JsonSerializable()
+class ProductVariantModel {
+  final int? id;
+  final num? price;
+  final int? stock;
+  final ProductSizeModel? size;
+  final ProductColorModel? color;
+
+  ProductVariantModel({this.id, this.price, this.stock, this.size, this.color});
+
+  factory ProductVariantModel.fromJson(Map<String, dynamic> json) =>
+      _$ProductVariantModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductVariantModelToJson(this);
+}
+
+@JsonSerializable()
+class ProductSizeModel {
+  final int? id;
+  final String? value;
+
+  ProductSizeModel({this.id, this.value});
+
+  factory ProductSizeModel.fromJson(Map<String, dynamic> json) => _$ProductSizeModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductSizeModelToJson(this);
+}
+
+@JsonSerializable()
+class ProductColorModel {
+  final int? id;
+  final String? value;
+
+  ProductColorModel({this.id, this.value});
+
+  factory ProductColorModel.fromJson(Map<String, dynamic> json) => _$ProductColorModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductColorModelToJson(this);
+}
+
+@JsonSerializable()
+class PaginationModel {
+  final int? total;
+  @JsonKey(name: 'per_page')
+  final int? perPage;
+  @JsonKey(name: 'current_page')
+  final int? currentPage;
+  @JsonKey(name: 'total_pages')
+  final int? totalPages;
+
+  PaginationModel({this.total, this.perPage, this.currentPage, this.totalPages});
+
+  factory PaginationModel.fromJson(Map<String, dynamic> json) => _$PaginationModelFromJson(json);
+  Map<String, dynamic> toJson() => _$PaginationModelToJson(this);
+}
+
+@JsonSerializable()
+class ProductsResponseModel {
+  final List<ProductModel>? products;
+  final PaginationModel? pagination;
+
+  ProductsResponseModel({this.products, this.pagination});
+
+  factory ProductsResponseModel.fromJson(Map<String, dynamic> json) =>
+      _$ProductsResponseModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductsResponseModelToJson(this);
 }
