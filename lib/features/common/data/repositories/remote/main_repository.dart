@@ -1,5 +1,4 @@
 import 'package:dawri/core/services/network/network_service.dart';
-import 'package:dawri/features/common/data/local/models/app_footer.dart';
 import 'package:dawri/features/common/data/local/models/app_user.dart';
 import 'package:async/async.dart';
 import 'package:injectable/injectable.dart';

@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
-import 'package:dawri/features/common/ui/widgets/circular_icon_button.dart';
 import 'package:dawri/core/utils/constants/app_colors.dart';
 import 'package:dawri/core/utils/constants/app_text_them.dart';
 import 'package:dawri/core/utils/constants/responsive.dart';

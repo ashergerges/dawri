@@ -6,7 +6,6 @@ import 'package:dawri/core/utils/constants/constants.dart';
 import 'package:injectable/injectable.dart';
 import 'package:dawri/features/splash/data/models/settings_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/app_footer.dart';
 import '../models/app_user.dart';
 
 @Singleton(as: ILocalPreference)

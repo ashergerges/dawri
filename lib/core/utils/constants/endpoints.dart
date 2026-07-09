@@ -19,7 +19,6 @@ class Endpoints {
   String get productsUrl => r'api/app/products/all';
   //vendor details
   String get vendorDetailsUrl => r'api/app/products/details';
-  String get wishlistToggleUrl => r'api/app/user/wishlist/toggle';
   String get wishlistTypeUrl => r'api/app/user/wishlist';
   String get packageDetailsUrl => r'api/app/package/details';
 
@@ -51,5 +50,13 @@ class Endpoints {
 
   //cart
   String get addedToCartUrl => r'api/app/cart/add';
+  String get cartUrl => r'api/app/cart';
+  String get cartDeleteUrl => r'api/app/cart/delete';
+  String get cartUpdateUrl => r'api/app/cart/update';
+  String get couponsApplyUrl => r'api/app/coupons/apply';
+
+  //product details
+  String get productDetailsUrl  => r'api/app/products/details';
+  String get wishlistToggleUrl => r'api/app/user/wishlist/toggle';
 
 }

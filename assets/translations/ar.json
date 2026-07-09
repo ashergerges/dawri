@@ -849,6 +849,14 @@
   "loginPhoneInvalid": "رقم الجوال غير صحيح، تأكد أنه يبدأ بـ 05 ومكوّن من 10 أرقام",
   "loginOtpIncomplete": "من فضلك أدخل الرمز كاملاً",
   "loginOtpInvalid": "الرمز غير صحيح، حاول مرة أخرى",
-  "errorGeneric": "حدث خطأ، حاول مرة أخرى"
-
+  "errorGeneric": "حدث خطأ، حاول مرة أخرى",
+  "cartConfirmDeleteTitle": "تأكيد الحذف",
+  "cartConfirmDeleteAllMsg": "هل أنت متأكد من حذف جميع المنتجات من السلة؟",
+  "cartConfirmRemoveItemMsg": "هل أنت متأكد من حذف هذا المنتج من السلة؟",
+  "cartPromoApply": "تطبيق",
+  "cartPromoRemove": "إزالة",
+  "cartTax": "الضريبة",
+  "cancel": "إلغاء",
+  "delete": "حذف",
+  "productDetailsSelectColor": "اختر اللون"
 }

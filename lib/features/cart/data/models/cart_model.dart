@@ -1,46 +1,102 @@
-class CartItemModel {
-  final String id;
-  final String titleKey;
-  final String imageUrl;
-  final double unitPrice;
-  final int quantity;
+// lib/features/cart/data/models/cart_model.dart
+import 'package:json_annotation/json_annotation.dart';
 
-  const CartItemModel({
-    required this.id,
-    required this.titleKey,
-    required this.imageUrl,
-    required this.unitPrice,
-    this.quantity = 1,
+part 'cart_model.g.dart';
+
+@JsonSerializable()
+class CartItemModel {
+  final int? id;
+  final int? quantity;
+  @JsonKey(name: 'sub_total')
+  final num? subTotal;
+  @JsonKey(name: 'product_name')
+  final String? productName;
+  @JsonKey(name: 'product_image')
+  final String? productImage;
+  final CartVariantModel? variant;
+
+  CartItemModel({
+    this.id,
+    this.quantity,
+    this.subTotal,
+    this.productName,
+    this.productImage,
+    this.variant,
   });
 
-  CartItemModel copyWith({int? quantity}) {
-    return CartItemModel(
-      id: id,
-      titleKey: titleKey,
-      imageUrl: imageUrl,
-      unitPrice: unitPrice,
-      quantity: quantity ?? this.quantity,
-    );
-  }
-
-  double get totalPrice => unitPrice * quantity;
+  factory CartItemModel.fromJson(Map<String, dynamic> json) => _$CartItemModelFromJson(json);
+  Map<String, dynamic> toJson() => _$CartItemModelToJson(this);
 }
 
-class CartMockData {
-  static const taxRate = 0.15;
+@JsonSerializable()
+class CartVariantModel {
+  final int? id;
+  final num? price;
+  final int? stock;
+  final CartSizeModel? size;
+  final CartColorModel? color;
 
-  static const initialItems = [
-    CartItemModel(
-      id: 'item1',
-      titleKey: 'cartProduct1Title',
-      imageUrl: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=150&q=80',
-      unitPrice: 140,
-    ),
-    CartItemModel(
-      id: 'item2',
-      titleKey: 'cartProduct2Title',
-      imageUrl: 'https://images.unsplash.com/photo-1622281549424-fd9aaea1fd43?w=150&q=80',
-      unitPrice: 450,
-    ),
-  ];
+  CartVariantModel({this.id, this.price, this.stock, this.size, this.color});
+
+  factory CartVariantModel.fromJson(Map<String, dynamic> json) => _$CartVariantModelFromJson(json);
+  Map<String, dynamic> toJson() => _$CartVariantModelToJson(this);
+}
+
+@JsonSerializable()
+class CartSizeModel {
+  final int? id;
+  final String? value;
+
+  CartSizeModel({this.id, this.value});
+
+  factory CartSizeModel.fromJson(Map<String, dynamic> json) => _$CartSizeModelFromJson(json);
+  Map<String, dynamic> toJson() => _$CartSizeModelToJson(this);
+}
+
+@JsonSerializable()
+class CartColorModel {
+  final int? id;
+  final String? value;
+
+  CartColorModel({this.id, this.value});
+
+  factory CartColorModel.fromJson(Map<String, dynamic> json) => _$CartColorModelFromJson(json);
+  Map<String, dynamic> toJson() => _$CartColorModelToJson(this);
+}
+
+@JsonSerializable()
+class CartResponseModel {
+  @JsonKey(name: 'cart_items')
+  final List<CartItemModel>? cartItems;
+  @JsonKey(name: 'cart_total')
+  final num? cartTotal;
+
+  CartResponseModel({this.cartItems, this.cartTotal});
+
+  factory CartResponseModel.fromJson(Map<String, dynamic> json) => _$CartResponseModelFromJson(json);
+  Map<String, dynamic> toJson() => _$CartResponseModelToJson(this);
+}
+
+@JsonSerializable()
+class CartCouponModel {
+  @JsonKey(name: 'coupon_code')
+  final String? couponCode;
+  final String? percentage;
+  @JsonKey(name: 'cart_total')
+  final num? cartTotal;
+  @JsonKey(name: 'discount_amount')
+  final num? discountAmount;
+  @JsonKey(name: 'final_total')
+  final num? finalTotal;
+
+  CartCouponModel({
+    this.couponCode,
+    this.percentage,
+    this.cartTotal,
+    this.discountAmount,
+    this.finalTotal,
+  });
+
+  factory CartCouponModel.fromJson(Map<String, dynamic> json) => _$CartCouponModelFromJson(json);
+  Map<String, dynamic> toJson() => _$CartCouponModelToJson(this);
 }

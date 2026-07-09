@@ -1,12 +1,6 @@
 import 'package:auto_route/annotations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:dawri/core/utils/common_widgets/custom_network_image.dart';
-import 'package:dawri/core/utils/common_widgets/on_tap.dart';
-import 'package:dawri/core/utils/constants/app_colors.dart';
-import 'package:dawri/core/utils/constants/app_text_them.dart';
-import 'package:dawri/core/utils/extensions/padding_extensions.dart';
 import 'package:photo_view/photo_view.dart';
 
 @RoutePage()

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:dawri/core/utils/extensions/padding_extensions.dart';
-import 'package:dawri/gen/assets.gen.dart';
 
 import '../../../../core/utils/constants/app_colors.dart';
 import '../../../../core/utils/common_widgets/app_button.dart';

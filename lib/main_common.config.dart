@@ -26,6 +26,9 @@ import 'core/services/network/token_service.dart' as _i797;
 import 'core/services/notification/notifications_service.dart' as _i402;
 import 'core/services/upgrader/upgrader_service.dart' as _i289;
 import 'core/utils/helper/error_handler.dart' as _i785;
+import 'features/cart/data/repositories/interfaces/i_cart_repository.dart'
+    as _i775;
+import 'features/cart/data/repositories/remote/cart_repository.dart' as _i48;
 import 'features/common/data/local/data_sources/local_storage.dart' as _i656;
 import 'features/common/data/local/repositories/token_local_repository.dart'
     as _i784;
@@ -47,6 +50,10 @@ import 'features/notifications/data/repositories/interfaces/i_notifications_repo
     as _i97;
 import 'features/notifications/data/repositories/remote/notifications_repository.dart'
     as _i192;
+import 'features/product_details/data/repositories/interfaces/i_product_details_repository.dart'
+    as _i873;
+import 'features/product_details/data/repositories/remote/product_details_repository.dart'
+    as _i442;
 import 'features/splash/cubits/splash_cubit/splash_cubit.dart' as _i331;
 import 'features/splash/data/repositories/interfaces/i_splash_repository.dart'
     as _i561;
@@ -97,6 +104,9 @@ _i174.GetIt $initGetIt(
   gh.factory<_i561.ISplashRepository>(
     () => _i120.SplashRepository(networkService: gh<_i969.NetworkService>()),
   );
+  gh.factory<_i775.ICartRepository>(
+    () => _i48.CartRepository(networkService: gh<_i969.NetworkService>()),
+  );
   gh.factory<_i185.IHomeRepository>(
     () => _i975.HomeRepository(networkService: gh<_i969.NetworkService>()),
   );
@@ -112,6 +122,11 @@ _i174.GetIt $initGetIt(
   );
   gh.factory<_i255.IStoreRepository>(
     () => _i77.StoreRepository(networkService: gh<_i969.NetworkService>()),
+  );
+  gh.factory<_i873.IProductDetailsRepository>(
+    () => _i442.ProductDetailsRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
   );
   gh.factory<_i967.IMainRepository>(
     () => _i210.MainRepository(networkService: gh<_i969.NetworkService>()),

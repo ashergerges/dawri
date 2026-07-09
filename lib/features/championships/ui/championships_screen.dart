@@ -1,5 +1,4 @@
 // lib/features/championships/ui/championships_screen.dart
-import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
 import 'package:dotted_line/dotted_line.dart';

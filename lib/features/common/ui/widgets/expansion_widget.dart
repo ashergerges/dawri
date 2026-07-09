@@ -4,7 +4,6 @@ import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
 import 'package:dawri/core/utils/constants/app_text_them.dart';
 import 'package:dawri/core/utils/extensions/padding_extensions.dart';
 
-import '../../../../gen/assets.gen.dart';
 
 class ExpansionWidget extends StatefulWidget {
   final String title;

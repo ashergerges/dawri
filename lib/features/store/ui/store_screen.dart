@@ -1,7 +1,7 @@
 // lib/features/store/ui/store_screen.dart
-import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
+import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
 import 'package:dawri/core/utils/constants/pull_refresh.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -416,7 +416,7 @@ class _ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return OnTap(
       onTap: () {
-        ProductDetailsRoute().push(context);
+        ProductDetailsRoute(productId: product.id??0).push(context);
       },
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -521,42 +521,43 @@ class _ProductCardShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: AppColors.slate300.withOpacity(0.4),
-      highlightColor: AppColors.slate300.withOpacity(0.1),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        child: SizedBox(
-          width: 145.w,
-          child: Padding(
-            padding: 10.w.padAll,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      child: Padding(
+        padding: 10.w.padAll,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ShimmerWidget.rectangular(
+              width: double.infinity,
+              height: 130.h,
+              shapeBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+            ),
+            10.h.sizedHeight,
+            ShimmerWidget.rectangular(width: 60.w, height: 10.h),
+            6.h.sizedHeight,
+            ShimmerWidget.rectangular(width: 100.w, height: 14.h),
+            const Spacer(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(14.r),
-                  child: Container(
-                    width: double.infinity,
-                    height: 110.h,
-                    color: AppColors.white,
-                  ),
+                ShimmerWidget.rectangular(width: 50.w, height: 16.h),
+                ShimmerWidget.rectangular(
+                  width: 34.w,
+                  height: 34.w,
+                  shapeBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
                 ),
-                10.h.sizedHeight,
-                Container(width: 90.w, height: 12.h, color: AppColors.white),
-                8.h.sizedHeight,
-                Container(width: 60.w, height: 12.h, color: AppColors.white),
               ],
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 }
-
 class _AddToCartButton extends StatelessWidget {
   const _AddToCartButton(this.id);
   final int id;

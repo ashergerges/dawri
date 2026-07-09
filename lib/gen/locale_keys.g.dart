@@ -847,5 +847,14 @@ abstract class  LocaleKeys {
   static const loginOtpIncomplete = 'loginOtpIncomplete';
   static const loginOtpInvalid = 'loginOtpInvalid';
   static const errorGeneric = 'errorGeneric';
+  static const cartConfirmDeleteTitle = 'cartConfirmDeleteTitle';
+  static const cartConfirmDeleteAllMsg = 'cartConfirmDeleteAllMsg';
+  static const cartConfirmRemoveItemMsg = 'cartConfirmRemoveItemMsg';
+  static const cartPromoApply = 'cartPromoApply';
+  static const cartPromoRemove = 'cartPromoRemove';
+  static const cartTax = 'cartTax';
+  static const cancel = 'cancel';
+  static const delete = 'delete';
+  static const productDetailsSelectColor = 'productDetailsSelectColor';
 
 }

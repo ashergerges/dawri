@@ -1,5 +1,4 @@
 // ignore: implementation_imports, depend_on_referenced_packages
-import 'dart:developer';
 
 import 'package:async/async.dart';
 import 'package:injectable/injectable.dart';

@@ -31,7 +31,7 @@ TODO: Describe and show how to build your code and run the tests.
   dart run easy_localization:generate --source-dir ./assets/translations -f keys -o locale_keys.g.dart -O lib/gen
   ```
 
-
+   
 
 # For build dev APK
 

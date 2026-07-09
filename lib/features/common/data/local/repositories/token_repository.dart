@@ -3,7 +3,6 @@ import 'package:dawri/core/interfaces/i_token_repository.dart';
 import 'package:dawri/core/services/models/refresh_token_model.dart';
 import 'package:dawri/core/services/network/network_service.dart';
 import 'package:async/async.dart';
-import 'package:dawri/features/common/data/local/models/basic_response.dart';
 import 'package:dawri/main_common.dart';
 import 'package:injectable/injectable.dart';
 import '../../../../../core/utils/constants/constants.dart';

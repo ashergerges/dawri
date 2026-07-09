@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
+import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
 import 'package:dawri/features/home/data/models/service_model.dart';
 import 'package:dawri/main_common.dart';
 import 'package:dotted_line/dotted_line.dart';
@@ -18,7 +19,6 @@ import 'package:dawri/core/utils/extensions/padding_extensions.dart';
 import 'package:dawri/core/utils/common_widgets/custom_network_image.dart';
 import 'package:dawri/features/home/cubit/home_cubit.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
-import 'package:shimmer/shimmer.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -510,6 +510,7 @@ class _ProductsSection extends StatelessWidget {
                 itemCount: state.products.length,
                 separatorBuilder: (_, __) => 15.w.sizedWidth,
                 itemBuilder: (_, i) => _ProductCard(
+                  productId: state.products[i].id??0,
                   onTapAddedToCart: (){
                     log("HIII");
                     context.read<HomeCubit>().addedToCart(id:state.products[i].id??0);
@@ -526,41 +527,33 @@ class _ProductsSection extends StatelessWidget {
     );
   }
 }
-
 class _ProductCardShimmer extends StatelessWidget {
   const _ProductCardShimmer();
 
   @override
   Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: AppColors.slate300.withOpacity(0.4),
-      highlightColor: AppColors.slate300.withOpacity(0.1),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        child: SizedBox(
-          width: 145.w,
-          child: Padding(
-            padding: 10.w.padAll,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(14.r),
-                  child: Container(
-                    width: double.infinity,
-                    height: 110.h,
-                    color: AppColors.white,
-                  ),
-                ),
-                10.h.sizedHeight,
-                Container(width: 90.w, height: 12.h, color: AppColors.white),
-                8.h.sizedHeight,
-                Container(width: 60.w, height: 12.h, color: AppColors.white),
-              ],
-            ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      child: SizedBox(
+        width: 145.w,
+        child: Padding(
+          padding: 10.w.padAll,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ShimmerWidget.rectangular(
+                width: double.infinity,
+                height: 110.h,
+                shapeBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+              ),
+              10.h.sizedHeight,
+              ShimmerWidget.rectangular(width: 90.w, height: 12.h),
+              8.h.sizedHeight,
+              ShimmerWidget.rectangular(width: 60.w, height: 12.h),
+            ],
           ),
         ),
       ),
@@ -568,23 +561,25 @@ class _ProductCardShimmer extends StatelessWidget {
   }
 }
 
+
 class _ProductCard extends StatelessWidget {
   final String imageUrl;
   final String title;
   final String price;
+  final int productId;
   final Function() onTapAddedToCart;
 
   const _ProductCard({
     required this.imageUrl,
     required this.title,
-    required this.price, required this.onTapAddedToCart,
+    required this.price, required this.onTapAddedToCart, required this.productId,
   });
 
   @override
   Widget build(BuildContext context) {
     return OnTap(
       onTap: () {
-        ProductDetailsRoute().push(context);
+        ProductDetailsRoute(productId:productId ).push(context);
       },
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -757,35 +752,35 @@ class _TicketCardShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: AppColors.slate300.withOpacity(0.4),
-      highlightColor: AppColors.slate300.withOpacity(0.1),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        child: SizedBox(
-          height: 80.h,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 15.h),
-            child: Row(
-              children: [
-                Container(width: 60.w, height: 50.h, color: AppColors.white),
-                16.w.sizedWidth,
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(width: 150.w, height: 12.h, color: AppColors.white),
-                      8.h.sizedHeight,
-                      Container(width: 100.w, height: 10.h, color: AppColors.white),
-                    ],
-                  ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: SizedBox(
+        height: 80.h,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 15.h),
+          child: Row(
+            children: [
+              ShimmerWidget.rectangular(
+                width: 60.w,
+                height: 50.h,
+                shapeBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+              ),
+              16.w.sizedWidth,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ShimmerWidget.rectangular(width: 150.w, height: 12.h),
+                    8.h.sizedHeight,
+                    ShimmerWidget.rectangular(width: 100.w, height: 10.h),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

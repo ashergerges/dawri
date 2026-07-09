@@ -1,7 +1,6 @@
 // lib/features/champ_profile/data/champ_profile_model.dart
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:dawri/core/utils/constants/app_colors.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
 
 enum ChampTab { info, teams, matches }

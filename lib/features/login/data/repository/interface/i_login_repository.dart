@@ -1,6 +1,5 @@
 import 'package:async/async.dart';
 import 'package:dawri/features/login/data/models/login_response_body.dart';
-import 'package:dawri/features/login/data/models/verify_otp_model.dart';
 
 
 abstract class IAuthRepo {

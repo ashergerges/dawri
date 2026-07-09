@@ -1,4 +1,6 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:dawri/core/utils/common_widgets/on_tap.dart';
+import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,9 +36,9 @@ class _CartView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocConsumer<CartCubit, CartState>(
-        listenWhen: (p, c) => p.isSuccess != c.isSuccess,
+        listenWhen: (p, c) => p.isCheckoutSuccess != c.isCheckoutSuccess,
         listener: (context, state) {
-          if (state.isSuccess) {
+          if (state.isCheckoutSuccess) {
             showDialog(
               context: context,
               barrierDismissible: false,
@@ -45,38 +47,58 @@ class _CartView extends StatelessWidget {
           }
         },
         builder: (context, state) {
-          if (state.items.isEmpty) {
-            return const Column(
+          return state.currState.when(
+            initial: () => const Column(
+              children: [_SubHeader(), Expanded(child: _CartShimmerList())],
+            ),
+            loading: () => const Column(
+              children: [_SubHeader(), Expanded(child: _CartShimmerList())],
+            ),
+            error: () => Column(
               children: [
-                _SubHeader(),
-                Expanded(child: _EmptyCart()),
-              ],
-            );
-          }
-          return Column(
-            children: [
-              const _SubHeader(),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: const [
-                      _CartItemsList(),
-                      _PromoCodeBox(),
-                      _OrderSummary(),
-                      SizedBox(height: 110),
-                    ],
+                const _SubHeader(),
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      LocaleKeys.errorGeneric.tr(),
+                      style: AppTextTheme.bodySmall(context).copyWith(color: AppColors.textMuted),
+                    ),
                   ),
                 ),
-              ),
-              const _CheckoutBottomBar(),
-            ],
+              ],
+            ),
+            success: () {
+              if (state.items.isEmpty) {
+                return const Column(
+                  children: [_SubHeader(), Expanded(child: _EmptyCart())],
+                );
+              }
+              return Column(
+                children: [
+                  const _SubHeader(),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children:  [
+                          _CartItemsList(),
+                          _PromoCodeBox(),
+                          20.verticalSpace,
+                          _OrderSummary(),
+                          SizedBox(height: 110),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const _CheckoutBottomBar(),
+                ],
+              );
+            },
           );
         },
       ),
     );
   }
 }
-
 // ─── SUB HEADER ────────────────────────────────────────────────────────────
 class _SubHeader extends StatelessWidget {
   const _SubHeader();
@@ -142,7 +164,13 @@ class _SubHeader extends StatelessWidget {
             },
           ),
           GestureDetector(
-            onTap: () => context.read<CartCubit>().clearCart(),
+            onTap: () async {
+              final confirmed = await _confirmDelete(
+                context,
+                message: LocaleKeys.cartConfirmDeleteAllMsg.tr(),
+              );
+              if (confirmed) context.read<CartCubit>().deleteAll();
+            },
             child: SizedBox(
               width: 40.w,
               height: 40.w,
@@ -151,6 +179,7 @@ class _SubHeader extends StatelessWidget {
               ),
             ),
           ),
+
         ],
       ),
     );
@@ -219,7 +248,71 @@ class _EmptyCart extends StatelessWidget {
     );
   }
 }
+class _CartShimmerList extends StatelessWidget {
+  const _CartShimmerList();
 
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: 20.w.padAll,
+      child: Column(
+        children: List.generate(
+          3,
+              (_) => Padding(
+            padding: EdgeInsets.only(bottom: 15.h),
+            child: _CartItemCardShimmer(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CartItemCardShimmer extends StatelessWidget {
+  const _CartItemCardShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.black.withOpacity(0.02),
+            blurRadius: 15,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: 12.w.padAll,
+        child: Row(
+          children: [
+            ShimmerWidget.rectangular(
+              width: 70.w,
+              height: 70.w,
+              shapeBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+            ),
+            14.w.sizedWidth,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ShimmerWidget.rectangular(width: 130.w, height: 12.h),
+                  8.h.sizedHeight,
+                  ShimmerWidget.rectangular(width: 80.w, height: 10.h),
+                  10.h.sizedHeight,
+                  ShimmerWidget.rectangular(width: 60.w, height: 14.h),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 // ─── CART ITEMS LIST ────────────────────────────────────────────────────────
 class _CartItemsList extends StatelessWidget {
   const _CartItemsList();
@@ -272,7 +365,7 @@ class _CartItemCard extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(14.r),
               child: CustomNetworkImage(
-                imageUrl: item.imageUrl,
+                imageUrl: item.productImage,
                 width: 85.w,
                 height: 85.w,
                 fit: BoxFit.cover,
@@ -284,7 +377,7 @@ class _CartItemCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item.titleKey.tr(),
+                    item.productName??"",
                     style: AppTextTheme.bodySmallSemiBold(context).copyWith(
                       fontWeight: FontWeight.w800,
                       color: AppColors.textDark,
@@ -298,7 +391,7 @@ class _CartItemCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '${item.unitPrice.toStringAsFixed(0)} ${LocaleKeys.cartCurrency.tr()}',
+                        '${item.variant?.price ?? 0} ${LocaleKeys.cartCurrency.tr()}',
                         style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
                           fontWeight: FontWeight.w900,
                           color: AppColors.primary,
@@ -334,7 +427,18 @@ class _QuantityControl extends StatelessWidget {
           children: [
             _QtyButton(
               icon: FontAwesomeIcons.minus,
-              onTap: () => context.read<CartCubit>().decreaseQuantity(item.id),
+              onTap: () async {
+                final cubit = context.read<CartCubit>();
+                if ((item.id != null) && cubit.willRemoveOnDecrease(item.id!)) {
+                  final confirmed = await _confirmDelete(
+                    context,
+                    message: LocaleKeys.cartConfirmRemoveItemMsg.tr(),
+                  );
+                  if (confirmed) cubit.removeItem(item.id!);
+                } else if (item.id != null) {
+                  cubit.decreaseQuantity(item.id!);
+                }
+              },
             ),
             SizedBox(
               width: 30.w,
@@ -349,7 +453,7 @@ class _QuantityControl extends StatelessWidget {
             ),
             _QtyButton(
               icon: FontAwesomeIcons.plus,
-              onTap: () => context.read<CartCubit>().increaseQuantity(item.id),
+              onTap: () => context.read<CartCubit>().increaseQuantity(item.id??0),
             ),
           ],
         ),
@@ -411,58 +515,125 @@ class _PromoCodeBoxState extends State<_PromoCodeBox> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.h),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          border: Border.all(color: AppColors.slate200, width: 1.5),
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(6.w),
-          child: Row(
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: BlocBuilder<CartCubit, CartState>(
+        buildWhen: (p, c) =>
+        p.isCouponApplied != c.isCouponApplied ||
+            p.isCouponLoading != c.isCouponLoading ||
+            p.appliedCouponCode != c.appliedCouponCode ||
+            p.couponErrorKey != c.couponErrorKey,
+        builder: (context, state) {
+          if (state.isCouponApplied && _controller.text.isEmpty) {
+            _controller.text = state.appliedCouponCode ?? '';
+          }
+          if (!state.isCouponApplied && _controller.text.isNotEmpty && state.appliedCouponCode == null) {
+            // keep whatever user typed
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _controller,
-                  onTapOutside: (_) => FocusScope.of(context).unfocus(),
-                  decoration: InputDecoration(
-                    hintText: LocaleKeys.cartPromoHint.tr(),
-                    hintStyle: AppTextTheme.bodySmall(context).copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textHint,
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
-                  ),
-                  style: AppTextTheme.bodySmall(context).copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark,
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () => context.read<CartCubit>().applyPromoCode(_controller.text),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryLight,
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
-                    child: Text(
-                      LocaleKeys.cartApply.tr(),
-                      style: AppTextTheme.bodySmall(context).copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.white,
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      enabled: !state.isCouponApplied && !state.isCouponLoading,
+                      decoration: InputDecoration(
+                        hintText: LocaleKeys.cartPromoHint.tr(),
+                        filled: true,
+                        fillColor: state.isCouponApplied ? AppColors.success.withOpacity(0.06) : AppColors.slate100,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14.r),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
-                ),
+                  10.w.sizedWidth,
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                    decoration: BoxDecoration(
+                      color: state.isCouponApplied ? AppColors.error : AppColors.primary,
+                      borderRadius: BorderRadius.circular(14.r),
+                    ),
+                    child: GestureDetector(
+                      onTap: state.isCouponLoading
+                          ? null
+                          : () {
+                        final cubit = context.read<CartCubit>();
+                        if (state.isCouponApplied) {
+                          cubit.removeCoupon();
+                          _controller.clear();
+                        } else {
+                          cubit.applyCoupon(_controller.text);
+                        }
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 14.h),
+                        child: state.isCouponLoading
+                            ? SizedBox(
+                          width: 18.w,
+                          height: 18.w,
+                          child: const CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
+                        )
+                            : AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 500),
+                          child: state.isCouponApplied
+                              ? Row(
+                            key: const ValueKey('remove'),
+                            children: [
+                              Text(
+                                LocaleKeys.cartPromoRemove.tr(),
+                                style: AppTextTheme.bodySmallSemiBold(context)
+                                    .copyWith(color: AppColors.white, fontWeight: FontWeight.w700),
+                              ),
+                            ],
+                          )
+                              : Row(
+                            key: const ValueKey('apply'),
+                            children: [
+                              Text(
+                                LocaleKeys.cartPromoApply.tr(),
+                                style: AppTextTheme.bodySmallSemiBold(context)
+                                    .copyWith(color: AppColors.white, fontWeight: FontWeight.w700),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
+              if (state.isCouponApplied)
+                Padding(
+                  padding: EdgeInsets.only(top: 8.h),
+                  child: Row(
+                    children: [
+                      FaIcon(FontAwesomeIcons.circleCheck, size: 14.sp, color: AppColors.success),
+                      6.w.sizedWidth,
+                      Text(
+                        '${state.appliedCouponCode} (${state.couponPercentage})',
+                        style: AppTextTheme.bodyXSmall(context)
+                            .copyWith(color: AppColors.success, fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
+                ),
+              if (state.couponErrorKey != null)
+                Padding(
+                  padding: EdgeInsets.only(top: 6.h),
+                  child: Text(
+                    state.couponErrorKey!.tr(),
+                    style: AppTextTheme.bodyXSmall(context).copyWith(color: AppColors.error),
+                  ),
+                ),
             ],
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -477,8 +648,7 @@ class _OrderSummary extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: BlocBuilder<CartCubit, CartState>(
-        buildWhen: (p, c) => p.items != c.items || p.discount != c.discount,
-        builder: (context, state) {
+        buildWhen: (p, c) => p.items != c.items || p.discountAmount != c.discountAmount || p.isCouponApplied != c.isCouponApplied,        builder: (context, state) {
           final cubit = context.read<CartCubit>();
           return DecoratedBox(
             decoration: BoxDecoration(
@@ -510,14 +680,12 @@ class _OrderSummary extends StatelessWidget {
                     label: LocaleKeys.cartSubtotal.tr(),
                     value: '${cubit.subTotal.toStringAsFixed(2)} ${LocaleKeys.cartCurrency.tr()}',
                   ),
-                  if (state.discount > 0) ...[
-                    10.h.sizedHeight,
-                    _SummaryRow(
-                      label: LocaleKeys.cartDiscount.tr(),
-                      value: '- ${state.discount.toStringAsFixed(2)} ${LocaleKeys.cartCurrency.tr()}',
-                      valueColor: AppColors.primaryLight,
-                    ),
-                  ],
+                   if (state.isCouponApplied)
+          _SummaryRow(
+            label: LocaleKeys.cartDiscount.tr(),
+            value: '- ${state.discountAmount} ${LocaleKeys.cartCurrency.tr()}',
+            valueColor: AppColors.success,
+          ),
                   10.h.sizedHeight,
                   _SummaryRow(
                     label: LocaleKeys.cartVat.tr(),
@@ -617,7 +785,7 @@ class _CheckoutBottomBar extends StatelessWidget {
         padding: 20.w.padAll,
         child: BlocBuilder<CartCubit, CartState>(
           buildWhen: (p, c) =>
-          p.items != c.items || p.discount != c.discount || p.isLoading != c.isLoading,
+          p.items != c.items || p.discountAmount != c.discountAmount || p.isCheckoutLoading  != c.isCheckoutLoading ,
           builder: (context, state) {
             final cubit = context.read<CartCubit>();
             return Row(
@@ -642,11 +810,11 @@ class _CheckoutBottomBar extends StatelessWidget {
                     ),
                   ],
                 ),
-                GestureDetector(
-                  onTap: state.isLoading ? null : cubit.checkout,
+                OnTap(
+                  onTap: state.isCheckoutLoading  ? null : cubit.checkout,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: state.isLoading ? AppColors.slate400 : AppColors.primary,
+                      color: state.isCheckoutLoading  ? AppColors.slate400 : AppColors.primary,
                       borderRadius: BorderRadius.circular(16.r),
                       boxShadow: [
                         BoxShadow(
@@ -658,7 +826,7 @@ class _CheckoutBottomBar extends StatelessWidget {
                     ),
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 14.h),
-                      child: state.isLoading
+                      child: state.isCheckoutLoading
                           ? SizedBox(
                         width: 20.w,
                         height: 20.w,
@@ -788,4 +956,29 @@ class _SuccessModal extends StatelessWidget {
       ),
     );
   }
+}
+Future<bool> _confirmDelete(BuildContext context, {required String message}) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      backgroundColor: AppColors.primary,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+      title: Text(
+        LocaleKeys.cartConfirmDeleteTitle.tr(),
+        style: AppTextTheme.bodyMediumSemiBold(ctx).copyWith(fontWeight: FontWeight.w800,color: AppColors.white),
+      ),
+      content: Text(message, style: AppTextTheme.bodySmall(ctx).copyWith(color: AppColors.white)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: Text(LocaleKeys.cancel.tr(), style: TextStyle(color: AppColors.white)),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          child: Text(LocaleKeys.delete.tr(), style: const TextStyle(color: AppColors.error)),
+        ),
+      ],
+    ),
+  );
+  return confirmed ?? false;
 }

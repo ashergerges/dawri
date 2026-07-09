@@ -1,31 +1,76 @@
-// lib/features/product_details/data/product_details_model.dart
-class ProductDetailsModel {
-  final String categoryKey;
-  final String titleKey;
-  final String descriptionKey;
-  final double price;
-  final String imageUrl;
-  final List<String> sizes;
+// lib/features/product_details/data/models/product_details_model.dart
+import 'package:json_annotation/json_annotation.dart';
 
-  const ProductDetailsModel({
-    required this.categoryKey,
-    required this.titleKey,
-    required this.descriptionKey,
-    required this.price,
-    required this.imageUrl,
-    required this.sizes,
+part 'product_details_model.g.dart';
+
+@JsonSerializable()
+class ProductDetailsModel {
+  final int? id;
+  final String? name;
+  final String? description;
+  final String? image;
+  final num? price;
+  final List<ProductVariantModel>? variants;
+
+  ProductDetailsModel({
+    this.id,
+    this.name,
+    this.description,
+    this.image,
+    this.price,
+    this.variants,
   });
+
+  factory ProductDetailsModel.fromJson(Map<String, dynamic> json) =>
+      _$ProductDetailsModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductDetailsModelToJson(this);
 }
 
-class ProductDetailsMockData {
-  static const product = ProductDetailsModel(
-    categoryKey: 'productDetailsCategory',
-    titleKey: 'productDetailsTitle',
-    descriptionKey: 'productDetailsDescription',
-    price: 140,
-    imageUrl: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=600&q=80',
-    sizes: ['S', 'M', 'L', 'XL'],
-  );
+@JsonSerializable()
+class ProductVariantModel {
+  final int? id;
+  final num? price;
+  final int? stock;
+  final ProductSizeModel? size;
+  final ProductColorModel? color;
 
-  static const defaultSizeIndex = 1; // 'M'
+  ProductVariantModel({this.id, this.price, this.stock, this.size, this.color});
+
+  factory ProductVariantModel.fromJson(Map<String, dynamic> json) =>
+      _$ProductVariantModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductVariantModelToJson(this);
+}
+
+@JsonSerializable()
+class ProductSizeModel {
+  final int? id;
+  final String? value;
+
+  ProductSizeModel({this.id, this.value});
+
+  factory ProductSizeModel.fromJson(Map<String, dynamic> json) => _$ProductSizeModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductSizeModelToJson(this);
+}
+
+@JsonSerializable()
+class ProductColorModel {
+  final int? id;
+  /// Hex code coming from backend, e.g. "#FF0000"
+  final String? value;
+
+  ProductColorModel({this.id, this.value});
+
+  factory ProductColorModel.fromJson(Map<String, dynamic> json) => _$ProductColorModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductColorModelToJson(this);
+}
+
+@JsonSerializable()
+class ProductDetailsResponseModel {
+  final ProductDetailsModel? product;
+
+  ProductDetailsResponseModel({this.product});
+
+  factory ProductDetailsResponseModel.fromJson(Map<String, dynamic> json) =>
+      _$ProductDetailsResponseModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductDetailsResponseModelToJson(this);
 }

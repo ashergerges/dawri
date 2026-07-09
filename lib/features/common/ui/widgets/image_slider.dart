@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
-import 'package:dawri/core/utils/constants/translations.dart';
 import 'package:dawri/features/common/ui/widgets/circular_icon_button.dart';
 import 'package:dawri/core/utils/common_widgets/custom_network_image.dart';
 import 'package:dawri/core/utils/constants/app_colors.dart';
@@ -10,7 +9,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:dawri/core/utils/extensions/padding_extensions.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-import '../../../../core/utils/constants/responsive.dart';
 import '../../../../gen/assets.gen.dart';
 
 class ImageSlider extends StatelessWidget {

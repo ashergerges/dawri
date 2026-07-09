@@ -1,11 +1,9 @@
-import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:dawri/core/interfaces/i_local_preference.dart';
 import 'package:dawri/core/router/app_router.dart';
-import 'package:dawri/core/services/dialogs/message_service.dart';
 import 'package:dawri/features/splash/data/repositories/interfaces/i_splash_repository.dart';
 import 'package:dawri/main_common.dart';
 

@@ -1,6 +1,5 @@
 // lib/features/championship_control/data/championship_control_model.dart
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter/material.dart';
+
 import 'package:dawri/gen/locale_keys.g.dart';
 
 // ─── Pending Request ──────────────────────────────────────────────────────
