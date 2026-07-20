@@ -731,3 +731,50 @@ class UpdateProfileRoute extends PageRouteInfo<void> {
     },
   );
 }
+
+/// generated route for
+/// [VerificationScreen]
+class VerificationRoute extends PageRouteInfo<VerificationRouteArgs> {
+  VerificationRoute({
+    Key? key,
+    required LoginCubit cubit,
+    List<PageRouteInfo>? children,
+  }) : super(
+         VerificationRoute.name,
+         args: VerificationRouteArgs(key: key, cubit: cubit),
+         initialChildren: children,
+       );
+
+  static const String name = 'VerificationRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<VerificationRouteArgs>();
+      return VerificationScreen(key: args.key, cubit: args.cubit);
+    },
+  );
+}
+
+class VerificationRouteArgs {
+  const VerificationRouteArgs({this.key, required this.cubit});
+
+  final Key? key;
+
+  final LoginCubit cubit;
+
+  @override
+  String toString() {
+    return 'VerificationRouteArgs{key: $key, cubit: $cubit}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! VerificationRouteArgs) return false;
+    return key == other.key && cubit == other.cubit;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ cubit.hashCode;
+}
