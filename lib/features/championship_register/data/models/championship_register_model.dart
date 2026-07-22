@@ -1,54 +1,16 @@
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter/material.dart';
-import 'package:dawri/gen/locale_keys.g.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-enum ParticipantRole { player, teamRep, coach, referee }
+part 'championship_register_model.g.dart';
 
-class RoleChipData {
-  final ParticipantRole role;
-  final IconData icon;
-  final String labelKey;
+@JsonSerializable()
+class ParticipantTypeModel {
+  final int? id;
+  final String? title;
+  final String? icon;
 
-  const RoleChipData({required this.role, required this.icon, required this.labelKey});
-}
+  ParticipantTypeModel({this.id, this.title, this.icon});
 
-class RegionOption {
-  final String value;
-  final String labelKey;
-
-  const RegionOption({required this.value, required this.labelKey});
-}
-
-class ChampionshipRegisterMockData {
-  static const tournamentName = 'دوري نجوم الأحياء 2026';
-
-  static const roles = [
-    RoleChipData(
-      role: ParticipantRole.player,
-      icon: FontAwesomeIcons.personRunning,
-      labelKey: LocaleKeys.registerRolePlayer,
-    ),
-    RoleChipData(
-      role: ParticipantRole.teamRep,
-      icon: FontAwesomeIcons.users,
-      labelKey: LocaleKeys.registerRoleTeamRep,
-    ),
-    RoleChipData(
-      role: ParticipantRole.coach,
-      icon: FontAwesomeIcons.stopwatch,
-      labelKey: LocaleKeys.registerRoleCoach,
-    ),
-    RoleChipData(
-      role: ParticipantRole.referee,
-      icon: FontAwesomeIcons.flag,
-      labelKey: LocaleKeys.registerRoleReferee,
-    ),
-  ];
-
-  static const regions = [
-    RegionOption(value: 'riyadh', labelKey: LocaleKeys.registerRegionRiyadh),
-    RegionOption(value: 'makkah', labelKey: LocaleKeys.registerRegionMakkah),
-    RegionOption(value: 'jeddah', labelKey: LocaleKeys.registerRegionJeddah),
-    RegionOption(value: 'dammam', labelKey: LocaleKeys.registerRegionDammam),
-  ];
+  factory ParticipantTypeModel.fromJson(Map<String, dynamic> json) =>
+      _$ParticipantTypeModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ParticipantTypeModelToJson(this);
 }

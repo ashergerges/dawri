@@ -636,7 +636,7 @@ class _BottomBar extends StatelessWidget {
                   builder: (context, state) {
                     return OnTap(
                       onTap: () {
-                        ChampionshipRegisterRoute().push(context);
+                        // ChampionshipRegisterRoute(id: 0).push(context);
                       },
                       child: DecoratedBox(
                         decoration: BoxDecoration(

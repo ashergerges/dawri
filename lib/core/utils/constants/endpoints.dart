@@ -59,4 +59,19 @@ class Endpoints {
   String get productDetailsUrl  => r'api/app/products/details';
   String get wishlistToggleUrl => r'api/app/user/wishlist/toggle';
 
+  // create championship
+  String get sportsUrl => r'api/app/sports';
+  String get championshipTypesUrl => r'api/app/championship-types';
+  String get registrationModesUrl => r'api/app/registration-modes';
+  String get citiesUrl => r'api/app/cities';
+  String get createChampionshipUrl => r'api/app/championships';
+
+  //championships
+  String get championshipsUrl => r'api/app/championships';
+  String get participantTypesUrl => r'api/app/participant-types';
+  String get championshipRegisterOneUrl => r'api/app/championships/register-one';
+
+  String get teamsUrl => r'api/app/teams';
+  String get championshipRegisterTeamUrl => r'api/app/championships/register-team';
+
 }

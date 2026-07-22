@@ -29,6 +29,18 @@ import 'core/utils/helper/error_handler.dart' as _i785;
 import 'features/cart/data/repositories/interfaces/i_cart_repository.dart'
     as _i775;
 import 'features/cart/data/repositories/remote/cart_repository.dart' as _i48;
+import 'features/championship_add_team/data/repositories/interfaces/i_championship_add_team_repository.dart'
+    as _i598;
+import 'features/championship_add_team/data/repositories/remote/championship_add_team_repository.dart'
+    as _i747;
+import 'features/championship_register/data/repositories/interfaces/i_championship_register_repository.dart'
+    as _i545;
+import 'features/championship_register/data/repositories/remote/championship_register_repository.dart'
+    as _i307;
+import 'features/championships/data/repositories/interfaces/i_championships_repository.dart'
+    as _i651;
+import 'features/championships/data/repositories/remote/championships_repository.dart'
+    as _i419;
 import 'features/common/data/local/data_sources/local_storage.dart' as _i656;
 import 'features/common/data/local/repositories/token_local_repository.dart'
     as _i784;
@@ -36,6 +48,10 @@ import 'features/common/data/local/repositories/token_repository.dart' as _i723;
 import 'features/common/data/repositories/interfaces/i_main_repository.dart'
     as _i967;
 import 'features/common/data/repositories/remote/main_repository.dart' as _i210;
+import 'features/create_championship/data/repositories/interfaces/i_create_championship_repository.dart'
+    as _i93;
+import 'features/create_championship/data/repositories/remote/create_championship_repository.dart'
+    as _i638;
 import 'features/home/data/repositories/interfaces/i_home_repository.dart'
     as _i185;
 import 'features/home/data/repositories/remote/home_repository.dart' as _i975;
@@ -115,8 +131,23 @@ _i174.GetIt $initGetIt(
       networkService: gh<_i969.NetworkService>(),
     ),
   );
+  gh.factory<_i598.IChampionshipAddTeamRepository>(
+    () => _i747.ChampionshipAddTeamRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
+  );
   gh.factory<_i97.INotificationsRepository>(
     () => _i192.NotificationsRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
+  );
+  gh.factory<_i93.ICreateChampionshipRepository>(
+    () => _i638.CreateChampionshipRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
+  );
+  gh.factory<_i651.IChampionshipsRepository>(
+    () => _i419.ChampionshipsRepository(
       networkService: gh<_i969.NetworkService>(),
     ),
   );
@@ -130,6 +161,11 @@ _i174.GetIt $initGetIt(
   );
   gh.factory<_i967.IMainRepository>(
     () => _i210.MainRepository(networkService: gh<_i969.NetworkService>()),
+  );
+  gh.factory<_i545.IChampionshipRegisterRepository>(
+    () => _i307.ChampionshipRegisterRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
   );
   gh.factory<_i772.IAuthRepo>(
     () => _i413.AuthRepo(networkService: gh<_i969.NetworkService>()),

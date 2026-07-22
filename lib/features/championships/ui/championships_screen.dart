@@ -1,11 +1,16 @@
 // lib/features/championships/ui/championships_screen.dart
 import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
+import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
+import 'package:dawri/core/utils/constants/pull_refresh.dart';
+import 'package:dawri/features/championships/data/models/championship_model.dart';
+import 'package:dawri/features/my_championships/ui/my_championships_screen.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:dawri/core/utils/constants/app_colors.dart';
 import 'package:dawri/core/utils/constants/app_text_them.dart';
@@ -13,6 +18,7 @@ import 'package:dawri/core/utils/extensions/padding_extensions.dart';
 import 'package:dawri/core/utils/common_widgets/custom_network_image.dart';
 import 'package:dawri/features/championships/cubit/championships_cubit.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 // ─── SCREEN ────────────────────────────────────────────────────────────────
 class ChampionshipsScreen extends StatelessWidget {
@@ -21,7 +27,7 @@ class ChampionshipsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ChampionshipsCubit(),
+      create: (_) => ChampionshipsCubit()..getAvailableChampionships(),
       child: const _ChampionshipsView(),
     );
   }
@@ -194,17 +200,143 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: const [
-          _CreateBanner(),
-          _TournamentsList(),
-        ],
-      ),
+    return BlocBuilder<ChampionshipsCubit, ChampionshipsState>(
+      buildWhen: (previous, current) => previous.activeTab != current.activeTab,
+      builder: (context, state) {
+        switch (state.activeTab) {
+          case 0:
+            return const _ChampionshipsListView(tab: 0);
+          case 1:
+            return const _ChampionshipsListView(tab: 1);
+          case 2:
+            return const _ChampionshipsListView(tab: 2);
+          default:
+            return MyChampionshipsScreen();
+        }
+      },
     );
   }
 }
 
+class _ChampionshipsListView extends StatelessWidget {
+  final int tab; // 0 available, 1 ongoing, 2 completed
+
+  const _ChampionshipsListView({required this.tab});
+
+  @override
+  Widget build(BuildContext context) {
+    final cubit = context.read<ChampionshipsCubit>();
+
+    return BlocBuilder<ChampionshipsCubit, ChampionshipsState>(
+      builder: (context, state) {
+        final items = switch (tab) {
+          0 => state.availableItems,
+          1 => state.ongoingItems,
+          _ => state.completedItems,
+        };
+        final status = switch (tab) {
+          0 => state.availableStatus,
+          1 => state.ongoingStatus,
+          _ => state.completedStatus,
+        };
+        final controller = switch (tab) {
+          0 => cubit.availableRefreshController,
+          1 => cubit.ongoingRefreshController,
+          _ => cubit.completedRefreshController,
+        };
+
+        if (status is Loading && items.isEmpty) {
+          return const _ChampionshipsListShimmer();
+        }
+
+        if (status is Error && items.isEmpty) {
+          return Center(
+            child: TextButton(
+              onPressed: () => _refresh(cubit, tab),
+              child: Text(LocaleKeys.somethingWentWrongRetry.tr()),
+            ),
+          );
+        }
+
+        return SmartRefresher(
+          key: ValueKey('smart_refresher_$tab'),
+          controller: controller,
+          enablePullUp: true,
+          enablePullDown: true,
+          onRefresh: () => _refresh(cubit, tab),
+          onLoading: () => _loadMore(cubit, tab),
+          header: PullRefresh.pullRefresh,
+          footer: const ClassicFooter(
+            loadStyle: LoadStyle.ShowAlways,
+            completeDuration: Duration(milliseconds: 500),
+          ),
+          child: ListView(
+            padding:20.padHorizontal,
+            children: [
+              if (tab == 0) const _CreateBanner(),
+              if (items.isEmpty)
+                Padding(
+                  padding: EdgeInsets.only(top: 60.h),
+                  child: Center(child: Text(LocaleKeys.championshipsEmpty.tr())),
+                )
+              else
+                for (final champ in items)
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 18.h),
+                    child: _TournamentCard(data: champ),
+                  ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _refresh(ChampionshipsCubit cubit, int tab) {
+    switch (tab) {
+      case 0:
+        cubit.getAvailableChampionships();
+        break;
+      case 1:
+        cubit.getOngoingChampionships();
+        break;
+      case 2:
+        cubit.getCompletedChampionships();
+        break;
+    }
+  }
+
+  void _loadMore(ChampionshipsCubit cubit, int tab) {
+    switch (tab) {
+      case 0:
+        cubit.loadMoreAvailableChampionships();
+        break;
+      case 1:
+        cubit.loadMoreOngoingChampionships();
+        break;
+      case 2:
+        cubit.loadMoreCompletedChampionships();
+        break;
+    }
+  }
+}
+class _ChampionshipsListShimmer extends StatelessWidget {
+  const _ChampionshipsListShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+      children: [
+        for (int i = 0; i < 3; i++)
+          Padding(
+            padding: EdgeInsets.only(bottom: 18.h),
+            child: ShimmerWidget.rectangular(width: double.infinity, height: 280.h),
+          ),
+      ],
+    );
+  }
+}
 // ─── CREATE BANNER ─────────────────────────────────────────────────────────
 class _CreateBanner extends StatelessWidget {
   const _CreateBanner();
@@ -216,7 +348,7 @@ class _CreateBanner extends StatelessWidget {
         CreateChampionshipRoute().push(context);
       },
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+        padding:15.padVertical,
         child: Stack(
           children: [
             // Background gradient
@@ -311,140 +443,42 @@ class _CreateBanner extends StatelessWidget {
   }
 }
 
-// ─── TOURNAMENTS LIST ──────────────────────────────────────────────────────
-class _TournamentsList extends StatelessWidget {
-  const _TournamentsList();
-
-  static const _tournaments = [
-    _TournamentData(
-      image: 'https://images.unsplash.com/photo-1622281549424-fd9aaea1fd43?w=500&q=80',
-      statusKey: LocaleKeys.championshipsRegisterOpen,
-      status: 1,
-      statusIcon: FontAwesomeIcons.lockOpen,
-      statusColor: AppColors.primary,
-      sportIcon: FontAwesomeIcons.futbol,
-      sportColor: AppColors.primary,
-      title: 'دوري نجوم الأحياء 2026',
-      date: '15 نوفمبر 2026',
-      location: 'الرياض - ملاعب أرينا المتعددة',
-      teams: '12 / 16',
-      prize: '50,000 ر.س',
-      buttonKey: LocaleKeys.championshipsRegisterTeam,
-      isPrimary: true,
-    ),
-    _TournamentData(
-      image: 'https://images.unsplash.com/photo-1600003014755-ba31aa59c4b6?w=500&q=80',
-      statusKey: LocaleKeys.championshipsRegisterOpen,
-      status: 2,
-      statusIcon: FontAwesomeIcons.lockOpen,
-      statusColor: AppColors.primary,
-      sportIcon: FontAwesomeIcons.gamepad,
-      sportColor: AppColors.info,
-      title: 'نجوم الأحياء للبلاستيشن',
-      date: '20 أكتوبر 2026',
-      location: 'أونلاين + التصفيات بالرياض',
-      teams: 'فردي (FIFA 26)',
-      prize: '15,000 ر.س',
-      buttonKey: LocaleKeys.championshipsJoinNow,
-      isPrimary: true,
-    ),
-    _TournamentData(
-      image: 'https://images.unsplash.com/photo-1622281549424-fd9aaea1fd43?w=500&q=80',
-      statusKey: LocaleKeys.championshipsNow,
-      status: 3,
-      statusIcon: FontAwesomeIcons.fire,
-      statusColor: AppColors.warning,
-      sportIcon: FontAwesomeIcons.tableTennisPaddleBall,
-      sportColor: AppColors.warning,
-      title: 'بطولة البادل المفتوحة للمحترفين',
-      date: 'ربع النهائي',
-      location: 'جدة - ملاعب بادل برو',
-      teams: '',
-      prize: '20,000 ر.س',
-      buttonKey: LocaleKeys.championshipsFollowResults,
-      isPrimary: false,
-    ),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
-      child: Column(
-        children: [
-          for (final data in _tournaments)
-            Padding(
-              padding: EdgeInsets.only(bottom: 18.h),
-              child: _TournamentCard(data: data),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── TOURNAMENT DATA ──────────────────────────────────────────────────────
-class _TournamentData {
-  final String image;
-  final String statusKey;
-  final IconData statusIcon;
-  final Color statusColor;
-  final IconData sportIcon;
-  final Color sportColor;
-  final String title;
-  final String date;
-  final String location;
-  final String teams;
-  final String prize;
-  final String buttonKey;
-  final bool isPrimary;
-  final int status;
-
-  const _TournamentData({
-    required this.image,
-    required this.statusKey,
-    required this.statusIcon,
-    required this.statusColor,
-    required this.sportIcon,
-    required this.sportColor,
-    required this.title,
-    required this.date,
-    required this.location,
-    required this.teams,
-    required this.prize,
-    required this.buttonKey,
-    required this.isPrimary,
-    required this.status,
-  });
-}
 
 // ─── TOURNAMENT CARD ──────────────────────────────────────────────────────
 class _TournamentCard extends StatelessWidget {
-  final _TournamentData data;
+  final ChampionshipModel data;
 
   const _TournamentCard({required this.data});
 
+  ({IconData icon, Color color}) get _statusStyle {
+    switch (data.status?.id) {
+      case 2: // مفتوحة للتسجيل
+        return (icon: FontAwesomeIcons.lockOpen, color: AppColors.primary);
+      case 3: // جارية
+        return (icon: FontAwesomeIcons.fire, color: AppColors.warning);
+      case 4: // مكتملة
+        return (icon: FontAwesomeIcons.circleCheck, color: AppColors.textMuted);
+      default:
+        return (icon: FontAwesomeIcons.circle, color: AppColors.textMuted);
+    }
+  }
+
+  bool get _isOpen => data.status?.id == 2;
+  bool get _isOngoing => data.status?.id == 3;
+
   @override
   Widget build(BuildContext context) {
-    final isOpen = data.statusKey == LocaleKeys.championshipsRegisterOpen;
-    final isOpenStatus = data.statusKey == LocaleKeys.championshipsRegisterOpen;
-    final isOngoing = data.statusKey == LocaleKeys.championshipsNow;
+    final statusStyle = _statusStyle;
 
     return OnTap(
-      onTap: (){
-        ChampProfileRoute().push(context);
-      },
+      onTap: () => ChampProfileRoute().push(context),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(color: AppColors.slate200),
           boxShadow: [
-            BoxShadow(
-              color: AppColors.black.withOpacity(0.03),
-              blurRadius: 15,
-              offset: const Offset(0, 4),
-            ),
+            BoxShadow(color: AppColors.black.withOpacity(0.03), blurRadius: 15, offset: const Offset(0, 4)),
           ],
         ),
         child: ClipRRect(
@@ -452,51 +486,42 @@ class _TournamentCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ─── Image & Badges ────────────────────────────────────────────
               Stack(
                 clipBehavior: Clip.none,
                 children: [
                   CustomNetworkImage(
-                    imageUrl: data.image,
+                    imageUrl: data.image ?? '',
                     width: double.infinity,
                     height: 140.h,
                     fit: BoxFit.cover,
                   ),
-                  // Status badge (top right)
                   Positioned(
                     top: 15.h,
                     right: 15.w,
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
                       decoration: BoxDecoration(
-                        color: isOpenStatus
+                        color: _isOpen
                             ? AppColors.white.withOpacity(0.9)
-                            : AppColors.warning.withOpacity(0.9),
+                            : statusStyle.color.withOpacity(0.9),
                         borderRadius: BorderRadius.circular(10.r),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          FaIcon(
-                            data.statusIcon,
-                            size: 10.sp,
-                            color: data.statusColor,
-                          ),
+                          FaIcon(statusStyle.icon, size: 10.sp, color: _isOpen ? statusStyle.color : AppColors.white),
                           4.w.sizedWidth,
                           Text(
-                            data.statusKey.tr(),
+                            data.status?.title ?? '',
                             style: AppTextTheme.bodyXXSmall(context).copyWith(
                               fontWeight: FontWeight.w800,
-                              color: isOpenStatus
-                                  ? AppColors.primary
-                                  : AppColors.white,
+                              color: _isOpen ? AppColors.primary : AppColors.white,
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  // Sport icon (bottom left - VISIBLE AT END)
                   Positioned(
                     bottom: -15.h,
                     left: 20.w,
@@ -507,32 +532,27 @@ class _TournamentCard extends StatelessWidget {
                         color: AppColors.white,
                         borderRadius: BorderRadius.circular(12.r),
                         boxShadow: [
-                          BoxShadow(
-                            color: AppColors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
+                          BoxShadow(color: AppColors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4)),
                         ],
                       ),
                       child: Center(
-                        child: FaIcon(
-                          data.sportIcon,
-                          size: 20.sp,
-                          color: data.sportColor,
+                        child: SvgPicture.network(
+                           data.sportType?.icon ?? '',
+                          width: 20.sp,
+                          height: 20.sp,
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
-              // ─── Info ──────────────────────────────────────────────────────
               Padding(
                 padding: EdgeInsets.fromLTRB(15.w, 20.h + 8.h, 15.w, 15.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data.title,
+                      data.title ?? '',
                       style: AppTextTheme.bodySmallSemiBold(context).copyWith(
                         fontWeight: FontWeight.w900,
                         color: AppColors.textDark,
@@ -544,33 +564,24 @@ class _TournamentCard extends StatelessWidget {
                       children: [
                         _DetailRow(
                           icon: FontAwesomeIcons.calendar,
-                          text: '${LocaleKeys.championshipsStarts.tr()} ${data.date}',
+                          text: '${LocaleKeys.championshipsStarts.tr()} ${data.startDate ?? ''}',
                         ),
                         6.h.sizedHeight,
                         _DetailRow(
                           icon: FontAwesomeIcons.locationDot,
-                          text: data.location,
+                          text: data.address?? '',
                         ),
-                        if (data.teams.isNotEmpty) ...[
+                        if ((data.registeredTeams ?? []).isNotEmpty) ...[
                           6.h.sizedHeight,
                           _DetailRow(
-                            icon: isOngoing
-                                ? FontAwesomeIcons.clock
-                                : FontAwesomeIcons.users,
-                            text: isOngoing
-                                ? '${LocaleKeys.championshipsCurrentRound.tr()} ${data.teams}'
-                                : '${LocaleKeys.championshipsTeams.tr()} ${data.teams}',
+                            icon: _isOngoing ? FontAwesomeIcons.clock : FontAwesomeIcons.users,
+                            text: ' ${LocaleKeys.championshipsTeams.tr() }${data.registeredTeams?.map((e)=>"$e")}',
                           ),
                         ],
                       ],
                     ),
                     15.h.sizedHeight,
-                    DottedLine(
-                      dashLength: 5,
-                      dashGapLength: 4,
-                      lineThickness: 1,
-                      dashColor: AppColors.slate100,
-                    ),
+                    DottedLine(dashLength: 5, dashGapLength: 4, lineThickness: 1, dashColor: AppColors.slate100),
                     15.h.sizedHeight,
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -579,61 +590,50 @@ class _TournamentCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              isOngoing
-                                  ? LocaleKeys.championshipsPrizeFirst.tr()
-                                  : LocaleKeys.championshipsPrize.tr(),
-                              style: AppTextTheme.bodyXXSmall(context).copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textMuted,
-                              ),
+                              LocaleKeys.championshipsPrize.tr(),
+                              style: AppTextTheme.bodyXXSmall(context).copyWith(fontWeight: FontWeight.w700, color: AppColors.textMuted),
                             ),
                             Text(
-                              data.prize,
-                              style: AppTextTheme.bodySmallSemiBold(context).copyWith(
-                                fontWeight: FontWeight.w900,
-                                color: AppColors.textDark,
-                              ),
+                              '${(data.prizeMoneyForFirst ?? 0)+(data.prizeMoneyForSecond ?? 0)}',
+                              style: AppTextTheme.bodySmallSemiBold(context).copyWith(fontWeight: FontWeight.w900, color: AppColors.textDark),
                             ),
                           ],
                         ),
                         OnTap(
-                          onTap: (){
-                            if(data.status==1){
-                              return ChampionshipRegisterRoute().push(context);
-                            }
-                            else if(data.status==2){
-                              ChampionshipAddTeamRoute().push(context);
+                          onTap: () {
+                            if (data.status?.id == 2) {
+                              if(data.registrationMode?.id==1){
+                                ChampionshipRegisterRoute(id: data.id??0,type:data.type?.title??"" ,championName:data.title??"" ,fees: data.entryFee??0,).push(context);
 
-                            }
-                            else{
-                            ChampionshipControlRoute().push(context);
+                              }
+                              else{
+                                ChampionshipAddTeamRoute(id: data.id??0,type:data.type?.title??"" ,championName:data.title??"" ,fees: data.entryFee??0,date: data.startDate??"").push(context);
 
+                              }
+
+                            }  else {
+                              ChampProfileRoute().push(context);
                             }
-                            //
                           },
                           child: DecoratedBox(
                             decoration: BoxDecoration(
-                              color: data.isPrimary
-                                  ? AppColors.primary
-                                  : AppColors.primaryLight.withOpacity(0.1),
+                              color: _isOpen ? AppColors.primary : AppColors.primaryLight.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12.r),
-                              boxShadow: data.isPrimary
-                                  ? [
-                                BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.2),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ]
+                              boxShadow: _isOpen
+                                  ? [BoxShadow(color: AppColors.primary.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))]
                                   : null,
                             ),
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
                               child: Text(
-                                data.buttonKey.tr(),
+                                _isOpen
+                                    ? LocaleKeys.championshipsRegisterTeam.tr()
+                                    : _isOngoing
+                                    ? LocaleKeys.championshipsFollowResults.tr()
+                                    : LocaleKeys.championshipsFollowResults.tr(),
                                 style: AppTextTheme.bodyXSmall(context).copyWith(
                                   fontWeight: FontWeight.w800,
-                                  color: data.isPrimary ? AppColors.white : AppColors.primaryLight,
+                                  color: _isOpen ? AppColors.white : AppColors.primaryLight,
                                 ),
                               ),
                             ),
@@ -651,7 +651,6 @@ class _TournamentCard extends StatelessWidget {
     );
   }
 }
-
 // ─── DETAIL ROW ────────────────────────────────────────────────────────────
 class _DetailRow extends StatelessWidget {
   final IconData icon;
@@ -675,6 +674,7 @@ class _DetailRow extends StatelessWidget {
         Expanded(
           child: Text(
             text,
+            maxLines: 1,
             style: AppTextTheme.bodyXSmall(context).copyWith(
               fontWeight: FontWeight.w600,
               color: AppColors.textMuted,

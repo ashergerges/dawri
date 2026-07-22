@@ -1,9 +1,15 @@
 // lib/features/championship_register/ui/championship_register_screen.dart
 import 'package:auto_route/auto_route.dart';
+import 'package:dawri/core/utils/common_widgets/on_tap.dart';
+import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
+import 'package:dawri/features/championship_control/data/models/championship_control_model.dart';
+import 'package:dawri/features/login/data/models/login_model.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:dawri/core/utils/constants/app_colors.dart';
 import 'package:dawri/core/utils/constants/app_text_them.dart';
@@ -16,20 +22,25 @@ import '../data/models/championship_register_model.dart';
 
 @RoutePage()
 class ChampionshipRegisterScreen extends StatelessWidget {
-  const ChampionshipRegisterScreen({super.key});
-
+  const ChampionshipRegisterScreen({super.key, required this.id, required this.fees, required this.championName, required this.type});
+  final int id;
+  final num fees;
+  final String championName;
+  final String type;
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ChampionshipRegisterCubit(),
-      child: const _ChampionshipRegisterView(),
+      create: (_) => ChampionshipRegisterCubit(id)..loadFormOptions(),
+      child:  _ChampionshipRegisterView(fees, championName, type)
     );
   }
 }
 
 class _ChampionshipRegisterView extends StatefulWidget {
-  const _ChampionshipRegisterView();
-
+  const _ChampionshipRegisterView(this.fees, this.championName, this.type);
+  final num fees;
+  final String championName;
+  final String type;
   @override
   State<_ChampionshipRegisterView> createState() => _ChampionshipRegisterViewState();
 }
@@ -63,7 +74,7 @@ class _ChampionshipRegisterViewState extends State<_ChampionshipRegisterView> {
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     child: Column(
                       children: [
-                        const _TournamentHero(),
+                         _TournamentHero(widget.championName,widget.type),
                         _RegisterFormSection(regionKey: _regionKey),
                         SizedBox(height: 100.h),
                       ],
@@ -71,7 +82,7 @@ class _ChampionshipRegisterViewState extends State<_ChampionshipRegisterView> {
                   ),
                 ),
               ),
-              _BottomActionBar(formKey: _formKey, regionKey: _regionKey),
+              _BottomActionBar(formKey: _formKey, regionKey: _regionKey,fees:widget.fees),
             ],
           );
         },
@@ -159,8 +170,9 @@ class _CircleIconButton extends StatelessWidget {
 
 // ─── TOURNAMENT HERO ─────────────────────────────────────────────────────────
 class _TournamentHero extends StatelessWidget {
-  const _TournamentHero();
-
+  const _TournamentHero(this.championName, this.type);
+  final String championName;
+  final String type;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -217,7 +229,7 @@ class _TournamentHero extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          ChampionshipRegisterMockData.tournamentName,
+                          championName,
                           style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
                             fontWeight: FontWeight.w900,
                             color: AppColors.white,
@@ -229,7 +241,7 @@ class _TournamentHero extends StatelessWidget {
                             FaIcon(FontAwesomeIcons.futbol, size: 11.sp, color: AppColors.white.withOpacity(0.9)),
                             5.w.sizedWidth,
                             Text(
-                              LocaleKeys.registerTournamentMeta.tr(),
+                              type,
                               style: AppTextTheme.bodyXSmall(context).copyWith(
                                 color: AppColors.white.withOpacity(0.9),
                               ),
@@ -298,13 +310,17 @@ class _RegisterFormSection extends StatelessWidget {
             label: LocaleKeys.registerPhone.tr(),
             hint: LocaleKeys.registerPhoneHint.tr(),
             keyboardType: TextInputType.phone,
+            maxLength: LoginConstants.phoneMaxLength,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             validator: Validator.validateSaudiMobile,
             onSaved: (v) => context.read<ChampionshipRegisterCubit>().updatePhone(v ?? ''),
           ),
           15.h.sizedHeight,
           _RegionDropdownField(
             key: regionKey,
-            onChanged: (v) => context.read<ChampionshipRegisterCubit>().updateRegion(v ?? ''),
+            onChanged: (id) {
+              if (id != null) context.read<ChampionshipRegisterCubit>().selectCity(id);
+            },
           ),
         ],
       ),
@@ -319,15 +335,30 @@ class _RoleChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ChampionshipRegisterCubit, ChampionshipRegisterState>(
-      buildWhen: (p, c) => p.selectedRole != c.selectedRole,
+      buildWhen: (p, c) =>
+      p.selectedParticipantTypeId != c.selectedParticipantTypeId ||
+          p.participantTypes != c.participantTypes ||
+          p.optionsStatus != c.optionsStatus,
       builder: (context, state) {
+        if (state.optionsStatus is Loading) {
+          return Wrap(
+            spacing: 10.w,
+            runSpacing: 10.h,
+            children: List.generate(
+              4,
+                  (_) => ShimmerWidget.rectangular(width: (1.sw - 50.w) / 2, height: 44.h),
+            ),
+          );
+        }
+
         return Wrap(
           spacing: 10.w,
           runSpacing: 10.h,
-          children: ChampionshipRegisterMockData.roles.map((roleData) {
-            final isSelected = state.selectedRole == roleData.role;
+          children: state.participantTypes.map((type) {
+            final isSelected = state.selectedParticipantTypeId == type.id;
             return GestureDetector(
-              onTap: () => context.read<ChampionshipRegisterCubit>().selectRole(roleData.role),
+              onTap: () =>
+                  context.read<ChampionshipRegisterCubit>().selectParticipantType(type.id!),
               child: Container(
                 width: (1.sw - 50.w) / 2,
                 padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -351,14 +382,18 @@ class _RoleChips extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    FaIcon(
-                      roleData.icon,
-                      size: 13.sp,
-                      color: isSelected ? AppColors.primary : AppColors.textMuted,
+                    SvgPicture.network(
+                       type.icon ?? '',
+                      width: 13.sp,
+                      height: 13.sp,
+                      colorFilter:   ColorFilter.mode(
+                        isSelected ? AppColors.primary : AppColors.textMuted,
+                        BlendMode.srcIn,
+                      ),
                     ),
                     8.w.sizedWidth,
                     Text(
-                      roleData.labelKey.tr(),
+                      type.title ?? '',
                       style: AppTextTheme.bodyXSmall(context).copyWith(
                         fontWeight: FontWeight.w800,
                         color: isSelected ? AppColors.primary : AppColors.textMuted,
@@ -374,7 +409,6 @@ class _RoleChips extends StatelessWidget {
     );
   }
 }
-
 // ─── INPUT FIELD ──────────────────────────────────────────────────────────
 class _RegisterInputField extends StatefulWidget {
   final IconData icon;
@@ -383,19 +417,23 @@ class _RegisterInputField extends StatefulWidget {
   final String? Function(String?)? validator;
   final void Function(String?)? onSaved;
   final TextInputType? keyboardType;
+  final int? maxLength;
+  final List<TextInputFormatter>? inputFormatters;
 
   const _RegisterInputField({
-    required this.icon,
-    required this.label,
-    required this.hint,
-    this.validator,
-    this.onSaved,
-    this.keyboardType,
+  required this.icon,
+  required this.label,
+  required this.hint,
+  this.validator,
+  this.onSaved,
+  this.keyboardType,
+  this.maxLength,
+  this.inputFormatters,
   });
 
   @override
   State<_RegisterInputField> createState() => _RegisterInputFieldState();
-}
+  }
 
 class _RegisterInputFieldState extends State<_RegisterInputField> {
   String? _errorText;
@@ -437,6 +475,8 @@ class _RegisterInputFieldState extends State<_RegisterInputField> {
                   onSaved: widget.onSaved,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   onTapOutside: (_) => FocusScope.of(context).unfocus(),
+                  maxLength: widget.maxLength,
+                  inputFormatters: widget.inputFormatters,
                   validator: (value) {
                     final error = widget.validator?.call(value);
                     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -454,6 +494,7 @@ class _RegisterInputFieldState extends State<_RegisterInputField> {
                     border: InputBorder.none,
                     errorBorder: InputBorder.none,
                     focusedErrorBorder: InputBorder.none,
+                    counterText: '', // يخفي عداد الحروف تحت الحقل
                     contentPadding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 14.h),
                   ),
                   style: AppTextTheme.bodySmall(context).copyWith(
@@ -461,8 +502,7 @@ class _RegisterInputFieldState extends State<_RegisterInputField> {
                     color: AppColors.textDark,
                   ),
                 ),
-              ),
-            ],
+              ),            ],
           ),
         ),
         if (_errorText != null) ...[
@@ -488,7 +528,7 @@ class _RegisterInputFieldState extends State<_RegisterInputField> {
 
 // ─── REGION DROPDOWN FIELD ────────────────────────────────────────────────
 class _RegionDropdownField extends StatefulWidget {
-  final ValueChanged<String?> onChanged;
+  final ValueChanged<int?> onChanged;
 
   const _RegionDropdownField({super.key, required this.onChanged});
 
@@ -497,7 +537,7 @@ class _RegionDropdownField extends StatefulWidget {
 }
 
 class _RegionDropdownFieldState extends State<_RegionDropdownField> {
-  String? _selectedValue;
+  int? _selectedValue;
   String? _errorText;
 
   void validate() {
@@ -508,78 +548,87 @@ class _RegionDropdownFieldState extends State<_RegionDropdownField> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          LocaleKeys.registerRegion.tr(),
-          style: AppTextTheme.bodyXSmall(context).copyWith(
-            fontWeight: FontWeight.w800,
-            color: AppColors.textMuted,
-          ),
-        ),
-        8.h.sizedHeight,
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(14.r),
-            border: Border.all(
-              color: _errorText != null ? AppColors.error : AppColors.slate200,
-              width: 1.5,
-            ),
-          ),
-          child: DropdownButtonFormField<String>(
-            initialValue: _selectedValue,
-
-            icon: Padding(
-              padding:15.padEnd,
-              child: FaIcon(FontAwesomeIcons.chevronDown, size: 14.sp, color: AppColors.textMuted),
-            ),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 14.h),
-            ),
-            hint: Text(
-              LocaleKeys.registerRegionHint.tr(),
-              style: AppTextTheme.bodySmall(context).copyWith(
-                fontWeight: FontWeight.w500,
-                color: AppColors.textHint,
+    return BlocBuilder<ChampionshipRegisterCubit, ChampionshipRegisterState>(
+      buildWhen: (p, c) =>
+      p.cities != c.cities || p.optionsStatus != c.optionsStatus,
+      builder: (context, state) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              LocaleKeys.registerRegion.tr(),
+              style: AppTextTheme.bodyXSmall(context).copyWith(
+                fontWeight: FontWeight.w800,
+                color: AppColors.textMuted,
               ),
             ),
-            style: AppTextTheme.bodySmall(context).copyWith(
-              fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
-            ),
-            dropdownColor: AppColors.white,
-            items: ChampionshipRegisterMockData.regions
-                .map((r) => DropdownMenuItem(value: r.value, child: Text(r.labelKey.tr())))
-                .toList(),
-            onChanged: (value) {
-              setState(() {
-                _selectedValue = value;
-                _errorText = null;
-              });
-              widget.onChanged(value);
-            },
-          ),
-        ),
-        if (_errorText != null) ...[
-          4.h.sizedHeight,
-          Row(
-            children: [
-              const FaIcon(FontAwesomeIcons.circleExclamation, size: 11, color: AppColors.error),
-              4.w.sizedWidth,
-              Text(
-                _errorText!,
-                style: AppTextTheme.bodyXXSmall(context).copyWith(
-                  color: AppColors.error,
-                  fontWeight: FontWeight.w600,
+            8.h.sizedHeight,
+            if (state.optionsStatus is Loading)
+              ShimmerWidget.rectangular(width: double.infinity, height: 52.h)
+            else ...[
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(14.r),
+                  border: Border.all(
+                    color: _errorText != null ? AppColors.error : AppColors.slate200,
+                    width: 1.5,
+                  ),
+                ),
+                child: DropdownButtonFormField<int>(
+                  initialValue: _selectedValue,
+                  icon: Padding(
+                    padding: 15.padEnd,
+                    child: FaIcon(FontAwesomeIcons.chevronDown, size: 14.sp, color: AppColors.textMuted),
+                  ),
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 14.h),
+                  ),
+                  hint: Text(
+                    LocaleKeys.registerRegionHint.tr(),
+                    style: AppTextTheme.bodySmall(context).copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textHint,
+                    ),
+                  ),
+                  style: AppTextTheme.bodySmall(context).copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
+                  ),
+                  dropdownColor: AppColors.white,
+                  items: state.cities
+                      .map((c) => DropdownMenuItem(value: c.id, child: Text(c.title ?? '')))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedValue = value;
+                      _errorText = null;
+                    });
+                    widget.onChanged(value);
+                  },
                 ),
               ),
+              if (_errorText != null) ...[
+                4.h.sizedHeight,
+                Row(
+                  children: [
+                    const FaIcon(FontAwesomeIcons.circleExclamation, size: 11, color: AppColors.error),
+                    4.w.sizedWidth,
+                    Text(
+                      _errorText!,
+                      style: AppTextTheme.bodyXXSmall(context).copyWith(
+                        color: AppColors.error,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
-          ),
-        ],
-      ],
+          ],
+        );
+      },
     );
   }
 }
@@ -588,8 +637,8 @@ class _RegionDropdownFieldState extends State<_RegionDropdownField> {
 class _BottomActionBar extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final GlobalKey<_RegionDropdownFieldState> regionKey;
-
-  const _BottomActionBar({required this.formKey, required this.regionKey});
+  final num fees;
+  const _BottomActionBar({required this.formKey, required this.regionKey, required this.fees});
 
   @override
   Widget build(BuildContext context) {
@@ -613,55 +662,84 @@ class _BottomActionBar extends StatelessWidget {
         child: BlocBuilder<ChampionshipRegisterCubit, ChampionshipRegisterState>(
           buildWhen: (p, c) => p.isLoading != c.isLoading,
           builder: (context, state) {
-            return GestureDetector(
-              onTap: state.isLoading
-                  ? null
-                  : () {
-                final formValid = formKey.currentState?.validate() ?? false;
-                regionKey.currentState?.validate();
-                final regionValid = regionKey.currentState?._selectedValue != null;
-                if (formValid && regionValid) {
-                  formKey.currentState?.save();
-                  context.read<ChampionshipRegisterCubit>().submitRegistration();
-                }
-              },
-              child: Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(vertical: 16.h),
-                decoration: BoxDecoration(
-                  color: state.isLoading ? AppColors.slate400 : AppColors.primary,
-                  borderRadius: BorderRadius.circular(16.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withOpacity(0.25),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (state.isLoading)
-                      SizedBox(
-                        width: 20.w,
-                        height: 20.w,
-                        child: const CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
-                      )
-                    else ...[
+            return Row(
+              children: [
+               if(fees!=0) Padding(
+                 padding:20.padEnd,
+                 child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
                       Text(
-                        LocaleKeys.registerConfirm.tr(),
-                        style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.white,
+                        LocaleKeys.addTeamRegistrationFee.tr(),
+                        style: AppTextTheme.bodyXSmall(context).copyWith(
+                          color: AppColors.textMuted,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                      8.w.sizedWidth,
-                      const FaIcon(FontAwesomeIcons.check, size: 16, color: AppColors.white),
+                      Text(
+                        '$fees ${LocaleKeys.addTeamCurrency.tr()}',
+                        style: AppTextTheme.headingSmall(context).copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.primary,
+                        ),
+                      ),
                     ],
-                  ],
+                  ),
+               ),
+                Expanded(
+                  child: OnTap(
+                    onTap: state.isLoading
+                        ? null
+                        : () {
+                      final formValid = formKey.currentState?.validate() ?? false;
+                      regionKey.currentState?.validate();
+                      final regionValid = regionKey.currentState?._selectedValue != null;
+                      if (formValid && regionValid) {
+                        formKey.currentState?.save();
+                        context.read<ChampionshipRegisterCubit>().submitRegistration();
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      decoration: BoxDecoration(
+                        color: state.isLoading ? AppColors.slate400 : AppColors.primary,
+                        borderRadius: BorderRadius.circular(16.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withOpacity(0.25),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (state.isLoading)
+                            SizedBox(
+                              width: 20.w,
+                              height: 20.w,
+                              child: const CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
+                            )
+                          else ...[
+                            Text(
+                              LocaleKeys.registerConfirm.tr(),
+                              style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.white,
+                              ),
+                            ),
+                            8.w.sizedWidth,
+                            const FaIcon(FontAwesomeIcons.check, size: 16, color: AppColors.white),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             );
           },
         ),

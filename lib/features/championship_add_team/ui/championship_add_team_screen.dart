@@ -1,5 +1,6 @@
 // lib/features/championship_add_team/ui/championship_add_team_screen.dart
 import 'package:auto_route/auto_route.dart';
+import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,20 +17,27 @@ import '../data/models/championship_add_team_model.dart';
 
 @RoutePage()
 class ChampionshipAddTeamScreen extends StatelessWidget {
-  const ChampionshipAddTeamScreen({super.key});
-
+  const ChampionshipAddTeamScreen({super.key, required this.id, required this.fees, required this.championName, required this.type, required this.date});
+  final int id;
+  final num fees;
+    final String championName;
+    final String type;
+  final String date;
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ChampionshipAddTeamCubit(),
-      child: const _ChampionshipAddTeamView(),
+      create: (_) => ChampionshipAddTeamCubit(id)..loadTeams(),
+      child:  _ChampionshipAddTeamView(fees, championName, type, date),
     );
   }
 }
 
 class _ChampionshipAddTeamView extends StatelessWidget {
-  const _ChampionshipAddTeamView();
-
+  const _ChampionshipAddTeamView(this.fees, this.championName, this.type, this.date);
+  final num fees;
+  final String championName;
+  final String type;
+  final String date;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,8 +59,8 @@ class _ChampionshipAddTeamView extends StatelessWidget {
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
-                    children: const [
-                      _TournamentSummaryCard(),
+                    children:  [
+                      _TournamentSummaryCard(championName,type,date),
                       _TeamSelectSection(),
                       _PlayersListSection(),
                       SizedBox(height: 110),
@@ -60,7 +68,7 @@ class _ChampionshipAddTeamView extends StatelessWidget {
                   ),
                 ),
               ),
-              const _BottomActionBar(),
+               _BottomActionBar(fees),
             ],
           );
         },
@@ -138,8 +146,10 @@ class _CircleIconButton extends StatelessWidget {
 
 // ─── TOURNAMENT SUMMARY CARD ────────────────────────────────────────────────
 class _TournamentSummaryCard extends StatelessWidget {
-  const _TournamentSummaryCard();
-
+  const _TournamentSummaryCard(this.championName, this.type, this.date);
+  final String championName;
+  final String type;
+  final String date;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -196,7 +206,7 @@ class _TournamentSummaryCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          ChampionshipAddTeamMockData.tournamentName,
+                          championName,
                           style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
                             fontWeight: FontWeight.w900,
                             color: AppColors.white,
@@ -204,7 +214,7 @@ class _TournamentSummaryCard extends StatelessWidget {
                         ),
                         4.h.sizedHeight,
                         Text(
-                          ChampionshipAddTeamMockData.tournamentMeta,
+                          "$type. $date",
                           style: AppTextTheme.bodyXSmall(context).copyWith(
                             color: AppColors.white.withOpacity(0.9),
                           ),
@@ -254,6 +264,45 @@ class _SectionHeader extends StatelessWidget {
 class _TeamSelectSection extends StatelessWidget {
   const _TeamSelectSection();
 
+  void _openTeamPicker(BuildContext context, ChampionshipAddTeamState state) {
+    final cubit = context.read<ChampionshipAddTeamCubit>();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+      ),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 15.h),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final team in state.teams)
+                ListTile(
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(10.r),
+                    child: CustomNetworkImage(
+                      imageUrl: team.logo ?? '',
+                      width: 40.w,
+                      height: 40.w,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  title: Text(team.name ?? ''),
+                  subtitle: Text('${LocaleKeys.addTeamTotalPlayers.tr()}: ${team.membersCount ?? 0}'),
+                  onTap: () {
+                    cubit.selectTeam(team.id!);
+                    Navigator.pop(context);
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -280,76 +329,94 @@ class _TeamSelectSection extends StatelessWidget {
               ),
             ),
           ),
-          GestureDetector(
-            onTap: () {},
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                border: Border.all(color: AppColors.primaryLight, width: 1.5),
-                borderRadius: BorderRadius.circular(16.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primaryLight.withOpacity(0.05),
-                    blurRadius: 15,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12.r),
-                        child: CustomNetworkImage(
-                          imageUrl: ChampionshipAddTeamMockData.teamLogoUrl,
-                          width: 45.w,
-                          height: 45.w,
-                          fit: BoxFit.cover,
-                        ),
+          BlocBuilder<ChampionshipAddTeamCubit, ChampionshipAddTeamState>(
+            buildWhen: (p, c) =>
+            p.teamsStatus != c.teamsStatus ||
+                p.teams != c.teams ||
+                p.selectedTeamId != c.selectedTeamId,
+            builder: (context, state) {
+              if (state.teamsStatus is Loading) {
+                return ShimmerWidget.rectangular(width: double.infinity, height: 70.h);
+              }
+
+              final selectedTeam =
+                  state.teams.where((t) => t.id == state.selectedTeamId).firstOrNull;
+
+              if (selectedTeam == null) {
+                return Center(child: Text("LocaleKeys.addTeamNoTeams.tr()"));
+              }
+
+              return GestureDetector(
+                onTap: () => _openTeamPicker(context, state),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    border: Border.all(color: AppColors.primaryLight, width: 1.5),
+                    borderRadius: BorderRadius.circular(16.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryLight.withOpacity(0.05),
+                        blurRadius: 15,
+                        offset: const Offset(0, 4),
                       ),
-                      12.w.sizedWidth,
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
                         children: [
-                          Text(
-                            ChampionshipAddTeamMockData.teamName,
-                            style: AppTextTheme.bodySmallSemiBold(context).copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.textDark,
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12.r),
+                            child: CustomNetworkImage(
+                              imageUrl: selectedTeam.logo ?? '',
+                              width: 45.w,
+                              height: 45.w,
+                              fit: BoxFit.cover,
                             ),
                           ),
-                          2.h.sizedHeight,
-                          Row(
+                          12.w.sizedWidth,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              FaIcon(FontAwesomeIcons.users, size: 10.sp, color: AppColors.textMuted),
-                              5.w.sizedWidth,
                               Text(
-                                '${LocaleKeys.addTeamTotalPlayers.tr()}: ${ChampionshipAddTeamMockData.teamTotalPlayers}',
-                                style: AppTextTheme.bodyXXSmall(context).copyWith(
-                                  color: AppColors.textMuted,
-                                  fontWeight: FontWeight.w600,
+                                selectedTeam.name ?? '',
+                                style: AppTextTheme.bodySmallSemiBold(context).copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.textDark,
                                 ),
+                              ),
+                              2.h.sizedHeight,
+                              Row(
+                                children: [
+                                  FaIcon(FontAwesomeIcons.users, size: 10.sp, color: AppColors.textMuted),
+                                  5.w.sizedWidth,
+                                  Text(
+                                    '${LocaleKeys.addTeamTotalPlayers.tr()}: ${selectedTeam.membersCount ?? 0}',
+                                    style: AppTextTheme.bodyXXSmall(context).copyWith(
+                                      color: AppColors.textMuted,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                         ],
                       ),
+                      FaIcon(FontAwesomeIcons.chevronDown, size: 14.sp, color: AppColors.primary),
                     ],
                   ),
-                  FaIcon(FontAwesomeIcons.chevronDown, size: 14.sp, color: AppColors.primary),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ],
       ),
     );
   }
 }
-
 // ─── PLAYERS LIST SECTION ───────────────────────────────────────────────────
 class _PlayersListSection extends StatelessWidget {
   const _PlayersListSection();
@@ -383,9 +450,10 @@ class _PlayersListSection extends StatelessWidget {
             },
           ),
           Padding(
-            padding: EdgeInsets.only(top: 0, bottom: 12.h),
+            padding: EdgeInsets.only(bottom: 12.h),
             child: Text(
-              '* ${LocaleKeys.addTeamMinPlayersNote.tr()}: ${ChampionshipAddTeamMockData.minPlayersRequired} ${LocaleKeys.addTeamPlayersWord.tr()}',
+              // TODO: minPlayersRequired ثابت مؤقتًا لحد ما ييجي من الـ API
+              '* ${LocaleKeys.addTeamMinPlayersNote.tr()}: ${ChampionshipAddTeamCubit.minPlayersRequired} ${LocaleKeys.addTeamPlayersWord.tr()}',
               style: AppTextTheme.bodyXXSmall(context).copyWith(
                 fontWeight: FontWeight.w700,
                 color: AppColors.warning,
@@ -393,18 +461,37 @@ class _PlayersListSection extends StatelessWidget {
             ),
           ),
           BlocBuilder<ChampionshipAddTeamCubit, ChampionshipAddTeamState>(
-            buildWhen: (p, c) => p.selectedPlayerIndexes != c.selectedPlayerIndexes,
+            buildWhen: (p, c) =>
+            p.selectedPlayerIndexes != c.selectedPlayerIndexes ||
+                p.selectedTeamId != c.selectedTeamId ||
+                p.teamsStatus != c.teamsStatus,
             builder: (context, state) {
+              final cubit = context.read<ChampionshipAddTeamCubit>();
+
+              if (state.teamsStatus is Loading) {
+                return Column(
+                  children: List.generate(
+                    3,
+                        (_) => Padding(
+                      padding: EdgeInsets.only(bottom: 10.h),
+                      child: ShimmerWidget.rectangular(width: double.infinity, height: 60.h),
+                    ),
+                  ),
+                );
+              }
+
+              final players = cubit.currentPlayers;
+
               return Column(
-                children: List.generate(ChampionshipAddTeamMockData.players.length, (i) {
-                  final player = ChampionshipAddTeamMockData.players[i];
+                children: List.generate(players.length, (i) {
+                  final player = players[i];
                   final isSelected = state.selectedPlayerIndexes.contains(i);
                   return Padding(
                     padding: EdgeInsets.only(bottom: 10.h),
                     child: _PlayerItem(
                       player: player,
                       isSelected: isSelected,
-                      onTap: () => context.read<ChampionshipAddTeamCubit>().togglePlayer(i),
+                      onTap: () => cubit.togglePlayer(i),
                     ),
                   );
                 }),
@@ -416,9 +503,8 @@ class _PlayersListSection extends StatelessWidget {
     );
   }
 }
-
 class _PlayerItem extends StatelessWidget {
-  final PlayerModel player;
+  final TeamMemberModel player;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -450,7 +536,7 @@ class _PlayerItem extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10.r),
                   child: CustomNetworkImage(
-                    imageUrl: player.avatarUrl,
+                    imageUrl: player.avatar ?? '',
                     width: 40.w,
                     height: 40.w,
                     fit: BoxFit.cover,
@@ -461,7 +547,7 @@ class _PlayerItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      player.isCaptain ? '${player.name} (C)' : player.name,
+                      (player.isCaptain ?? false) ? '${player.name} (C)' : (player.name ?? ''),
                       style: AppTextTheme.bodySmall(context).copyWith(
                         fontWeight: FontWeight.w800,
                         color: AppColors.textDark,
@@ -469,7 +555,7 @@ class _PlayerItem extends StatelessWidget {
                     ),
                     2.h.sizedHeight,
                     Text(
-                      player.positionKey,
+                      player.role ?? '',
                       style: AppTextTheme.bodyXSmall(context).copyWith(
                         color: AppColors.textMuted,
                         fontWeight: FontWeight.w600,
@@ -486,7 +572,6 @@ class _PlayerItem extends StatelessWidget {
     );
   }
 }
-
 class _CustomCheckbox extends StatelessWidget {
   final bool isChecked;
   const _CustomCheckbox({required this.isChecked});
@@ -514,8 +599,8 @@ class _CustomCheckbox extends StatelessWidget {
 
 // ─── BOTTOM ACTION BAR ──────────────────────────────────────────────────────
 class _BottomActionBar extends StatelessWidget {
-  const _BottomActionBar();
-
+  const _BottomActionBar(this.registrationFee);
+  final num registrationFee;
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
@@ -554,7 +639,7 @@ class _BottomActionBar extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${ChampionshipAddTeamMockData.registrationFee} ${LocaleKeys.addTeamCurrency.tr()}',
+                      '${registrationFee} ${LocaleKeys.addTeamCurrency.tr()}',
                       style: AppTextTheme.headingSmall(context).copyWith(
                         fontWeight: FontWeight.w900,
                         color: AppColors.primary,

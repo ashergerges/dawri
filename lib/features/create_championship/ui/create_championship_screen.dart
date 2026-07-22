@@ -2,13 +2,17 @@
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:dawri/core/services/dialogs/message_service.dart';
 import 'package:dawri/core/utils/common_widgets/app_button.dart';
 import 'package:dawri/core/utils/common_widgets/day_picker_page_custom.dart';
+import 'package:dawri/core/utils/common_widgets/on_tap.dart';
+import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
 import 'package:dawri/features/create_championship/cubit/create_championship_cubit.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:dawri/core/utils/constants/app_colors.dart';
@@ -27,7 +31,7 @@ class CreateChampionshipScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => CreateChampionshipCubit(),
+      create: (_) => CreateChampionshipCubit()..loadFormOptions(),
       child: const _CreateChampionshipView(),
     );
   }
@@ -58,8 +62,9 @@ class _CreateChampionshipViewState extends State<_CreateChampionshipView> {
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 key: _formKey,
                 child: Column(
-                  children: const [
-                    _UploadSection(),
+                  children:  [
+                    _ImageSection(),
+                     60.verticalSpace,
                     _BasicInfoSection(),
                     _SystemSection(),
                     _LocationSection(),
@@ -146,11 +151,11 @@ class _UploadSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 20.h),
+      padding: 20.padVertical,
       child: Center(
         child: BlocBuilder<CreateChampionshipCubit, CreateChampionshipState>(
           builder: (context, state) {
-            return GestureDetector(
+            return OnTap(
               onTap: () => context.read<CreateChampionshipCubit>().pickImage(),
               child: state.logoFile != null
                   ? ClipRRect(
@@ -199,8 +204,100 @@ class _UploadSection extends StatelessWidget {
     );
   }
 }
+class _CoverImageUpload extends StatelessWidget {
+  const _CoverImageUpload();
 
-// ─── BASIC INFO SECTION ──────────────────────────────────────────────────
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CreateChampionshipCubit, CreateChampionshipState>(
+      builder: (context, state) {
+        return GestureDetector(
+          onTap: () => context.read<CreateChampionshipCubit>().pickCoverImage(),
+          child: DottedBorder(
+            options: RoundedRectDottedBorderOptions(
+              color: AppColors.slate300,
+              dashPattern: [10, 5],
+              strokeWidth: 2,
+              radius: Radius.circular(16.r),
+            ),
+            child: Container(
+              width: double.infinity,
+              height: 150.h,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16.r),
+                color: AppColors.slate50,
+              ),
+              child: state.coverImage != null
+                  ? ClipRRect(
+                borderRadius: BorderRadius.circular(16.r),
+                child: Image.file(
+                  File(state.coverImage!.path),
+                  width: double.infinity,
+                  height: 150.h,
+                  fit: BoxFit.cover,
+                ),
+              )
+                  : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FaIcon(
+                    FontAwesomeIcons.image,
+                    size: 32.sp,
+                    color: AppColors.textMuted,
+                  ),
+                  8.h.sizedHeight,
+                  Text(
+                    LocaleKeys.createChampionshipCover.tr(),
+                    style: AppTextTheme.bodyXXSmall(context).copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+class _ImageSection extends StatelessWidget {
+  const _ImageSection();
+
+  @override
+  Widget build(BuildContext context) {
+    // Sizes that match your existing widgets
+    final double coverHeight = 150.h;          // from _CoverImageUpload
+    final double logoTotalHeight = 120.h;      // 120.h (box) + 20.h padding top + 20.h padding bottom
+    final double overflow = logoTotalHeight / 2; // half of the logo hangs out
+
+    return BlocBuilder<CreateChampionshipCubit, CreateChampionshipState>(
+      builder: (context, state) {
+        return Padding(
+          padding: 16.padHorizontal,
+          child: SizedBox(
+            height: coverHeight + overflow,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // ─── Cover Image (unchanged) ──────────────────────────
+                const _CoverImageUpload(),
+
+                // ─── Logo – bottom‑right, half outside ──────────────
+                Positioned(
+                  bottom: -overflow,  // half of logo's total height hangs below
+                  right: -5.w,       // slight offset from the right edge (adjust as you like)
+                  child: const _UploadSection(),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}// ─── BASIC INFO SECTION ──────────────────────────────────────────────────
 class _BasicInfoSection extends StatelessWidget {
   const _BasicInfoSection();
 
@@ -225,6 +322,11 @@ class _BasicInfoSection extends StatelessWidget {
                 context.read<CreateChampionshipCubit>().updateName(value ?? ''),
           ),
           15.h.sizedHeight,
+          _AboutField(
+            onSaved: (value) =>
+                context.read<CreateChampionshipCubit>().updateAbout(value ?? ''),
+          ),
+          15.verticalSpace,
           Text(
             LocaleKeys.createChampionshipSport.tr(),
             style: AppTextTheme.bodyXSmall(context).copyWith(
@@ -235,36 +337,32 @@ class _BasicInfoSection extends StatelessWidget {
           10.h.sizedHeight,
           BlocBuilder<CreateChampionshipCubit, CreateChampionshipState>(
             builder: (context, state) {
+              if (state.optionsStatus is Loading) {
+               return Row(
+                  children: [
+                    ShimmerWidget.rectangular(width: 90.w, height: 38.h),
+                    10.w.sizedWidth,
+                    ShimmerWidget.rectangular(width: 90.w, height: 38.h),
+                    10.w.sizedWidth,
+                    ShimmerWidget.rectangular(width: 90.w, height: 38.h),
+                  ],
+                );
+              }
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    _SportChip(
-                      icon: FontAwesomeIcons.futbol,
-                      label: LocaleKeys.createChampionshipFootball.tr(),
-                      isSelected: state.selectedSport == SportType.football,
-                      onTap: () => context
-                          .read<CreateChampionshipCubit>()
-                          .selectSport(SportType.football),
-                    ),
-                    10.w.sizedWidth,
-                    _SportChip(
-                      icon: FontAwesomeIcons.gamepad,
-                      label: LocaleKeys.createChampionshipEsports.tr(),
-                      isSelected: state.selectedSport == SportType.esports,
-                      onTap: () => context
-                          .read<CreateChampionshipCubit>()
-                          .selectSport(SportType.esports),
-                    ),
-                    10.w.sizedWidth,
-                    _SportChip(
-                      icon: FontAwesomeIcons.tableTennisPaddleBall,
-                      label: LocaleKeys.createChampionshipPadel.tr(),
-                      isSelected: state.selectedSport == SportType.padel,
-                      onTap: () => context
-                          .read<CreateChampionshipCubit>()
-                          .selectSport(SportType.padel),
-                    ),
+                    for (int i = 0; i < state.sports.length; i++) ...[
+                      if (i != 0) 10.w.sizedWidth,
+                      _SportChip(
+                        iconUrl: state.sports[i].icon ?? '',
+                        label: state.sports[i].title ?? '',
+                        isSelected: state.selectedSportId == state.sports[i].id,
+                        onTap: () => context
+                            .read<CreateChampionshipCubit>()
+                            .selectSport(state.sports[i].id!),
+                      ),
+                    ],
                   ],
                 ),
               );
@@ -278,13 +376,13 @@ class _BasicInfoSection extends StatelessWidget {
 }
 
 class _SportChip extends StatelessWidget {
-  final IconData icon;
+  final String iconUrl;
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _SportChip({
-    required this.icon,
+    required this.iconUrl,
     required this.label,
     required this.isSelected,
     required this.onTap,
@@ -304,21 +402,19 @@ class _SportChip extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(14.r),
           boxShadow: isSelected
-              ? [
-            BoxShadow(
-              color: AppColors.primary.withOpacity(0.2),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ]
+              ? [BoxShadow(color: AppColors.primary.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))]
               : null,
         ),
         child: Row(
           children: [
-            FaIcon(
-              icon,
-              size: 14.sp,
-              color: isSelected ? AppColors.white : AppColors.textMuted,
+            SvgPicture.network(
+              iconUrl,
+              width: 14.sp,
+              height: 14.sp,
+              colorFilter:   ColorFilter.mode(
+                isSelected ? AppColors.white : AppColors.textMuted,
+                BlendMode.srcIn,
+              ),
             ),
             8.w.sizedWidth,
             Text(
@@ -334,10 +430,41 @@ class _SportChip extends StatelessWidget {
     );
   }
 }
-
 // ─── SYSTEM SECTION ──────────────────────────────────────────────────────
 class _SystemSection extends StatelessWidget {
   const _SystemSection();
+
+  String _championshipTypeLabel(int? id) {
+    switch (id) {
+      case 1:
+        return LocaleKeys.createChampionshipTypeLeague.tr();
+      case 2:
+        return LocaleKeys.createChampionshipTypeCup.tr();
+      default:
+        return '';
+    }
+  }
+
+  String _registrationModeLabel(int? id) {
+    switch (id) {
+      case 1:
+        return LocaleKeys.createChampionshipRegistrationIndividual.tr();
+      case 2:
+        return LocaleKeys.createChampionshipRegistrationTeam.tr();
+      default:
+        return '';
+    }
+  }
+
+  Widget _chipsShimmer() {
+    return Row(
+      children: [
+        ShimmerWidget.rectangular(width: 90.w, height: 38.h),
+        10.w.sizedWidth,
+        ShimmerWidget.rectangular(width: 90.w, height: 38.h),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -351,37 +478,72 @@ class _SystemSection extends StatelessWidget {
             title: LocaleKeys.createChampionshipSystem.tr(),
           ),
           15.h.sizedHeight,
+
+          // ─── Championship Types ──────────────────────────────
           BlocBuilder<CreateChampionshipCubit, CreateChampionshipState>(
+            buildWhen: (previous, current) =>
+            previous.optionsStatus != current.optionsStatus ||
+                previous.championshipTypes != current.championshipTypes ||
+                previous.selectedChampionshipTypeId != current.selectedChampionshipTypeId,
             builder: (context, state) {
+              if (state.optionsStatus is Loading) {
+                return _chipsShimmer();
+              }
               return Wrap(
                 spacing: 10.w,
                 runSpacing: 10.h,
                 children: [
-                  _SystemChip(
-                    label: LocaleKeys.createChampionshipSystemKnockout.tr(),
-                    isSelected: state.selectedSystem == TournamentSystem.knockout,
-                    onTap: () => context
-                        .read<CreateChampionshipCubit>()
-                        .selectSystem(TournamentSystem.knockout),
-                  ),
-                  _SystemChip(
-                    label: LocaleKeys.createChampionshipSystemGroups.tr(),
-                    isSelected: state.selectedSystem == TournamentSystem.groups,
-                    onTap: () => context
-                        .read<CreateChampionshipCubit>()
-                        .selectSystem(TournamentSystem.groups),
-                  ),
-                  _SystemChip(
-                    label: LocaleKeys.createChampionshipSystemLeague.tr(),
-                    isSelected: state.selectedSystem == TournamentSystem.league,
-                    onTap: () => context
-                        .read<CreateChampionshipCubit>()
-                        .selectSystem(TournamentSystem.league),
-                  ),
+                  for (final type in state.championshipTypes)
+                    _SystemChip(
+                      iconUrl: type.icon,
+                      label: _championshipTypeLabel(type.id),
+                      isSelected: state.selectedChampionshipTypeId == type.id,
+                      onTap: () => context
+                          .read<CreateChampionshipCubit>()
+                          .selectChampionshipType(type.id!),
+                    ),
                 ],
               );
             },
           ),
+
+          15.h.sizedHeight,
+          Text(
+            LocaleKeys.createChampionshipRegistrationMode.tr(),
+            style: AppTextTheme.bodyXSmall(context).copyWith(
+              fontWeight: FontWeight.w800,
+              color: AppColors.textMuted,
+            ),
+          ),
+          10.h.sizedHeight,
+
+          // ─── Registration Modes ──────────────────────────────
+          BlocBuilder<CreateChampionshipCubit, CreateChampionshipState>(
+            buildWhen: (previous, current) =>
+            previous.optionsStatus != current.optionsStatus ||
+                previous.registrationModes != current.registrationModes ||
+                previous.selectedRegistrationModeId != current.selectedRegistrationModeId,
+            builder: (context, state) {
+              if (state.optionsStatus is Loading) {
+                return _chipsShimmer();
+              }
+              return Wrap(
+                spacing: 10.w,
+                runSpacing: 10.h,
+                children: [
+                  for (final mode in state.registrationModes)
+                    _SystemChip(
+                      label: _registrationModeLabel(mode.id),
+                      isSelected: state.selectedRegistrationModeId == mode.id,
+                      onTap: () => context
+                          .read<CreateChampionshipCubit>()
+                          .selectRegistrationMode(mode.id!),
+                    ),
+                ],
+              );
+            },
+          ),
+
           15.h.sizedHeight,
           Row(
             children: [
@@ -414,13 +576,14 @@ class _SystemSection extends StatelessWidget {
     );
   }
 }
-
 class _SystemChip extends StatelessWidget {
+  final String? iconUrl;
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _SystemChip({
+    this.iconUrl,
     required this.label,
     required this.isSelected,
     required this.onTap,
@@ -440,27 +603,37 @@ class _SystemChip extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(14.r),
           boxShadow: isSelected
-              ? [
-            BoxShadow(
-              color: AppColors.primary.withOpacity(0.2),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ]
+              ? [BoxShadow(color: AppColors.primary.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))]
               : null,
         ),
-        child: Text(
-          label,
-          style: AppTextTheme.bodyXSmall(context).copyWith(
-            fontWeight: FontWeight.w800,
-            color: isSelected ? AppColors.white : AppColors.textMuted,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (iconUrl != null && iconUrl!.isNotEmpty) ...[
+              SvgPicture.network(
+                 iconUrl!,
+                width: 14.sp,
+                height: 14.sp,
+                colorFilter:   ColorFilter.mode(
+                  isSelected ? AppColors.white : AppColors.textMuted,
+                  BlendMode.srcIn,
+                ),
+              ),
+              8.w.sizedWidth,
+            ],
+            Text(
+              label,
+              style: AppTextTheme.bodyXSmall(context).copyWith(
+                fontWeight: FontWeight.w800,
+                color: isSelected ? AppColors.white : AppColors.textMuted,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-
 // ─── LOCATION SECTION ─────────────────────────────────────────────────────
 class _LocationSection extends StatelessWidget {
   const _LocationSection();
@@ -477,13 +650,21 @@ class _LocationSection extends StatelessWidget {
             title: LocaleKeys.createChampionshipLocation.tr(),
           ),
           15.h.sizedHeight,
-          _InputField(
-            icon: FontAwesomeIcons.mapPin,
-            label: LocaleKeys.createChampionshipStadium.tr(),
-            hint: LocaleKeys.createChampionshipStadiumHint.tr(),
-            validator: Validator.validateStadium,
-            onSaved: (value) =>
-                context.read<CreateChampionshipCubit>().updateStadium(value ?? ''),
+          BlocBuilder<CreateChampionshipCubit, CreateChampionshipState>(
+            builder: (context, state) {
+              if (state.optionsStatus is Loading) {
+                return const ShimmerWidget.rectangular(width: double.infinity, height: 52);
+              }
+              return _DropdownField(
+                label: LocaleKeys.createChampionshipStadium.tr(),
+                hint: LocaleKeys.createChampionshipStadiumHint.tr(),
+                items: {for (final c in state.cities) c.id!: c.title ?? ''},
+                value: state.selectedCityId,
+                onChanged: (id) {
+                  if (id != null) context.read<CreateChampionshipCubit>().selectCity(id);
+                },
+              );
+            },
           ),
           15.h.sizedHeight,
           Row(
@@ -1129,5 +1310,137 @@ class _DatePickerFieldState extends State<_DatePickerField> {
 
   void setError(String error) {
     setState(() => _errorText = error);
+  }
+
+}
+class _DropdownField extends StatelessWidget {
+  final String label;
+  final String hint;
+  final Map<int, String> items; // id -> title
+  final int? value;
+  final ValueChanged<int?> onChanged;
+
+  const _DropdownField({
+    required this.label,
+    required this.hint,
+    required this.items,
+    this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: AppTextTheme.bodyXSmall(context).copyWith(
+            fontWeight: FontWeight.w800,
+            color: AppColors.textMuted,
+          ),
+        ),
+        6.h.sizedHeight,
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(14.r),
+            border: Border.all(color: AppColors.slate200),
+          ),
+          child: DropdownButtonFormField<int>(
+            value: value,
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(horizontal: 12),
+            ),
+            hint: Text(
+              hint,
+              style: AppTextTheme.bodySmall(context).copyWith(
+                fontWeight: FontWeight.w500,
+                color: AppColors.textHint,
+              ),
+            ),
+            style: AppTextTheme.bodySmall(context).copyWith(
+              fontWeight: FontWeight.w700,
+              color: AppColors.textDark,
+            ),
+            dropdownColor: AppColors.white,
+            items: items.entries
+                .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+                .toList(),
+            onChanged: onChanged,
+            icon: FaIcon(
+              FontAwesomeIcons.chevronDown,
+              size: 14.sp,
+              color: AppColors.textMuted,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+class _AboutField extends StatelessWidget {
+  final void Function(String?)? onSaved;
+
+  const _AboutField({this.onSaved});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          LocaleKeys.createChampionshipAbout.tr(),
+          style: AppTextTheme.bodyXSmall(context).copyWith(
+            fontWeight: FontWeight.w800,
+            color: AppColors.textMuted,
+          ),
+        ),
+        8.h.sizedHeight,
+        TextFormField(
+          onTapOutside: (_) => FocusScope.of(context).unfocus(),
+          onSaved: onSaved,
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return LocaleKeys.pleaseEnterAbout.tr();
+            }
+            return null;
+          },
+          maxLines: 3,
+          keyboardType: TextInputType.multiline,
+          decoration: InputDecoration(
+            hintText: LocaleKeys.createChampionshipAboutHint.tr(),
+            hintStyle: AppTextTheme.bodySmall(context).copyWith(
+              fontWeight: FontWeight.w500,
+              color: AppColors.textHint,
+            ),
+            fillColor: AppColors.white,
+            filled: true,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14.r),
+              borderSide: const BorderSide(color: AppColors.slate200),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14.r),
+              borderSide: const BorderSide(color: AppColors.slate200),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14.r),
+              borderSide: const BorderSide(color: AppColors.primary),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14.r),
+              borderSide: const BorderSide(color: AppColors.error),
+            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+          ),
+          style: AppTextTheme.bodySmall(context).copyWith(
+            fontWeight: FontWeight.w700,
+            color: AppColors.textDark,
+          ),
+        ),
+      ],
+    );
   }
 }

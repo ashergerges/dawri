@@ -14,7 +14,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CreateChampionshipState {
 
- String get name; SportType get selectedSport; TournamentSystem get selectedSystem; String get teams; String get fee; String get stadium; String get startDate; String get endDate; String get prizeFirst; String get prizeSecond; XFile? get logoFile; CreateChampionshipStateStatus get currState; bool get isSuccess; String? get errorMessage;
+ String get name; String get teams; String get fee; int? get selectedCityId; String get startDate; String get endDate; String get prizeFirst; String get prizeSecond; XFile? get logoFile; XFile? get coverImage; String get about;// ─── Options loaded from APIs ───────────────────────────
+ List<SportModel> get sports; List<ChampionshipTypeModel> get championshipTypes; List<RegistrationModeModel> get registrationModes; List<CityModel> get cities; int? get selectedSportId; int? get selectedChampionshipTypeId; int? get selectedRegistrationModeId; CreateChampionshipStateStatus get optionsStatus;// ─── Submit status ───────────────────────────────────────
+ CreateChampionshipStateStatus get currState; bool get isSuccess; String? get errorMessage;
 /// Create a copy of CreateChampionshipState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +27,16 @@ $CreateChampionshipStateCopyWith<CreateChampionshipState> get copyWith => _$Crea
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateChampionshipState&&(identical(other.name, name) || other.name == name)&&(identical(other.selectedSport, selectedSport) || other.selectedSport == selectedSport)&&(identical(other.selectedSystem, selectedSystem) || other.selectedSystem == selectedSystem)&&(identical(other.teams, teams) || other.teams == teams)&&(identical(other.fee, fee) || other.fee == fee)&&(identical(other.stadium, stadium) || other.stadium == stadium)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.prizeFirst, prizeFirst) || other.prizeFirst == prizeFirst)&&(identical(other.prizeSecond, prizeSecond) || other.prizeSecond == prizeSecond)&&(identical(other.logoFile, logoFile) || other.logoFile == logoFile)&&(identical(other.currState, currState) || other.currState == currState)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateChampionshipState&&(identical(other.name, name) || other.name == name)&&(identical(other.teams, teams) || other.teams == teams)&&(identical(other.fee, fee) || other.fee == fee)&&(identical(other.selectedCityId, selectedCityId) || other.selectedCityId == selectedCityId)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.prizeFirst, prizeFirst) || other.prizeFirst == prizeFirst)&&(identical(other.prizeSecond, prizeSecond) || other.prizeSecond == prizeSecond)&&(identical(other.logoFile, logoFile) || other.logoFile == logoFile)&&(identical(other.coverImage, coverImage) || other.coverImage == coverImage)&&(identical(other.about, about) || other.about == about)&&const DeepCollectionEquality().equals(other.sports, sports)&&const DeepCollectionEquality().equals(other.championshipTypes, championshipTypes)&&const DeepCollectionEquality().equals(other.registrationModes, registrationModes)&&const DeepCollectionEquality().equals(other.cities, cities)&&(identical(other.selectedSportId, selectedSportId) || other.selectedSportId == selectedSportId)&&(identical(other.selectedChampionshipTypeId, selectedChampionshipTypeId) || other.selectedChampionshipTypeId == selectedChampionshipTypeId)&&(identical(other.selectedRegistrationModeId, selectedRegistrationModeId) || other.selectedRegistrationModeId == selectedRegistrationModeId)&&(identical(other.optionsStatus, optionsStatus) || other.optionsStatus == optionsStatus)&&(identical(other.currState, currState) || other.currState == currState)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,name,selectedSport,selectedSystem,teams,fee,stadium,startDate,endDate,prizeFirst,prizeSecond,logoFile,currState,isSuccess,errorMessage);
+int get hashCode => Object.hashAll([runtimeType,name,teams,fee,selectedCityId,startDate,endDate,prizeFirst,prizeSecond,logoFile,coverImage,about,const DeepCollectionEquality().hash(sports),const DeepCollectionEquality().hash(championshipTypes),const DeepCollectionEquality().hash(registrationModes),const DeepCollectionEquality().hash(cities),selectedSportId,selectedChampionshipTypeId,selectedRegistrationModeId,optionsStatus,currState,isSuccess,errorMessage]);
 
 @override
 String toString() {
-  return 'CreateChampionshipState(name: $name, selectedSport: $selectedSport, selectedSystem: $selectedSystem, teams: $teams, fee: $fee, stadium: $stadium, startDate: $startDate, endDate: $endDate, prizeFirst: $prizeFirst, prizeSecond: $prizeSecond, logoFile: $logoFile, currState: $currState, isSuccess: $isSuccess, errorMessage: $errorMessage)';
+  return 'CreateChampionshipState(name: $name, teams: $teams, fee: $fee, selectedCityId: $selectedCityId, startDate: $startDate, endDate: $endDate, prizeFirst: $prizeFirst, prizeSecond: $prizeSecond, logoFile: $logoFile, coverImage: $coverImage, about: $about, sports: $sports, championshipTypes: $championshipTypes, registrationModes: $registrationModes, cities: $cities, selectedSportId: $selectedSportId, selectedChampionshipTypeId: $selectedChampionshipTypeId, selectedRegistrationModeId: $selectedRegistrationModeId, optionsStatus: $optionsStatus, currState: $currState, isSuccess: $isSuccess, errorMessage: $errorMessage)';
 }
 
 
@@ -45,11 +47,11 @@ abstract mixin class $CreateChampionshipStateCopyWith<$Res>  {
   factory $CreateChampionshipStateCopyWith(CreateChampionshipState value, $Res Function(CreateChampionshipState) _then) = _$CreateChampionshipStateCopyWithImpl;
 @useResult
 $Res call({
- String name, SportType selectedSport, TournamentSystem selectedSystem, String teams, String fee, String stadium, String startDate, String endDate, String prizeFirst, String prizeSecond, XFile? logoFile, CreateChampionshipStateStatus currState, bool isSuccess, String? errorMessage
+ String name, String teams, String fee, int? selectedCityId, String startDate, String endDate, String prizeFirst, String prizeSecond, XFile? logoFile, XFile? coverImage, String about, List<SportModel> sports, List<ChampionshipTypeModel> championshipTypes, List<RegistrationModeModel> registrationModes, List<CityModel> cities, int? selectedSportId, int? selectedChampionshipTypeId, int? selectedRegistrationModeId, CreateChampionshipStateStatus optionsStatus, CreateChampionshipStateStatus currState, bool isSuccess, String? errorMessage
 });
 
 
-$CreateChampionshipStateStatusCopyWith<$Res> get currState;
+$CreateChampionshipStateStatusCopyWith<$Res> get optionsStatus;$CreateChampionshipStateStatusCopyWith<$Res> get currState;
 
 }
 /// @nodoc
@@ -62,26 +64,43 @@ class _$CreateChampionshipStateCopyWithImpl<$Res>
 
 /// Create a copy of CreateChampionshipState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? selectedSport = null,Object? selectedSystem = null,Object? teams = null,Object? fee = null,Object? stadium = null,Object? startDate = null,Object? endDate = null,Object? prizeFirst = null,Object? prizeSecond = null,Object? logoFile = freezed,Object? currState = null,Object? isSuccess = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? teams = null,Object? fee = null,Object? selectedCityId = freezed,Object? startDate = null,Object? endDate = null,Object? prizeFirst = null,Object? prizeSecond = null,Object? logoFile = freezed,Object? coverImage = freezed,Object? about = null,Object? sports = null,Object? championshipTypes = null,Object? registrationModes = null,Object? cities = null,Object? selectedSportId = freezed,Object? selectedChampionshipTypeId = freezed,Object? selectedRegistrationModeId = freezed,Object? optionsStatus = null,Object? currState = null,Object? isSuccess = null,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,selectedSport: null == selectedSport ? _self.selectedSport : selectedSport // ignore: cast_nullable_to_non_nullable
-as SportType,selectedSystem: null == selectedSystem ? _self.selectedSystem : selectedSystem // ignore: cast_nullable_to_non_nullable
-as TournamentSystem,teams: null == teams ? _self.teams : teams // ignore: cast_nullable_to_non_nullable
+as String,teams: null == teams ? _self.teams : teams // ignore: cast_nullable_to_non_nullable
 as String,fee: null == fee ? _self.fee : fee // ignore: cast_nullable_to_non_nullable
-as String,stadium: null == stadium ? _self.stadium : stadium // ignore: cast_nullable_to_non_nullable
-as String,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
+as String,selectedCityId: freezed == selectedCityId ? _self.selectedCityId : selectedCityId // ignore: cast_nullable_to_non_nullable
+as int?,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
 as String,endDate: null == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
 as String,prizeFirst: null == prizeFirst ? _self.prizeFirst : prizeFirst // ignore: cast_nullable_to_non_nullable
 as String,prizeSecond: null == prizeSecond ? _self.prizeSecond : prizeSecond // ignore: cast_nullable_to_non_nullable
 as String,logoFile: freezed == logoFile ? _self.logoFile : logoFile // ignore: cast_nullable_to_non_nullable
-as XFile?,currState: null == currState ? _self.currState : currState // ignore: cast_nullable_to_non_nullable
+as XFile?,coverImage: freezed == coverImage ? _self.coverImage : coverImage // ignore: cast_nullable_to_non_nullable
+as XFile?,about: null == about ? _self.about : about // ignore: cast_nullable_to_non_nullable
+as String,sports: null == sports ? _self.sports : sports // ignore: cast_nullable_to_non_nullable
+as List<SportModel>,championshipTypes: null == championshipTypes ? _self.championshipTypes : championshipTypes // ignore: cast_nullable_to_non_nullable
+as List<ChampionshipTypeModel>,registrationModes: null == registrationModes ? _self.registrationModes : registrationModes // ignore: cast_nullable_to_non_nullable
+as List<RegistrationModeModel>,cities: null == cities ? _self.cities : cities // ignore: cast_nullable_to_non_nullable
+as List<CityModel>,selectedSportId: freezed == selectedSportId ? _self.selectedSportId : selectedSportId // ignore: cast_nullable_to_non_nullable
+as int?,selectedChampionshipTypeId: freezed == selectedChampionshipTypeId ? _self.selectedChampionshipTypeId : selectedChampionshipTypeId // ignore: cast_nullable_to_non_nullable
+as int?,selectedRegistrationModeId: freezed == selectedRegistrationModeId ? _self.selectedRegistrationModeId : selectedRegistrationModeId // ignore: cast_nullable_to_non_nullable
+as int?,optionsStatus: null == optionsStatus ? _self.optionsStatus : optionsStatus // ignore: cast_nullable_to_non_nullable
+as CreateChampionshipStateStatus,currState: null == currState ? _self.currState : currState // ignore: cast_nullable_to_non_nullable
 as CreateChampionshipStateStatus,isSuccess: null == isSuccess ? _self.isSuccess : isSuccess // ignore: cast_nullable_to_non_nullable
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
 /// Create a copy of CreateChampionshipState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$CreateChampionshipStateStatusCopyWith<$Res> get optionsStatus {
+  
+  return $CreateChampionshipStateStatusCopyWith<$Res>(_self.optionsStatus, (value) {
+    return _then(_self.copyWith(optionsStatus: value));
+  });
+}/// Create a copy of CreateChampionshipState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
@@ -172,10 +191,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  SportType selectedSport,  TournamentSystem selectedSystem,  String teams,  String fee,  String stadium,  String startDate,  String endDate,  String prizeFirst,  String prizeSecond,  XFile? logoFile,  CreateChampionshipStateStatus currState,  bool isSuccess,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  String teams,  String fee,  int? selectedCityId,  String startDate,  String endDate,  String prizeFirst,  String prizeSecond,  XFile? logoFile,  XFile? coverImage,  String about,  List<SportModel> sports,  List<ChampionshipTypeModel> championshipTypes,  List<RegistrationModeModel> registrationModes,  List<CityModel> cities,  int? selectedSportId,  int? selectedChampionshipTypeId,  int? selectedRegistrationModeId,  CreateChampionshipStateStatus optionsStatus,  CreateChampionshipStateStatus currState,  bool isSuccess,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CreateChampionshipState() when $default != null:
-return $default(_that.name,_that.selectedSport,_that.selectedSystem,_that.teams,_that.fee,_that.stadium,_that.startDate,_that.endDate,_that.prizeFirst,_that.prizeSecond,_that.logoFile,_that.currState,_that.isSuccess,_that.errorMessage);case _:
+return $default(_that.name,_that.teams,_that.fee,_that.selectedCityId,_that.startDate,_that.endDate,_that.prizeFirst,_that.prizeSecond,_that.logoFile,_that.coverImage,_that.about,_that.sports,_that.championshipTypes,_that.registrationModes,_that.cities,_that.selectedSportId,_that.selectedChampionshipTypeId,_that.selectedRegistrationModeId,_that.optionsStatus,_that.currState,_that.isSuccess,_that.errorMessage);case _:
   return orElse();
 
 }
@@ -193,10 +212,10 @@ return $default(_that.name,_that.selectedSport,_that.selectedSystem,_that.teams,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  SportType selectedSport,  TournamentSystem selectedSystem,  String teams,  String fee,  String stadium,  String startDate,  String endDate,  String prizeFirst,  String prizeSecond,  XFile? logoFile,  CreateChampionshipStateStatus currState,  bool isSuccess,  String? errorMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  String teams,  String fee,  int? selectedCityId,  String startDate,  String endDate,  String prizeFirst,  String prizeSecond,  XFile? logoFile,  XFile? coverImage,  String about,  List<SportModel> sports,  List<ChampionshipTypeModel> championshipTypes,  List<RegistrationModeModel> registrationModes,  List<CityModel> cities,  int? selectedSportId,  int? selectedChampionshipTypeId,  int? selectedRegistrationModeId,  CreateChampionshipStateStatus optionsStatus,  CreateChampionshipStateStatus currState,  bool isSuccess,  String? errorMessage)  $default,) {final _that = this;
 switch (_that) {
 case _CreateChampionshipState():
-return $default(_that.name,_that.selectedSport,_that.selectedSystem,_that.teams,_that.fee,_that.stadium,_that.startDate,_that.endDate,_that.prizeFirst,_that.prizeSecond,_that.logoFile,_that.currState,_that.isSuccess,_that.errorMessage);case _:
+return $default(_that.name,_that.teams,_that.fee,_that.selectedCityId,_that.startDate,_that.endDate,_that.prizeFirst,_that.prizeSecond,_that.logoFile,_that.coverImage,_that.about,_that.sports,_that.championshipTypes,_that.registrationModes,_that.cities,_that.selectedSportId,_that.selectedChampionshipTypeId,_that.selectedRegistrationModeId,_that.optionsStatus,_that.currState,_that.isSuccess,_that.errorMessage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -213,10 +232,10 @@ return $default(_that.name,_that.selectedSport,_that.selectedSystem,_that.teams,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  SportType selectedSport,  TournamentSystem selectedSystem,  String teams,  String fee,  String stadium,  String startDate,  String endDate,  String prizeFirst,  String prizeSecond,  XFile? logoFile,  CreateChampionshipStateStatus currState,  bool isSuccess,  String? errorMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  String teams,  String fee,  int? selectedCityId,  String startDate,  String endDate,  String prizeFirst,  String prizeSecond,  XFile? logoFile,  XFile? coverImage,  String about,  List<SportModel> sports,  List<ChampionshipTypeModel> championshipTypes,  List<RegistrationModeModel> registrationModes,  List<CityModel> cities,  int? selectedSportId,  int? selectedChampionshipTypeId,  int? selectedRegistrationModeId,  CreateChampionshipStateStatus optionsStatus,  CreateChampionshipStateStatus currState,  bool isSuccess,  String? errorMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _CreateChampionshipState() when $default != null:
-return $default(_that.name,_that.selectedSport,_that.selectedSystem,_that.teams,_that.fee,_that.stadium,_that.startDate,_that.endDate,_that.prizeFirst,_that.prizeSecond,_that.logoFile,_that.currState,_that.isSuccess,_that.errorMessage);case _:
+return $default(_that.name,_that.teams,_that.fee,_that.selectedCityId,_that.startDate,_that.endDate,_that.prizeFirst,_that.prizeSecond,_that.logoFile,_that.coverImage,_that.about,_that.sports,_that.championshipTypes,_that.registrationModes,_that.cities,_that.selectedSportId,_that.selectedChampionshipTypeId,_that.selectedRegistrationModeId,_that.optionsStatus,_that.currState,_that.isSuccess,_that.errorMessage);case _:
   return null;
 
 }
@@ -228,20 +247,55 @@ return $default(_that.name,_that.selectedSport,_that.selectedSystem,_that.teams,
 
 
 class _CreateChampionshipState implements CreateChampionshipState {
-  const _CreateChampionshipState({this.name = '', this.selectedSport = SportType.football, this.selectedSystem = TournamentSystem.knockout, this.teams = '', this.fee = '', this.stadium = '', this.startDate = '', this.endDate = '', this.prizeFirst = '', this.prizeSecond = '', this.logoFile, this.currState = const CreateChampionshipStateStatus.initial(), this.isSuccess = false, this.errorMessage});
+  const _CreateChampionshipState({this.name = '', this.teams = '', this.fee = '', this.selectedCityId, this.startDate = '', this.endDate = '', this.prizeFirst = '', this.prizeSecond = '', this.logoFile, this.coverImage, this.about = '', final  List<SportModel> sports = const [], final  List<ChampionshipTypeModel> championshipTypes = const [], final  List<RegistrationModeModel> registrationModes = const [], final  List<CityModel> cities = const [], this.selectedSportId, this.selectedChampionshipTypeId, this.selectedRegistrationModeId, this.optionsStatus = const CreateChampionshipStateStatus.initial(), this.currState = const CreateChampionshipStateStatus.initial(), this.isSuccess = false, this.errorMessage}): _sports = sports,_championshipTypes = championshipTypes,_registrationModes = registrationModes,_cities = cities;
   
 
 @override@JsonKey() final  String name;
-@override@JsonKey() final  SportType selectedSport;
-@override@JsonKey() final  TournamentSystem selectedSystem;
 @override@JsonKey() final  String teams;
 @override@JsonKey() final  String fee;
-@override@JsonKey() final  String stadium;
+@override final  int? selectedCityId;
 @override@JsonKey() final  String startDate;
 @override@JsonKey() final  String endDate;
 @override@JsonKey() final  String prizeFirst;
 @override@JsonKey() final  String prizeSecond;
 @override final  XFile? logoFile;
+@override final  XFile? coverImage;
+@override@JsonKey() final  String about;
+// ─── Options loaded from APIs ───────────────────────────
+ final  List<SportModel> _sports;
+// ─── Options loaded from APIs ───────────────────────────
+@override@JsonKey() List<SportModel> get sports {
+  if (_sports is EqualUnmodifiableListView) return _sports;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_sports);
+}
+
+ final  List<ChampionshipTypeModel> _championshipTypes;
+@override@JsonKey() List<ChampionshipTypeModel> get championshipTypes {
+  if (_championshipTypes is EqualUnmodifiableListView) return _championshipTypes;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_championshipTypes);
+}
+
+ final  List<RegistrationModeModel> _registrationModes;
+@override@JsonKey() List<RegistrationModeModel> get registrationModes {
+  if (_registrationModes is EqualUnmodifiableListView) return _registrationModes;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_registrationModes);
+}
+
+ final  List<CityModel> _cities;
+@override@JsonKey() List<CityModel> get cities {
+  if (_cities is EqualUnmodifiableListView) return _cities;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_cities);
+}
+
+@override final  int? selectedSportId;
+@override final  int? selectedChampionshipTypeId;
+@override final  int? selectedRegistrationModeId;
+@override@JsonKey() final  CreateChampionshipStateStatus optionsStatus;
+// ─── Submit status ───────────────────────────────────────
 @override@JsonKey() final  CreateChampionshipStateStatus currState;
 @override@JsonKey() final  bool isSuccess;
 @override final  String? errorMessage;
@@ -256,16 +310,16 @@ _$CreateChampionshipStateCopyWith<_CreateChampionshipState> get copyWith => __$C
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateChampionshipState&&(identical(other.name, name) || other.name == name)&&(identical(other.selectedSport, selectedSport) || other.selectedSport == selectedSport)&&(identical(other.selectedSystem, selectedSystem) || other.selectedSystem == selectedSystem)&&(identical(other.teams, teams) || other.teams == teams)&&(identical(other.fee, fee) || other.fee == fee)&&(identical(other.stadium, stadium) || other.stadium == stadium)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.prizeFirst, prizeFirst) || other.prizeFirst == prizeFirst)&&(identical(other.prizeSecond, prizeSecond) || other.prizeSecond == prizeSecond)&&(identical(other.logoFile, logoFile) || other.logoFile == logoFile)&&(identical(other.currState, currState) || other.currState == currState)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateChampionshipState&&(identical(other.name, name) || other.name == name)&&(identical(other.teams, teams) || other.teams == teams)&&(identical(other.fee, fee) || other.fee == fee)&&(identical(other.selectedCityId, selectedCityId) || other.selectedCityId == selectedCityId)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.prizeFirst, prizeFirst) || other.prizeFirst == prizeFirst)&&(identical(other.prizeSecond, prizeSecond) || other.prizeSecond == prizeSecond)&&(identical(other.logoFile, logoFile) || other.logoFile == logoFile)&&(identical(other.coverImage, coverImage) || other.coverImage == coverImage)&&(identical(other.about, about) || other.about == about)&&const DeepCollectionEquality().equals(other._sports, _sports)&&const DeepCollectionEquality().equals(other._championshipTypes, _championshipTypes)&&const DeepCollectionEquality().equals(other._registrationModes, _registrationModes)&&const DeepCollectionEquality().equals(other._cities, _cities)&&(identical(other.selectedSportId, selectedSportId) || other.selectedSportId == selectedSportId)&&(identical(other.selectedChampionshipTypeId, selectedChampionshipTypeId) || other.selectedChampionshipTypeId == selectedChampionshipTypeId)&&(identical(other.selectedRegistrationModeId, selectedRegistrationModeId) || other.selectedRegistrationModeId == selectedRegistrationModeId)&&(identical(other.optionsStatus, optionsStatus) || other.optionsStatus == optionsStatus)&&(identical(other.currState, currState) || other.currState == currState)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,name,selectedSport,selectedSystem,teams,fee,stadium,startDate,endDate,prizeFirst,prizeSecond,logoFile,currState,isSuccess,errorMessage);
+int get hashCode => Object.hashAll([runtimeType,name,teams,fee,selectedCityId,startDate,endDate,prizeFirst,prizeSecond,logoFile,coverImage,about,const DeepCollectionEquality().hash(_sports),const DeepCollectionEquality().hash(_championshipTypes),const DeepCollectionEquality().hash(_registrationModes),const DeepCollectionEquality().hash(_cities),selectedSportId,selectedChampionshipTypeId,selectedRegistrationModeId,optionsStatus,currState,isSuccess,errorMessage]);
 
 @override
 String toString() {
-  return 'CreateChampionshipState(name: $name, selectedSport: $selectedSport, selectedSystem: $selectedSystem, teams: $teams, fee: $fee, stadium: $stadium, startDate: $startDate, endDate: $endDate, prizeFirst: $prizeFirst, prizeSecond: $prizeSecond, logoFile: $logoFile, currState: $currState, isSuccess: $isSuccess, errorMessage: $errorMessage)';
+  return 'CreateChampionshipState(name: $name, teams: $teams, fee: $fee, selectedCityId: $selectedCityId, startDate: $startDate, endDate: $endDate, prizeFirst: $prizeFirst, prizeSecond: $prizeSecond, logoFile: $logoFile, coverImage: $coverImage, about: $about, sports: $sports, championshipTypes: $championshipTypes, registrationModes: $registrationModes, cities: $cities, selectedSportId: $selectedSportId, selectedChampionshipTypeId: $selectedChampionshipTypeId, selectedRegistrationModeId: $selectedRegistrationModeId, optionsStatus: $optionsStatus, currState: $currState, isSuccess: $isSuccess, errorMessage: $errorMessage)';
 }
 
 
@@ -276,11 +330,11 @@ abstract mixin class _$CreateChampionshipStateCopyWith<$Res> implements $CreateC
   factory _$CreateChampionshipStateCopyWith(_CreateChampionshipState value, $Res Function(_CreateChampionshipState) _then) = __$CreateChampionshipStateCopyWithImpl;
 @override @useResult
 $Res call({
- String name, SportType selectedSport, TournamentSystem selectedSystem, String teams, String fee, String stadium, String startDate, String endDate, String prizeFirst, String prizeSecond, XFile? logoFile, CreateChampionshipStateStatus currState, bool isSuccess, String? errorMessage
+ String name, String teams, String fee, int? selectedCityId, String startDate, String endDate, String prizeFirst, String prizeSecond, XFile? logoFile, XFile? coverImage, String about, List<SportModel> sports, List<ChampionshipTypeModel> championshipTypes, List<RegistrationModeModel> registrationModes, List<CityModel> cities, int? selectedSportId, int? selectedChampionshipTypeId, int? selectedRegistrationModeId, CreateChampionshipStateStatus optionsStatus, CreateChampionshipStateStatus currState, bool isSuccess, String? errorMessage
 });
 
 
-@override $CreateChampionshipStateStatusCopyWith<$Res> get currState;
+@override $CreateChampionshipStateStatusCopyWith<$Res> get optionsStatus;@override $CreateChampionshipStateStatusCopyWith<$Res> get currState;
 
 }
 /// @nodoc
@@ -293,20 +347,28 @@ class __$CreateChampionshipStateCopyWithImpl<$Res>
 
 /// Create a copy of CreateChampionshipState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? selectedSport = null,Object? selectedSystem = null,Object? teams = null,Object? fee = null,Object? stadium = null,Object? startDate = null,Object? endDate = null,Object? prizeFirst = null,Object? prizeSecond = null,Object? logoFile = freezed,Object? currState = null,Object? isSuccess = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? teams = null,Object? fee = null,Object? selectedCityId = freezed,Object? startDate = null,Object? endDate = null,Object? prizeFirst = null,Object? prizeSecond = null,Object? logoFile = freezed,Object? coverImage = freezed,Object? about = null,Object? sports = null,Object? championshipTypes = null,Object? registrationModes = null,Object? cities = null,Object? selectedSportId = freezed,Object? selectedChampionshipTypeId = freezed,Object? selectedRegistrationModeId = freezed,Object? optionsStatus = null,Object? currState = null,Object? isSuccess = null,Object? errorMessage = freezed,}) {
   return _then(_CreateChampionshipState(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,selectedSport: null == selectedSport ? _self.selectedSport : selectedSport // ignore: cast_nullable_to_non_nullable
-as SportType,selectedSystem: null == selectedSystem ? _self.selectedSystem : selectedSystem // ignore: cast_nullable_to_non_nullable
-as TournamentSystem,teams: null == teams ? _self.teams : teams // ignore: cast_nullable_to_non_nullable
+as String,teams: null == teams ? _self.teams : teams // ignore: cast_nullable_to_non_nullable
 as String,fee: null == fee ? _self.fee : fee // ignore: cast_nullable_to_non_nullable
-as String,stadium: null == stadium ? _self.stadium : stadium // ignore: cast_nullable_to_non_nullable
-as String,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
+as String,selectedCityId: freezed == selectedCityId ? _self.selectedCityId : selectedCityId // ignore: cast_nullable_to_non_nullable
+as int?,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
 as String,endDate: null == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
 as String,prizeFirst: null == prizeFirst ? _self.prizeFirst : prizeFirst // ignore: cast_nullable_to_non_nullable
 as String,prizeSecond: null == prizeSecond ? _self.prizeSecond : prizeSecond // ignore: cast_nullable_to_non_nullable
 as String,logoFile: freezed == logoFile ? _self.logoFile : logoFile // ignore: cast_nullable_to_non_nullable
-as XFile?,currState: null == currState ? _self.currState : currState // ignore: cast_nullable_to_non_nullable
+as XFile?,coverImage: freezed == coverImage ? _self.coverImage : coverImage // ignore: cast_nullable_to_non_nullable
+as XFile?,about: null == about ? _self.about : about // ignore: cast_nullable_to_non_nullable
+as String,sports: null == sports ? _self._sports : sports // ignore: cast_nullable_to_non_nullable
+as List<SportModel>,championshipTypes: null == championshipTypes ? _self._championshipTypes : championshipTypes // ignore: cast_nullable_to_non_nullable
+as List<ChampionshipTypeModel>,registrationModes: null == registrationModes ? _self._registrationModes : registrationModes // ignore: cast_nullable_to_non_nullable
+as List<RegistrationModeModel>,cities: null == cities ? _self._cities : cities // ignore: cast_nullable_to_non_nullable
+as List<CityModel>,selectedSportId: freezed == selectedSportId ? _self.selectedSportId : selectedSportId // ignore: cast_nullable_to_non_nullable
+as int?,selectedChampionshipTypeId: freezed == selectedChampionshipTypeId ? _self.selectedChampionshipTypeId : selectedChampionshipTypeId // ignore: cast_nullable_to_non_nullable
+as int?,selectedRegistrationModeId: freezed == selectedRegistrationModeId ? _self.selectedRegistrationModeId : selectedRegistrationModeId // ignore: cast_nullable_to_non_nullable
+as int?,optionsStatus: null == optionsStatus ? _self.optionsStatus : optionsStatus // ignore: cast_nullable_to_non_nullable
+as CreateChampionshipStateStatus,currState: null == currState ? _self.currState : currState // ignore: cast_nullable_to_non_nullable
 as CreateChampionshipStateStatus,isSuccess: null == isSuccess ? _self.isSuccess : isSuccess // ignore: cast_nullable_to_non_nullable
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -314,6 +376,15 @@ as String?,
 }
 
 /// Create a copy of CreateChampionshipState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$CreateChampionshipStateStatusCopyWith<$Res> get optionsStatus {
+  
+  return $CreateChampionshipStateStatusCopyWith<$Res>(_self.optionsStatus, (value) {
+    return _then(_self.copyWith(optionsStatus: value));
+  });
+}/// Create a copy of CreateChampionshipState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
