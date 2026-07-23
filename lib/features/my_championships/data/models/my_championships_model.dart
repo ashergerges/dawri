@@ -1,4 +1,5 @@
 // lib/features/my_championships/data/my_championships_model.dart
+import 'package:dawri/core/router/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:dawri/core/utils/constants/app_colors.dart';
@@ -9,7 +10,8 @@ class TournamentAction {
   final IconData icon;
   final String labelKey;
   final bool isPrimary;
-  const TournamentAction({required this.icon, required this.labelKey, this.isPrimary = false});
+  final Function() onTap;
+  const TournamentAction( {required Function() onTap,required this.icon, required this.labelKey, this.isPrimary = false}) : onTap = onTap;
 }
 
 class MyTournamentModel {
@@ -45,7 +47,7 @@ class MyChampionshipsMockData {
   static const totalOrganized = 2;
   static const totalTitles = 1;
 
-  static const participations = [
+  static final participations = [
     MyTournamentModel(
       id: 'p1',
       titleKey: 'myChampTour1Title',
@@ -57,8 +59,8 @@ class MyChampionshipsMockData {
       statusKey: 'myChampStatusUpcoming',
       detailKeys: ['myChampTour1Detail1', 'myChampTour1Detail2'],
       actions: [
-        TournamentAction(icon: FontAwesomeIcons.calendarDays, labelKey: 'myChampActionSchedule', isPrimary: true),
-        TournamentAction(icon: FontAwesomeIcons.users, labelKey: 'myChampActionMyTeam'),
+        TournamentAction(onTap:(){},icon: FontAwesomeIcons.calendarDays, labelKey: 'myChampActionSchedule', isPrimary: true),
+        TournamentAction(onTap:(){},icon: FontAwesomeIcons.users, labelKey: 'myChampActionMyTeam'),
       ],
     ),
     MyTournamentModel(
@@ -72,12 +74,12 @@ class MyChampionshipsMockData {
       statusKey: 'myChampStatusOngoing',
       detailKeys: ['myChampTour2Detail1', 'myChampTour2Detail2'],
       actions: [
-        TournamentAction(icon: FontAwesomeIcons.sitemap, labelKey: 'myChampActionBracket', isPrimary: true),
+        TournamentAction(onTap:(){},icon: FontAwesomeIcons.sitemap, labelKey: 'myChampActionBracket', isPrimary: true),
       ],
     ),
   ];
 
-  static const organized = [
+  static final organized = [
     MyTournamentModel(
       id: 'o1',
       titleKey: 'myChampTour3Title',
@@ -89,12 +91,12 @@ class MyChampionshipsMockData {
       statusKey: 'myChampStatusRegistrationOpen',
       detailKeys: ['myChampTour3Detail1', 'myChampTour3Detail2'],
       actions: [
-        TournamentAction(icon: FontAwesomeIcons.gear, labelKey: 'myChampActionManage', isPrimary: true),
+        TournamentAction(onTap:(){},icon: FontAwesomeIcons.gear, labelKey: 'myChampActionManage', isPrimary: true),
       ],
     ),
   ];
 
-  static const history = [
+  static final history = [
     MyTournamentModel(
       id: 'h1',
       titleKey: 'myChampTour4Title',
@@ -106,7 +108,7 @@ class MyChampionshipsMockData {
       statusKey: 'myChampStatusCompleted',
       detailKeys: [],
       actions: [
-        TournamentAction(icon: FontAwesomeIcons.chartSimple, labelKey: 'myChampActionStats'),
+        TournamentAction(onTap:(){},icon: FontAwesomeIcons.chartSimple, labelKey: 'myChampActionStats'),
       ],
       achievementKey: 'myChampAchievement1',
     ),

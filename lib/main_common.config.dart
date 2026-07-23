@@ -33,6 +33,10 @@ import 'features/championship_add_team/data/repositories/interfaces/i_championsh
     as _i598;
 import 'features/championship_add_team/data/repositories/remote/championship_add_team_repository.dart'
     as _i747;
+import 'features/championship_control/data/repositories/interfaces/i_championship_control_repository.dart'
+    as _i779;
+import 'features/championship_control/data/repositories/remote/championship_control_repository.dart'
+    as _i22;
 import 'features/championship_register/data/repositories/interfaces/i_championship_register_repository.dart'
     as _i545;
 import 'features/championship_register/data/repositories/remote/championship_register_repository.dart'
@@ -125,6 +129,11 @@ _i174.GetIt $initGetIt(
   );
   gh.factory<_i185.IHomeRepository>(
     () => _i975.HomeRepository(networkService: gh<_i969.NetworkService>()),
+  );
+  gh.factory<_i779.IChampionshipControlRepository>(
+    () => _i22.ChampionshipControlRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
   );
   gh.factory<_i493.INotificationRepository>(
     () => _i782.NotificationRepository(

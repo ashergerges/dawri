@@ -327,6 +327,16 @@ abstract class  LocaleKeys {
   static const championshipControlAccepted = 'championshipControlAccepted';
   static const championshipControlDelete = 'championshipControlDelete';
   static const championshipControlJoined = 'championshipControlJoined';
+  static const championshipControlNoMatches = 'championshipControlNoMatches';
+  static const championshipControlNoTeams = 'championshipControlNoTeams';
+  static const championshipControlSelectTeam = 'championshipControlSelectTeam';
+  static const championshipControlSelectDateTime = 'championshipControlSelectDateTime';
+  static const championshipControlRequestAccepted = 'championshipControlRequestAccepted';
+  static const championshipControlRequestRejected = 'championshipControlRequestRejected';
+  static const championshipControlTeamRemoved = 'championshipControlTeamRemoved';
+  static const championshipControlScoreUpdated = 'championshipControlScoreUpdated';
+  static const championshipControlMatchAdded = 'championshipControlMatchAdded';
+  static const championshipControlActionFailed = 'championshipControlActionFailed';
   static const cartTitle = 'cartTitle';
   static const cartEmptyTitle = 'cartEmptyTitle';
   static const cartEmptyDesc = 'cartEmptyDesc';

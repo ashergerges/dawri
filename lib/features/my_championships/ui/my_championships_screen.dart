@@ -1,5 +1,7 @@
 // lib/features/my_championships/ui/my_championships_screen.dart
 import 'package:auto_route/auto_route.dart';
+import 'package:dawri/core/router/app_router.dart';
+import 'package:dawri/core/utils/common_widgets/on_tap.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -44,7 +46,7 @@ class _MyChampionshipsView extends StatelessWidget {
               builder: (context, state) {
                 return IndexedStack(
                   index: state.selectedTabIndex,
-                  children: const [
+                  children:  [
                     _TournamentList(tournaments: MyChampionshipsMockData.participations),
                     _TournamentList(tournaments: MyChampionshipsMockData.organized),
                     _HistoryList(),
@@ -220,7 +222,11 @@ class _TournamentList extends StatelessWidget {
         child: Column(
           children: tournaments.map((t) => Padding(
             padding: EdgeInsets.only(bottom: 15.h),
-            child: _TournamentCard(tournament: t),
+            child: OnTap(
+                onTap: (){
+                  ChampionshipControlRoute(championshipId: 1).push(context);
+                },
+                child: _TournamentCard(tournament: t)),
           )).toList(),
         ),
       ),

@@ -1,182 +1,162 @@
-// lib/features/championship_control/data/championship_control_model.dart
+import 'package:json_annotation/json_annotation.dart';
 
-import 'package:dawri/gen/locale_keys.g.dart';
+part 'championship_control_model.g.dart';
 
-// ─── Pending Request ──────────────────────────────────────────────────────
-class PendingRequest {
-  final String id;
-  final String teamName;
-  final String captain;
-  final String imageUrl;
-  final DateTime requestedAt;
+// ─── Status (shared: championship status / match status) ────────────────────
+@JsonSerializable()
+class ControlStatusModel {
+  final int? id;
+  final String? title;
 
-  const PendingRequest({
-    required this.id,
-    required this.teamName,
-    required this.captain,
-    required this.imageUrl,
-    required this.requestedAt,
-  });
+  ControlStatusModel({this.id, this.title});
+
+  factory ControlStatusModel.fromJson(Map<String, dynamic> json) =>
+      _$ControlStatusModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ControlStatusModelToJson(this);
 }
 
-// ─── Approved Team ────────────────────────────────────────────────────────
-class ApprovedTeam {
-  final String id;
-  final String name;
-  final String captain;
-  final DateTime joinDate;
-  final String? imageUrl;
+// ─── Overview ───────────────────────────────────────────────────────────────
+@JsonSerializable()
+class ChampionshipOverviewModel {
+  final int? id;
+  final String? title;
+  final String? logo;
+  final ControlStatusModel? status;
+  @JsonKey(name: 'teams_count')
+  final int? teamsCount;
+  @JsonKey(name: 'matches_played')
+  final int? matchesPlayed;
+  @JsonKey(name: 'matches_remaining')
+  final int? matchesRemaining;
+  @JsonKey(name: 'pending_requests_count')
+  final int? pendingRequestsCount;
+  @JsonKey(name: 'pending_requests')
+  final List<PendingRequestModel>? pendingRequests;
 
-  const ApprovedTeam({
-    required this.id,
-    required this.name,
-    required this.captain,
-    required this.joinDate,
-    this.imageUrl,
+  ChampionshipOverviewModel({
+    this.id,
+    this.title,
+    this.logo,
+    this.status,
+    this.teamsCount,
+    this.matchesPlayed,
+    this.matchesRemaining,
+    this.pendingRequestsCount,
+    this.pendingRequests,
   });
 
-  ApprovedTeam copyWith({
-    String? id,
-    String? name,
-    String? captain,
-    DateTime? joinDate,
-    String? imageUrl,
-  }) {
-    return ApprovedTeam(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      captain: captain ?? this.captain,
-      joinDate: joinDate ?? this.joinDate,
-      imageUrl: imageUrl ?? this.imageUrl,
-    );
-  }
+  factory ChampionshipOverviewModel.fromJson(Map<String, dynamic> json) =>
+      _$ChampionshipOverviewModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ChampionshipOverviewModelToJson(this);
 }
 
-// ─── Match ─────────────────────────────────────────────────────────────────
-class Match {
-  final String id;
-  final String team1Name;
-  final String team1Image;
-  final String team2Name;
-  final String team2Image;
-  final int? score1;
-  final int? score2;
-  final bool isFinished;
-  final String time;
-  final String stadium;
-  final DateTime dateTime;
+// ─── Pending Request ──────────────────────────────────────────────────────────
+@JsonSerializable()
+class PendingRequestModel {
+  final int? id;
+  final String? name;
+  final String? logo;
+  @JsonKey(name: 'captain_name')
+  final String? captainName;
 
-  const Match({
-    required this.id,
-    required this.team1Name,
-    required this.team1Image,
-    required this.team2Name,
-    required this.team2Image,
-    this.score1,
-    this.score2,
-    this.isFinished = false,
-    required this.time,
-    required this.stadium,
-    required this.dateTime,
+  PendingRequestModel({this.id, this.name, this.logo, this.captainName});
+
+  factory PendingRequestModel.fromJson(Map<String, dynamic> json) =>
+      _$PendingRequestModelFromJson(json);
+  Map<String, dynamic> toJson() => _$PendingRequestModelToJson(this);
+}
+
+// ─── Approved Team (a championship participation) ───────────────────────────
+@JsonSerializable()
+class ApprovedTeamModel {
+  /// Participation id — used when deleting the participation.
+  final int? id;
+  @JsonKey(name: 'team_id')
+  final int? teamId;
+  final String? name;
+  final String? logo;
+  @JsonKey(name: 'captain_name')
+  final String? captainName;
+  @JsonKey(name: 'joined_at')
+  final String? joinedAt;
+
+  ApprovedTeamModel({
+    this.id,
+    this.teamId,
+    this.name,
+    this.logo,
+    this.captainName,
+    this.joinedAt,
   });
 
-  Match copyWith({
-    String? id,
-    String? team1Name,
-    String? team1Image,
-    String? team2Name,
-    String? team2Image,
-    int? score1,
-    int? score2,
-    bool? isFinished,
-    String? time,
-    String? stadium,
-    DateTime? dateTime,
-  }) {
-    return Match(
-      id: id ?? this.id,
-      team1Name: team1Name ?? this.team1Name,
-      team1Image: team1Image ?? this.team1Image,
-      team2Name: team2Name ?? this.team2Name,
-      team2Image: team2Image ?? this.team2Image,
-      score1: score1 ?? this.score1,
-      score2: score2 ?? this.score2,
-      isFinished: isFinished ?? this.isFinished,
-      time: time ?? this.time,
-      stadium: stadium ?? this.stadium,
-      dateTime: dateTime ?? this.dateTime,
-    );
-  }
+  factory ApprovedTeamModel.fromJson(Map<String, dynamic> json) =>
+      _$ApprovedTeamModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ApprovedTeamModelToJson(this);
 }
 
-// ─── Mock Data ─────────────────────────────────────────────────────────────
-class ChampionshipControlMockData {
-  static const tournamentName = 'كأس أبطال الرياض';
-  static const tournamentLogo =
-      'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=150&q=80';
-  static const tournamentStatus = LocaleKeys.championshipControlStatus;
+// ─── Match team reference ───────────────────────────────────────────────────
+@JsonSerializable()
+class MatchTeamModel {
+  final int? id;
+  final String? name;
+  final String? logo;
 
-  static List<PendingRequest> get pendingRequests =>  [
-    PendingRequest(
-      id: 'req-1',
-      teamName: 'نادي الصقور',
-      captain: 'فهد الدوسري',
-      imageUrl:
-      'https://images.unsplash.com/photo-1599474924187-334a4ae5bd3c?w=100&q=80',
-      requestedAt: DateTime.now(),
-    ),
-    PendingRequest(
-      id: 'req-2',
-      teamName: 'أكاديمية المجد',
-      captain: 'سالم المطيري',
-      imageUrl:
-      'https://images.unsplash.com/photo-1622281549424-fd9aaea1fd43?w=100&q=80',
-      requestedAt: DateTime.now(),
-    ),
-  ];
+  MatchTeamModel({this.id, this.name, this.logo});
 
-  static List<ApprovedTeam> get approvedTeams =>  [
-    ApprovedTeam(
-      id: 'team-1',
-      name: 'نادي الاتحاد',
-      captain: 'أحمد الغامدي',
-      joinDate: DateTime(2026, 6, 10),
-    ),
-    ApprovedTeam(
-      id: 'team-2',
-      name: 'نادي الشباب',
-      captain: 'خالد الزهراني',
-      joinDate: DateTime(2026, 6, 11),
-    ),
-  ];
+  factory MatchTeamModel.fromJson(Map<String, dynamic> json) =>
+      _$MatchTeamModelFromJson(json);
+  Map<String, dynamic> toJson() => _$MatchTeamModelToJson(this);
+}
 
-  static List<Match> get matches => [
-    Match(
-      id: 'match-1',
-      team1Name: 'الصقور',
-      team1Image:
-      'https://images.unsplash.com/photo-1599474924187-334a4ae5bd3c?w=100&q=80',
-      team2Name: 'الزعيم',
-      team2Image:
-      'https://images.unsplash.com/photo-1622281549424-fd9aaea1fd43?w=100&q=80',
-      time: 'الليلة، 09:00 م',
-      stadium: 'ملعب أرينا الرياض',
-      dateTime: DateTime.now().add(const Duration(hours: 3)),
-    ),
-    Match(
-      id: 'match-2',
-      team1Name: 'الاتحاد',
-      team1Image:
-      'https://images.unsplash.com/photo-1599474924187-334a4ae5bd3c?w=100&q=80',
-      team2Name: 'الشباب',
-      team2Image:
-      'https://images.unsplash.com/photo-1622281549424-fd9aaea1fd43?w=100&q=80',
-      score1: 3,
-      score2: 1,
-      isFinished: true,
-      time: 'انتهت',
-      stadium: 'الأمس',
-      dateTime: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-  ];
+// ─── Match ────────────────────────────────────────────────────────────────────
+@JsonSerializable()
+class MatchModel {
+  final int? id;
+
+  /// May arrive as int or string depending on backend — kept dynamic to be safe.
+  final dynamic round;
+  final String? place;
+  @JsonKey(name: 'match_date')
+  final String? matchDate;
+  final MatchTeamModel? home;
+  final MatchTeamModel? away;
+  @JsonKey(name: 'home_score')
+  final int? homeScore;
+  @JsonKey(name: 'away_score')
+  final int? awayScore;
+  @JsonKey(name: 'has_result')
+  final bool? hasResult;
+  final ControlStatusModel? status;
+
+  MatchModel({
+    this.id,
+    this.round,
+    this.place,
+    this.matchDate,
+    this.home,
+    this.away,
+    this.homeScore,
+    this.awayScore,
+    this.hasResult,
+    this.status,
+  });
+
+  bool get isFinished => hasResult == true;
+
+  factory MatchModel.fromJson(Map<String, dynamic> json) =>
+      _$MatchModelFromJson(json);
+  Map<String, dynamic> toJson() => _$MatchModelToJson(this);
+}
+
+// ─── Match group (matches bucketed by round) ────────────────────────────────
+@JsonSerializable()
+class MatchGroupModel {
+  final dynamic round;
+  final List<MatchModel>? matches;
+
+  MatchGroupModel({this.round, this.matches});
+
+  factory MatchGroupModel.fromJson(Map<String, dynamic> json) =>
+      _$MatchGroupModelFromJson(json);
+  Map<String, dynamic> toJson() => _$MatchGroupModelToJson(this);
 }

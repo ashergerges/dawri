@@ -152,18 +152,56 @@ class ChampionshipAddTeamRouteArgs {
 
 /// generated route for
 /// [ChampionshipControlScreen]
-class ChampionshipControlRoute extends PageRouteInfo<void> {
-  const ChampionshipControlRoute({List<PageRouteInfo>? children})
-    : super(ChampionshipControlRoute.name, initialChildren: children);
+class ChampionshipControlRoute
+    extends PageRouteInfo<ChampionshipControlRouteArgs> {
+  ChampionshipControlRoute({
+    Key? key,
+    required int championshipId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         ChampionshipControlRoute.name,
+         args: ChampionshipControlRouteArgs(
+           key: key,
+           championshipId: championshipId,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'ChampionshipControlRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const ChampionshipControlScreen();
+      final args = data.argsAs<ChampionshipControlRouteArgs>();
+      return ChampionshipControlScreen(
+        key: args.key,
+        championshipId: args.championshipId,
+      );
     },
   );
+}
+
+class ChampionshipControlRouteArgs {
+  const ChampionshipControlRouteArgs({this.key, required this.championshipId});
+
+  final Key? key;
+
+  final int championshipId;
+
+  @override
+  String toString() {
+    return 'ChampionshipControlRouteArgs{key: $key, championshipId: $championshipId}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ChampionshipControlRouteArgs) return false;
+    return key == other.key && championshipId == other.championshipId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ championshipId.hashCode;
 }
 
 /// generated route for

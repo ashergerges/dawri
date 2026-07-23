@@ -74,4 +74,12 @@ class Endpoints {
   String get teamsUrl => r'api/app/teams';
   String get championshipRegisterTeamUrl => r'api/app/championships/register-team';
 
+  //championship control
+  String get championshipControlOverviewUrl => r'api/app/championship/control/overview';
+  String get championshipApprovedTeamsUrl => r'api/app/championship/teams';
+  String get championshipMatchesUrl => r'api/app/championship/matches';
+  String get championshipMatchResultUrl => r'api/app/championship/matches/result';
+  String get championshipRequestUpdateStatusUrl => r'api/app/championship/requests/update-status';
+  String get championshipParticipationDeleteUrl => r'api/app/championship/participations/delete';
+
 }
