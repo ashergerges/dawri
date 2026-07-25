@@ -62,6 +62,10 @@ import 'features/home/data/repositories/remote/home_repository.dart' as _i975;
 import 'features/login/data/repository/interface/i_login_repository.dart'
     as _i772;
 import 'features/login/data/repository/remote/login_repository.dart' as _i413;
+import 'features/my_championships/data/repositories/interfaces/i_my_championships_repository.dart'
+    as _i735;
+import 'features/my_championships/data/repositories/remote/my_championships_repository.dart'
+    as _i730;
 import 'features/notification/data/repositories/interfaces/i_notification_repository.dart'
     as _i493;
 import 'features/notification/data/repositories/remote/notification_repository.dart'
@@ -126,6 +130,11 @@ _i174.GetIt $initGetIt(
   );
   gh.factory<_i775.ICartRepository>(
     () => _i48.CartRepository(networkService: gh<_i969.NetworkService>()),
+  );
+  gh.factory<_i735.IMyChampionshipsRepository>(
+    () => _i730.MyChampionshipsRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
   );
   gh.factory<_i185.IHomeRepository>(
     () => _i975.HomeRepository(networkService: gh<_i969.NetworkService>()),

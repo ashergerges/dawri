@@ -909,6 +909,12 @@ abstract class  LocaleKeys {
   static const myChampActionBracket = 'myChampActionBracket';
   static const myChampActionManage = 'myChampActionManage';
   static const myChampActionStats = 'myChampActionStats';
+  static const myChampNoMatches = 'myChampNoMatches';
+  static const myChampNoTeam = 'myChampNoTeam';
+  static const myChampCaptain = 'myChampCaptain';
+  static const myChampPlayers = 'myChampPlayers';
+  static const myChampTeamsLabel = 'myChampTeamsLabel';
+  static const myChampPendingRequests = 'myChampPendingRequests';
   static const myChampTour1Title = 'myChampTour1Title';
   static const myChampTour1Role = 'myChampTour1Role';
   static const myChampTour1Detail1 = 'myChampTour1Detail1';

@@ -1,132 +1,190 @@
-// lib/features/my_championships/data/my_championships_model.dart
-import 'package:dawri/core/router/app_router.dart';
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:dawri/core/utils/constants/app_colors.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-enum TournamentStatus { upcoming, ongoing, completed }
+part 'my_championships_model.g.dart';
 
-class TournamentAction {
-  final IconData icon;
-  final String labelKey;
-  final bool isPrimary;
-  final Function() onTap;
-  const TournamentAction( {required Function() onTap,required this.icon, required this.labelKey, this.isPrimary = false}) : onTap = onTap;
+// ─── id/title reference (status, registration_mode) ─────────────────────────
+@JsonSerializable()
+class IdTitleModel {
+  final int? id;
+  final String? title;
+
+  IdTitleModel({this.id, this.title});
+
+  factory IdTitleModel.fromJson(Map<String, dynamic> json) =>
+      _$IdTitleModelFromJson(json);
+  Map<String, dynamic> toJson() => _$IdTitleModelToJson(this);
 }
 
-class MyTournamentModel {
-  final String id;
-  final String titleKey;
-  final String roleKey;
-  final IconData sportIcon;
-  final Color sportColor;
-  final Color sportBg;
-  final TournamentStatus status;
-  final String statusKey;
-  final List<String> detailKeys;
-  final List<TournamentAction> actions;
-  final String? achievementKey;
+// ─── Stats ──────────────────────────────────────────────────────────────────
+@JsonSerializable()
+class MyChampionshipsStatsModel {
+  final int? titles;
+  @JsonKey(name: 'organized_count')
+  final int? organizedCount;
+  @JsonKey(name: 'participations_count')
+  final int? participationsCount;
 
-  const MyTournamentModel({
-    required this.id,
-    required this.titleKey,
-    required this.roleKey,
-    required this.sportIcon,
-    required this.sportColor,
-    required this.sportBg,
-    required this.status,
-    required this.statusKey,
-    required this.detailKeys,
-    required this.actions,
-    this.achievementKey,
+  MyChampionshipsStatsModel({
+    this.titles,
+    this.organizedCount,
+    this.participationsCount,
   });
+
+  factory MyChampionshipsStatsModel.fromJson(Map<String, dynamic> json) =>
+      _$MyChampionshipsStatsModelFromJson(json);
+  Map<String, dynamic> toJson() => _$MyChampionshipsStatsModelToJson(this);
 }
 
-class MyChampionshipsMockData {
-  static const totalParticipations = 5;
-  static const totalOrganized = 2;
-  static const totalTitles = 1;
+// ─── Participation role (tab 1 & 3) ──────────────────────────────────────────
+@JsonSerializable()
+class ParticipationRoleModel {
+  final String? type;
+  @JsonKey(name: 'participation_id')
+  final int? participationId;
+  final String? label;
+  final String? name;
+  final String? logo;
+  final String? reference;
 
-  static final participations = [
-    MyTournamentModel(
-      id: 'p1',
-      titleKey: 'myChampTour1Title',
-      roleKey: 'myChampTour1Role',
-      sportIcon: FontAwesomeIcons.futbol,
-      sportColor: AppColors.primaryLight,
-      sportBg: AppColors.secondary50,
-      status: TournamentStatus.upcoming,
-      statusKey: 'myChampStatusUpcoming',
-      detailKeys: ['myChampTour1Detail1', 'myChampTour1Detail2'],
-      actions: [
-        TournamentAction(onTap:(){},icon: FontAwesomeIcons.calendarDays, labelKey: 'myChampActionSchedule', isPrimary: true),
-        TournamentAction(onTap:(){},icon: FontAwesomeIcons.users, labelKey: 'myChampActionMyTeam'),
-      ],
-    ),
-    MyTournamentModel(
-      id: 'p2',
-      titleKey: 'myChampTour2Title',
-      roleKey: 'myChampTour2Role',
-      sportIcon: FontAwesomeIcons.gamepad,
-      sportColor: AppColors.blue500,
-      sportBg: Color(0xFFDBEAFE),
-      status: TournamentStatus.ongoing,
-      statusKey: 'myChampStatusOngoing',
-      detailKeys: ['myChampTour2Detail1', 'myChampTour2Detail2'],
-      actions: [
-        TournamentAction(onTap:(){},icon: FontAwesomeIcons.sitemap, labelKey: 'myChampActionBracket', isPrimary: true),
-      ],
-    ),
-  ];
+  ParticipationRoleModel({
+    this.type,
+    this.participationId,
+    this.label,
+    this.name,
+    this.logo,
+    this.reference,
+  });
 
-  static final organized = [
-    MyTournamentModel(
-      id: 'o1',
-      titleKey: 'myChampTour3Title',
-      roleKey: 'myChampTour3Role',
-      sportIcon: FontAwesomeIcons.tableTennisPaddleBall,
-      sportColor: AppColors.amber500,
-      sportBg: AppColors.warningLight,
-      status: TournamentStatus.upcoming,
-      statusKey: 'myChampStatusRegistrationOpen',
-      detailKeys: ['myChampTour3Detail1', 'myChampTour3Detail2'],
-      actions: [
-        TournamentAction(onTap:(){},icon: FontAwesomeIcons.gear, labelKey: 'myChampActionManage', isPrimary: true),
-      ],
-    ),
-  ];
+  factory ParticipationRoleModel.fromJson(Map<String, dynamic> json) =>
+      _$ParticipationRoleModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ParticipationRoleModelToJson(this);
+}
 
-  static final history = [
-    MyTournamentModel(
-      id: 'h1',
-      titleKey: 'myChampTour4Title',
-      roleKey: 'myChampTour4Role',
-      sportIcon: FontAwesomeIcons.futbol,
-      sportColor: AppColors.textMuted,
-      sportBg: AppColors.slate100,
-      status: TournamentStatus.completed,
-      statusKey: 'myChampStatusCompleted',
-      detailKeys: [],
-      actions: [
-        TournamentAction(onTap:(){},icon: FontAwesomeIcons.chartSimple, labelKey: 'myChampActionStats'),
-      ],
-      achievementKey: 'myChampAchievement1',
-    ),
-  ];
+// ─── Participation championship (tab 1 = subscribed, tab 3 = completed) ──────
+@JsonSerializable()
+class MyChampionshipParticipationModel {
+  final int? id;
+  final String? title;
+  final String? image;
+  final IdTitleModel? status;
+  @JsonKey(name: 'registration_mode')
+  final IdTitleModel? registrationMode;
+  final String? city;
+  @JsonKey(name: 'start_date')
+  final String? startDate;
+  @JsonKey(name: 'end_date')
+  final String? endDate;
+  final ParticipationRoleModel? role;
+  final String? achievement;
 
-  static Color statusColor(TournamentStatus s) {
-    switch (s) {
-      case TournamentStatus.upcoming: return AppColors.blue500;
-      case TournamentStatus.ongoing: return AppColors.danger;
-      case TournamentStatus.completed: return AppColors.success;
-    }
-  }
+  MyChampionshipParticipationModel({
+    this.id,
+    this.title,
+    this.image,
+    this.status,
+    this.registrationMode,
+    this.city,
+    this.startDate,
+    this.endDate,
+    this.role,
+    this.achievement,
+  });
 
-  static IconData statusIcon(TournamentStatus s) {
-    switch (s) {
-      case TournamentStatus.upcoming: return FontAwesomeIcons.clock;
-      case TournamentStatus.ongoing: return FontAwesomeIcons.fire;
-      case TournamentStatus.completed: return FontAwesomeIcons.checkDouble;
-    }
-  }
+  /// Team registration mode → show the "my team" action.
+  bool get isTeamMode => registrationMode?.id == 2;
+
+  factory MyChampionshipParticipationModel.fromJson(Map<String, dynamic> json) =>
+      _$MyChampionshipParticipationModelFromJson(json);
+  Map<String, dynamic> toJson() =>
+      _$MyChampionshipParticipationModelToJson(this);
+}
+
+// ─── Organized championship (tab 2) ──────────────────────────────────────────
+@JsonSerializable()
+class MyChampionshipOrganizedModel {
+  final int? id;
+  final String? title;
+  final String? image;
+  final IdTitleModel? status;
+  @JsonKey(name: 'registration_mode')
+  final IdTitleModel? registrationMode;
+  @JsonKey(name: 'role_label')
+  final String? roleLabel;
+  @JsonKey(name: 'accepted_count')
+  final int? acceptedCount;
+  final int? max;
+  final String? capacity;
+  @JsonKey(name: 'pending_requests_count')
+  final int? pendingRequestsCount;
+
+  MyChampionshipOrganizedModel({
+    this.id,
+    this.title,
+    this.image,
+    this.status,
+    this.registrationMode,
+    this.roleLabel,
+    this.acceptedCount,
+    this.max,
+    this.capacity,
+    this.pendingRequestsCount,
+  });
+
+  factory MyChampionshipOrganizedModel.fromJson(Map<String, dynamic> json) =>
+      _$MyChampionshipOrganizedModelFromJson(json);
+  Map<String, dynamic> toJson() => _$MyChampionshipOrganizedModelToJson(this);
+}
+
+// ─── My team (bottom sheet) ──────────────────────────────────────────────────
+@JsonSerializable()
+class MyTeamModel {
+  final int? id;
+  @JsonKey(name: 'team_id')
+  final int? teamId;
+  final String? name;
+  final String? logo;
+  @JsonKey(name: 'captain_name')
+  final String? captainName;
+  @JsonKey(name: 'players_count')
+  final int? playersCount;
+  final List<MyTeamPlayerModel>? players;
+
+  MyTeamModel({
+    this.id,
+    this.teamId,
+    this.name,
+    this.logo,
+    this.captainName,
+    this.playersCount,
+    this.players,
+  });
+
+  factory MyTeamModel.fromJson(Map<String, dynamic> json) =>
+      _$MyTeamModelFromJson(json);
+  Map<String, dynamic> toJson() => _$MyTeamModelToJson(this);
+}
+
+@JsonSerializable()
+class MyTeamPlayerModel {
+  final int? id;
+  final String? name;
+  final String? role;
+  final String? avatar;
+  @JsonKey(name: 'is_captain')
+  final bool? isCaptain;
+  @JsonKey(name: 'user_id')
+  final int? userId;
+
+  MyTeamPlayerModel({
+    this.id,
+    this.name,
+    this.role,
+    this.avatar,
+    this.isCaptain,
+    this.userId,
+  });
+
+  factory MyTeamPlayerModel.fromJson(Map<String, dynamic> json) =>
+      _$MyTeamPlayerModelFromJson(json);
+  Map<String, dynamic> toJson() => _$MyTeamPlayerModelToJson(this);
 }
