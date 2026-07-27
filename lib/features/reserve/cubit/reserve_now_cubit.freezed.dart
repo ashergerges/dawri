@@ -14,7 +14,12 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ReserveNowState {
 
- int get selectedDurationIndex; int get selectedTimeSlotIndex; int get selectedPaymentIndex; bool get isLoading; bool get isSuccess;
+// ─── Stadium details ─────────────────────────────────────
+ StadiumModel? get stadium; ReserveStatus get stadiumStatus;// ─── Durations ───────────────────────────────────────────
+ List<BookingDurationModel> get durations; ReserveStatus get durationsStatus; BookingDurationModel? get selectedDuration;// ─── Slots ───────────────────────────────────────────────
+ List<BookingSlotModel> get slots; ReserveStatus get slotsStatus; BookingSlotModel? get selectedSlot;// ─── Payment (static) ────────────────────────────────────
+ int get selectedPaymentIndex;// ─── Booking submission ──────────────────────────────────
+ ReserveStatus get bookingStatus; String? get bookingMessage;
 /// Create a copy of ReserveNowState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +30,16 @@ $ReserveNowStateCopyWith<ReserveNowState> get copyWith => _$ReserveNowStateCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReserveNowState&&(identical(other.selectedDurationIndex, selectedDurationIndex) || other.selectedDurationIndex == selectedDurationIndex)&&(identical(other.selectedTimeSlotIndex, selectedTimeSlotIndex) || other.selectedTimeSlotIndex == selectedTimeSlotIndex)&&(identical(other.selectedPaymentIndex, selectedPaymentIndex) || other.selectedPaymentIndex == selectedPaymentIndex)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReserveNowState&&(identical(other.stadium, stadium) || other.stadium == stadium)&&(identical(other.stadiumStatus, stadiumStatus) || other.stadiumStatus == stadiumStatus)&&const DeepCollectionEquality().equals(other.durations, durations)&&(identical(other.durationsStatus, durationsStatus) || other.durationsStatus == durationsStatus)&&(identical(other.selectedDuration, selectedDuration) || other.selectedDuration == selectedDuration)&&const DeepCollectionEquality().equals(other.slots, slots)&&(identical(other.slotsStatus, slotsStatus) || other.slotsStatus == slotsStatus)&&(identical(other.selectedSlot, selectedSlot) || other.selectedSlot == selectedSlot)&&(identical(other.selectedPaymentIndex, selectedPaymentIndex) || other.selectedPaymentIndex == selectedPaymentIndex)&&(identical(other.bookingStatus, bookingStatus) || other.bookingStatus == bookingStatus)&&(identical(other.bookingMessage, bookingMessage) || other.bookingMessage == bookingMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,selectedDurationIndex,selectedTimeSlotIndex,selectedPaymentIndex,isLoading,isSuccess);
+int get hashCode => Object.hash(runtimeType,stadium,stadiumStatus,const DeepCollectionEquality().hash(durations),durationsStatus,selectedDuration,const DeepCollectionEquality().hash(slots),slotsStatus,selectedSlot,selectedPaymentIndex,bookingStatus,bookingMessage);
 
 @override
 String toString() {
-  return 'ReserveNowState(selectedDurationIndex: $selectedDurationIndex, selectedTimeSlotIndex: $selectedTimeSlotIndex, selectedPaymentIndex: $selectedPaymentIndex, isLoading: $isLoading, isSuccess: $isSuccess)';
+  return 'ReserveNowState(stadium: $stadium, stadiumStatus: $stadiumStatus, durations: $durations, durationsStatus: $durationsStatus, selectedDuration: $selectedDuration, slots: $slots, slotsStatus: $slotsStatus, selectedSlot: $selectedSlot, selectedPaymentIndex: $selectedPaymentIndex, bookingStatus: $bookingStatus, bookingMessage: $bookingMessage)';
 }
 
 
@@ -45,11 +50,11 @@ abstract mixin class $ReserveNowStateCopyWith<$Res>  {
   factory $ReserveNowStateCopyWith(ReserveNowState value, $Res Function(ReserveNowState) _then) = _$ReserveNowStateCopyWithImpl;
 @useResult
 $Res call({
- int selectedDurationIndex, int selectedTimeSlotIndex, int selectedPaymentIndex, bool isLoading, bool isSuccess
+ StadiumModel? stadium, ReserveStatus stadiumStatus, List<BookingDurationModel> durations, ReserveStatus durationsStatus, BookingDurationModel? selectedDuration, List<BookingSlotModel> slots, ReserveStatus slotsStatus, BookingSlotModel? selectedSlot, int selectedPaymentIndex, ReserveStatus bookingStatus, String? bookingMessage
 });
 
 
-
+$ReserveStatusCopyWith<$Res> get stadiumStatus;$ReserveStatusCopyWith<$Res> get durationsStatus;$ReserveStatusCopyWith<$Res> get slotsStatus;$ReserveStatusCopyWith<$Res> get bookingStatus;
 
 }
 /// @nodoc
@@ -62,17 +67,59 @@ class _$ReserveNowStateCopyWithImpl<$Res>
 
 /// Create a copy of ReserveNowState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? selectedDurationIndex = null,Object? selectedTimeSlotIndex = null,Object? selectedPaymentIndex = null,Object? isLoading = null,Object? isSuccess = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? stadium = freezed,Object? stadiumStatus = null,Object? durations = null,Object? durationsStatus = null,Object? selectedDuration = freezed,Object? slots = null,Object? slotsStatus = null,Object? selectedSlot = freezed,Object? selectedPaymentIndex = null,Object? bookingStatus = null,Object? bookingMessage = freezed,}) {
   return _then(_self.copyWith(
-selectedDurationIndex: null == selectedDurationIndex ? _self.selectedDurationIndex : selectedDurationIndex // ignore: cast_nullable_to_non_nullable
-as int,selectedTimeSlotIndex: null == selectedTimeSlotIndex ? _self.selectedTimeSlotIndex : selectedTimeSlotIndex // ignore: cast_nullable_to_non_nullable
-as int,selectedPaymentIndex: null == selectedPaymentIndex ? _self.selectedPaymentIndex : selectedPaymentIndex // ignore: cast_nullable_to_non_nullable
-as int,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,isSuccess: null == isSuccess ? _self.isSuccess : isSuccess // ignore: cast_nullable_to_non_nullable
-as bool,
+stadium: freezed == stadium ? _self.stadium : stadium // ignore: cast_nullable_to_non_nullable
+as StadiumModel?,stadiumStatus: null == stadiumStatus ? _self.stadiumStatus : stadiumStatus // ignore: cast_nullable_to_non_nullable
+as ReserveStatus,durations: null == durations ? _self.durations : durations // ignore: cast_nullable_to_non_nullable
+as List<BookingDurationModel>,durationsStatus: null == durationsStatus ? _self.durationsStatus : durationsStatus // ignore: cast_nullable_to_non_nullable
+as ReserveStatus,selectedDuration: freezed == selectedDuration ? _self.selectedDuration : selectedDuration // ignore: cast_nullable_to_non_nullable
+as BookingDurationModel?,slots: null == slots ? _self.slots : slots // ignore: cast_nullable_to_non_nullable
+as List<BookingSlotModel>,slotsStatus: null == slotsStatus ? _self.slotsStatus : slotsStatus // ignore: cast_nullable_to_non_nullable
+as ReserveStatus,selectedSlot: freezed == selectedSlot ? _self.selectedSlot : selectedSlot // ignore: cast_nullable_to_non_nullable
+as BookingSlotModel?,selectedPaymentIndex: null == selectedPaymentIndex ? _self.selectedPaymentIndex : selectedPaymentIndex // ignore: cast_nullable_to_non_nullable
+as int,bookingStatus: null == bookingStatus ? _self.bookingStatus : bookingStatus // ignore: cast_nullable_to_non_nullable
+as ReserveStatus,bookingMessage: freezed == bookingMessage ? _self.bookingMessage : bookingMessage // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
-
+/// Create a copy of ReserveNowState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ReserveStatusCopyWith<$Res> get stadiumStatus {
+  
+  return $ReserveStatusCopyWith<$Res>(_self.stadiumStatus, (value) {
+    return _then(_self.copyWith(stadiumStatus: value));
+  });
+}/// Create a copy of ReserveNowState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ReserveStatusCopyWith<$Res> get durationsStatus {
+  
+  return $ReserveStatusCopyWith<$Res>(_self.durationsStatus, (value) {
+    return _then(_self.copyWith(durationsStatus: value));
+  });
+}/// Create a copy of ReserveNowState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ReserveStatusCopyWith<$Res> get slotsStatus {
+  
+  return $ReserveStatusCopyWith<$Res>(_self.slotsStatus, (value) {
+    return _then(_self.copyWith(slotsStatus: value));
+  });
+}/// Create a copy of ReserveNowState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ReserveStatusCopyWith<$Res> get bookingStatus {
+  
+  return $ReserveStatusCopyWith<$Res>(_self.bookingStatus, (value) {
+    return _then(_self.copyWith(bookingStatus: value));
+  });
+}
 }
 
 
@@ -154,10 +201,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int selectedDurationIndex,  int selectedTimeSlotIndex,  int selectedPaymentIndex,  bool isLoading,  bool isSuccess)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( StadiumModel? stadium,  ReserveStatus stadiumStatus,  List<BookingDurationModel> durations,  ReserveStatus durationsStatus,  BookingDurationModel? selectedDuration,  List<BookingSlotModel> slots,  ReserveStatus slotsStatus,  BookingSlotModel? selectedSlot,  int selectedPaymentIndex,  ReserveStatus bookingStatus,  String? bookingMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ReserveNowState() when $default != null:
-return $default(_that.selectedDurationIndex,_that.selectedTimeSlotIndex,_that.selectedPaymentIndex,_that.isLoading,_that.isSuccess);case _:
+return $default(_that.stadium,_that.stadiumStatus,_that.durations,_that.durationsStatus,_that.selectedDuration,_that.slots,_that.slotsStatus,_that.selectedSlot,_that.selectedPaymentIndex,_that.bookingStatus,_that.bookingMessage);case _:
   return orElse();
 
 }
@@ -175,10 +222,10 @@ return $default(_that.selectedDurationIndex,_that.selectedTimeSlotIndex,_that.se
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int selectedDurationIndex,  int selectedTimeSlotIndex,  int selectedPaymentIndex,  bool isLoading,  bool isSuccess)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( StadiumModel? stadium,  ReserveStatus stadiumStatus,  List<BookingDurationModel> durations,  ReserveStatus durationsStatus,  BookingDurationModel? selectedDuration,  List<BookingSlotModel> slots,  ReserveStatus slotsStatus,  BookingSlotModel? selectedSlot,  int selectedPaymentIndex,  ReserveStatus bookingStatus,  String? bookingMessage)  $default,) {final _that = this;
 switch (_that) {
 case _ReserveNowState():
-return $default(_that.selectedDurationIndex,_that.selectedTimeSlotIndex,_that.selectedPaymentIndex,_that.isLoading,_that.isSuccess);case _:
+return $default(_that.stadium,_that.stadiumStatus,_that.durations,_that.durationsStatus,_that.selectedDuration,_that.slots,_that.slotsStatus,_that.selectedSlot,_that.selectedPaymentIndex,_that.bookingStatus,_that.bookingMessage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -195,10 +242,10 @@ return $default(_that.selectedDurationIndex,_that.selectedTimeSlotIndex,_that.se
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int selectedDurationIndex,  int selectedTimeSlotIndex,  int selectedPaymentIndex,  bool isLoading,  bool isSuccess)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( StadiumModel? stadium,  ReserveStatus stadiumStatus,  List<BookingDurationModel> durations,  ReserveStatus durationsStatus,  BookingDurationModel? selectedDuration,  List<BookingSlotModel> slots,  ReserveStatus slotsStatus,  BookingSlotModel? selectedSlot,  int selectedPaymentIndex,  ReserveStatus bookingStatus,  String? bookingMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _ReserveNowState() when $default != null:
-return $default(_that.selectedDurationIndex,_that.selectedTimeSlotIndex,_that.selectedPaymentIndex,_that.isLoading,_that.isSuccess);case _:
+return $default(_that.stadium,_that.stadiumStatus,_that.durations,_that.durationsStatus,_that.selectedDuration,_that.slots,_that.slotsStatus,_that.selectedSlot,_that.selectedPaymentIndex,_that.bookingStatus,_that.bookingMessage);case _:
   return null;
 
 }
@@ -210,14 +257,39 @@ return $default(_that.selectedDurationIndex,_that.selectedTimeSlotIndex,_that.se
 
 
 class _ReserveNowState implements ReserveNowState {
-  const _ReserveNowState({this.selectedDurationIndex = 1, this.selectedTimeSlotIndex = 3, this.selectedPaymentIndex = 0, this.isLoading = false, this.isSuccess = false});
+  const _ReserveNowState({this.stadium, this.stadiumStatus = const ReserveStatus.initial(), final  List<BookingDurationModel> durations = const [], this.durationsStatus = const ReserveStatus.initial(), this.selectedDuration, final  List<BookingSlotModel> slots = const [], this.slotsStatus = const ReserveStatus.initial(), this.selectedSlot, this.selectedPaymentIndex = 0, this.bookingStatus = const ReserveStatus.initial(), this.bookingMessage}): _durations = durations,_slots = slots;
   
 
-@override@JsonKey() final  int selectedDurationIndex;
-@override@JsonKey() final  int selectedTimeSlotIndex;
+// ─── Stadium details ─────────────────────────────────────
+@override final  StadiumModel? stadium;
+@override@JsonKey() final  ReserveStatus stadiumStatus;
+// ─── Durations ───────────────────────────────────────────
+ final  List<BookingDurationModel> _durations;
+// ─── Durations ───────────────────────────────────────────
+@override@JsonKey() List<BookingDurationModel> get durations {
+  if (_durations is EqualUnmodifiableListView) return _durations;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_durations);
+}
+
+@override@JsonKey() final  ReserveStatus durationsStatus;
+@override final  BookingDurationModel? selectedDuration;
+// ─── Slots ───────────────────────────────────────────────
+ final  List<BookingSlotModel> _slots;
+// ─── Slots ───────────────────────────────────────────────
+@override@JsonKey() List<BookingSlotModel> get slots {
+  if (_slots is EqualUnmodifiableListView) return _slots;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_slots);
+}
+
+@override@JsonKey() final  ReserveStatus slotsStatus;
+@override final  BookingSlotModel? selectedSlot;
+// ─── Payment (static) ────────────────────────────────────
 @override@JsonKey() final  int selectedPaymentIndex;
-@override@JsonKey() final  bool isLoading;
-@override@JsonKey() final  bool isSuccess;
+// ─── Booking submission ──────────────────────────────────
+@override@JsonKey() final  ReserveStatus bookingStatus;
+@override final  String? bookingMessage;
 
 /// Create a copy of ReserveNowState
 /// with the given fields replaced by the non-null parameter values.
@@ -229,16 +301,16 @@ _$ReserveNowStateCopyWith<_ReserveNowState> get copyWith => __$ReserveNowStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReserveNowState&&(identical(other.selectedDurationIndex, selectedDurationIndex) || other.selectedDurationIndex == selectedDurationIndex)&&(identical(other.selectedTimeSlotIndex, selectedTimeSlotIndex) || other.selectedTimeSlotIndex == selectedTimeSlotIndex)&&(identical(other.selectedPaymentIndex, selectedPaymentIndex) || other.selectedPaymentIndex == selectedPaymentIndex)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReserveNowState&&(identical(other.stadium, stadium) || other.stadium == stadium)&&(identical(other.stadiumStatus, stadiumStatus) || other.stadiumStatus == stadiumStatus)&&const DeepCollectionEquality().equals(other._durations, _durations)&&(identical(other.durationsStatus, durationsStatus) || other.durationsStatus == durationsStatus)&&(identical(other.selectedDuration, selectedDuration) || other.selectedDuration == selectedDuration)&&const DeepCollectionEquality().equals(other._slots, _slots)&&(identical(other.slotsStatus, slotsStatus) || other.slotsStatus == slotsStatus)&&(identical(other.selectedSlot, selectedSlot) || other.selectedSlot == selectedSlot)&&(identical(other.selectedPaymentIndex, selectedPaymentIndex) || other.selectedPaymentIndex == selectedPaymentIndex)&&(identical(other.bookingStatus, bookingStatus) || other.bookingStatus == bookingStatus)&&(identical(other.bookingMessage, bookingMessage) || other.bookingMessage == bookingMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,selectedDurationIndex,selectedTimeSlotIndex,selectedPaymentIndex,isLoading,isSuccess);
+int get hashCode => Object.hash(runtimeType,stadium,stadiumStatus,const DeepCollectionEquality().hash(_durations),durationsStatus,selectedDuration,const DeepCollectionEquality().hash(_slots),slotsStatus,selectedSlot,selectedPaymentIndex,bookingStatus,bookingMessage);
 
 @override
 String toString() {
-  return 'ReserveNowState(selectedDurationIndex: $selectedDurationIndex, selectedTimeSlotIndex: $selectedTimeSlotIndex, selectedPaymentIndex: $selectedPaymentIndex, isLoading: $isLoading, isSuccess: $isSuccess)';
+  return 'ReserveNowState(stadium: $stadium, stadiumStatus: $stadiumStatus, durations: $durations, durationsStatus: $durationsStatus, selectedDuration: $selectedDuration, slots: $slots, slotsStatus: $slotsStatus, selectedSlot: $selectedSlot, selectedPaymentIndex: $selectedPaymentIndex, bookingStatus: $bookingStatus, bookingMessage: $bookingMessage)';
 }
 
 
@@ -249,11 +321,11 @@ abstract mixin class _$ReserveNowStateCopyWith<$Res> implements $ReserveNowState
   factory _$ReserveNowStateCopyWith(_ReserveNowState value, $Res Function(_ReserveNowState) _then) = __$ReserveNowStateCopyWithImpl;
 @override @useResult
 $Res call({
- int selectedDurationIndex, int selectedTimeSlotIndex, int selectedPaymentIndex, bool isLoading, bool isSuccess
+ StadiumModel? stadium, ReserveStatus stadiumStatus, List<BookingDurationModel> durations, ReserveStatus durationsStatus, BookingDurationModel? selectedDuration, List<BookingSlotModel> slots, ReserveStatus slotsStatus, BookingSlotModel? selectedSlot, int selectedPaymentIndex, ReserveStatus bookingStatus, String? bookingMessage
 });
 
 
-
+@override $ReserveStatusCopyWith<$Res> get stadiumStatus;@override $ReserveStatusCopyWith<$Res> get durationsStatus;@override $ReserveStatusCopyWith<$Res> get slotsStatus;@override $ReserveStatusCopyWith<$Res> get bookingStatus;
 
 }
 /// @nodoc
@@ -266,18 +338,366 @@ class __$ReserveNowStateCopyWithImpl<$Res>
 
 /// Create a copy of ReserveNowState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? selectedDurationIndex = null,Object? selectedTimeSlotIndex = null,Object? selectedPaymentIndex = null,Object? isLoading = null,Object? isSuccess = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? stadium = freezed,Object? stadiumStatus = null,Object? durations = null,Object? durationsStatus = null,Object? selectedDuration = freezed,Object? slots = null,Object? slotsStatus = null,Object? selectedSlot = freezed,Object? selectedPaymentIndex = null,Object? bookingStatus = null,Object? bookingMessage = freezed,}) {
   return _then(_ReserveNowState(
-selectedDurationIndex: null == selectedDurationIndex ? _self.selectedDurationIndex : selectedDurationIndex // ignore: cast_nullable_to_non_nullable
-as int,selectedTimeSlotIndex: null == selectedTimeSlotIndex ? _self.selectedTimeSlotIndex : selectedTimeSlotIndex // ignore: cast_nullable_to_non_nullable
-as int,selectedPaymentIndex: null == selectedPaymentIndex ? _self.selectedPaymentIndex : selectedPaymentIndex // ignore: cast_nullable_to_non_nullable
-as int,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,isSuccess: null == isSuccess ? _self.isSuccess : isSuccess // ignore: cast_nullable_to_non_nullable
-as bool,
+stadium: freezed == stadium ? _self.stadium : stadium // ignore: cast_nullable_to_non_nullable
+as StadiumModel?,stadiumStatus: null == stadiumStatus ? _self.stadiumStatus : stadiumStatus // ignore: cast_nullable_to_non_nullable
+as ReserveStatus,durations: null == durations ? _self._durations : durations // ignore: cast_nullable_to_non_nullable
+as List<BookingDurationModel>,durationsStatus: null == durationsStatus ? _self.durationsStatus : durationsStatus // ignore: cast_nullable_to_non_nullable
+as ReserveStatus,selectedDuration: freezed == selectedDuration ? _self.selectedDuration : selectedDuration // ignore: cast_nullable_to_non_nullable
+as BookingDurationModel?,slots: null == slots ? _self._slots : slots // ignore: cast_nullable_to_non_nullable
+as List<BookingSlotModel>,slotsStatus: null == slotsStatus ? _self.slotsStatus : slotsStatus // ignore: cast_nullable_to_non_nullable
+as ReserveStatus,selectedSlot: freezed == selectedSlot ? _self.selectedSlot : selectedSlot // ignore: cast_nullable_to_non_nullable
+as BookingSlotModel?,selectedPaymentIndex: null == selectedPaymentIndex ? _self.selectedPaymentIndex : selectedPaymentIndex // ignore: cast_nullable_to_non_nullable
+as int,bookingStatus: null == bookingStatus ? _self.bookingStatus : bookingStatus // ignore: cast_nullable_to_non_nullable
+as ReserveStatus,bookingMessage: freezed == bookingMessage ? _self.bookingMessage : bookingMessage // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
+/// Create a copy of ReserveNowState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ReserveStatusCopyWith<$Res> get stadiumStatus {
+  
+  return $ReserveStatusCopyWith<$Res>(_self.stadiumStatus, (value) {
+    return _then(_self.copyWith(stadiumStatus: value));
+  });
+}/// Create a copy of ReserveNowState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ReserveStatusCopyWith<$Res> get durationsStatus {
+  
+  return $ReserveStatusCopyWith<$Res>(_self.durationsStatus, (value) {
+    return _then(_self.copyWith(durationsStatus: value));
+  });
+}/// Create a copy of ReserveNowState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ReserveStatusCopyWith<$Res> get slotsStatus {
+  
+  return $ReserveStatusCopyWith<$Res>(_self.slotsStatus, (value) {
+    return _then(_self.copyWith(slotsStatus: value));
+  });
+}/// Create a copy of ReserveNowState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ReserveStatusCopyWith<$Res> get bookingStatus {
+  
+  return $ReserveStatusCopyWith<$Res>(_self.bookingStatus, (value) {
+    return _then(_self.copyWith(bookingStatus: value));
+  });
+}
+}
+
+/// @nodoc
+mixin _$ReserveStatus {
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReserveStatus);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ReserveStatus()';
+}
+
 
 }
+
+/// @nodoc
+class $ReserveStatusCopyWith<$Res>  {
+$ReserveStatusCopyWith(ReserveStatus _, $Res Function(ReserveStatus) __);
+}
+
+
+/// Adds pattern-matching-related methods to [ReserveStatus].
+extension ReserveStatusPatterns on ReserveStatus {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ReserveStatusInitial value)?  initial,TResult Function( ReserveStatusLoading value)?  loading,TResult Function( ReserveStatusSuccess value)?  success,TResult Function( ReserveStatusError value)?  error,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case ReserveStatusInitial() when initial != null:
+return initial(_that);case ReserveStatusLoading() when loading != null:
+return loading(_that);case ReserveStatusSuccess() when success != null:
+return success(_that);case ReserveStatusError() when error != null:
+return error(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ReserveStatusInitial value)  initial,required TResult Function( ReserveStatusLoading value)  loading,required TResult Function( ReserveStatusSuccess value)  success,required TResult Function( ReserveStatusError value)  error,}){
+final _that = this;
+switch (_that) {
+case ReserveStatusInitial():
+return initial(_that);case ReserveStatusLoading():
+return loading(_that);case ReserveStatusSuccess():
+return success(_that);case ReserveStatusError():
+return error(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ReserveStatusInitial value)?  initial,TResult? Function( ReserveStatusLoading value)?  loading,TResult? Function( ReserveStatusSuccess value)?  success,TResult? Function( ReserveStatusError value)?  error,}){
+final _that = this;
+switch (_that) {
+case ReserveStatusInitial() when initial != null:
+return initial(_that);case ReserveStatusLoading() when loading != null:
+return loading(_that);case ReserveStatusSuccess() when success != null:
+return success(_that);case ReserveStatusError() when error != null:
+return error(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function()?  success,TResult Function()?  error,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case ReserveStatusInitial() when initial != null:
+return initial();case ReserveStatusLoading() when loading != null:
+return loading();case ReserveStatusSuccess() when success != null:
+return success();case ReserveStatusError() when error != null:
+return error();case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function()  success,required TResult Function()  error,}) {final _that = this;
+switch (_that) {
+case ReserveStatusInitial():
+return initial();case ReserveStatusLoading():
+return loading();case ReserveStatusSuccess():
+return success();case ReserveStatusError():
+return error();case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function()?  success,TResult? Function()?  error,}) {final _that = this;
+switch (_that) {
+case ReserveStatusInitial() when initial != null:
+return initial();case ReserveStatusLoading() when loading != null:
+return loading();case ReserveStatusSuccess() when success != null:
+return success();case ReserveStatusError() when error != null:
+return error();case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class ReserveStatusInitial implements ReserveStatus {
+  const ReserveStatusInitial();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReserveStatusInitial);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ReserveStatus.initial()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class ReserveStatusLoading implements ReserveStatus {
+  const ReserveStatusLoading();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReserveStatusLoading);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ReserveStatus.loading()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class ReserveStatusSuccess implements ReserveStatus {
+  const ReserveStatusSuccess();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReserveStatusSuccess);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ReserveStatus.success()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class ReserveStatusError implements ReserveStatus {
+  const ReserveStatusError();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReserveStatusError);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ReserveStatus.error()';
+}
+
+
+}
+
+
+
 
 // dart format on

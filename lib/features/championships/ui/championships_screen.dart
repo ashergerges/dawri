@@ -471,7 +471,7 @@ class _TournamentCard extends StatelessWidget {
     final statusStyle = _statusStyle;
 
     return OnTap(
-      onTap: () => ChampProfileRoute().push(context),
+      onTap: () => ChampProfileRoute(championshipId: data.id ?? 0).push(context),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -612,7 +612,7 @@ class _TournamentCard extends StatelessWidget {
                               }
 
                             }  else {
-                              ChampProfileRoute().push(context);
+                              ChampProfileRoute(championshipId: data.id ?? 0).push(context);
                             }
                           },
                           child: DecoratedBox(

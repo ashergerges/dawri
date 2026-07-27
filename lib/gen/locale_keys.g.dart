@@ -209,6 +209,7 @@ abstract class  LocaleKeys {
   static const allKey = 'allKey';
   static const stadiumsTitle = 'stadiumsTitle';
   static const stadiumsPriceFrom = 'stadiumsPriceFrom';
+  static const stadiumsEmpty = 'stadiumsEmpty';
   static const stadiumsBookNow = 'stadiumsBookNow';
   static const reserveNowTitle = 'reserveNowTitle';
   static const reserveNowStadiumName = 'reserveNowStadiumName';
@@ -226,6 +227,7 @@ abstract class  LocaleKeys {
   static const reserveNowCardNumber = 'reserveNowCardNumber';
   static const reserveNowTotalFor = 'reserveNowTotalFor';
   static const reserveNowCurrency = 'reserveNowCurrency';
+  static const reserveNowNoSlots = 'reserveNowNoSlots';
   static const reserveNowPayAndBook = 'reserveNowPayAndBook';
   static const reserveNowSuccessTitle = 'reserveNowSuccessTitle';
   static const reserveNowSuccessDesc = 'reserveNowSuccessDesc';
@@ -735,6 +737,8 @@ abstract class  LocaleKeys {
   static const champProfileOrganizerName = 'champProfileOrganizerName';
   static const champProfileOrganizerMeta = 'champProfileOrganizerMeta';
   static const champProfileTeamsTitle = 'champProfileTeamsTitle';
+  static const champProfileTeamsEmpty = 'champProfileTeamsEmpty';
+  static const champProfileOrganizerChamps = 'champProfileOrganizerChamps';
   static const champProfileTeam1Name = 'champProfileTeam1Name';
   static const champProfileTeam1Captain = 'champProfileTeam1Captain';
   static const champProfileTeam2Name = 'champProfileTeam2Name';

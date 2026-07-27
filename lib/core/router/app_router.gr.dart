@@ -44,18 +44,52 @@ class ChallengesRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [ChampProfileScreen]
-class ChampProfileRoute extends PageRouteInfo<void> {
-  const ChampProfileRoute({List<PageRouteInfo>? children})
-    : super(ChampProfileRoute.name, initialChildren: children);
+class ChampProfileRoute extends PageRouteInfo<ChampProfileRouteArgs> {
+  ChampProfileRoute({
+    Key? key,
+    required int championshipId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         ChampProfileRoute.name,
+         args: ChampProfileRouteArgs(key: key, championshipId: championshipId),
+         initialChildren: children,
+       );
 
   static const String name = 'ChampProfileRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const ChampProfileScreen();
+      final args = data.argsAs<ChampProfileRouteArgs>();
+      return ChampProfileScreen(
+        key: args.key,
+        championshipId: args.championshipId,
+      );
     },
   );
+}
+
+class ChampProfileRouteArgs {
+  const ChampProfileRouteArgs({this.key, required this.championshipId});
+
+  final Key? key;
+
+  final int championshipId;
+
+  @override
+  String toString() {
+    return 'ChampProfileRouteArgs{key: $key, championshipId: $championshipId}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ChampProfileRouteArgs) return false;
+    return key == other.key && championshipId == other.championshipId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ championshipId.hashCode;
 }
 
 /// generated route for
@@ -789,18 +823,60 @@ class PurchaseHistoryRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [ReserveNowScreen]
-class ReserveNowRoute extends PageRouteInfo<void> {
-  const ReserveNowRoute({List<PageRouteInfo>? children})
-    : super(ReserveNowRoute.name, initialChildren: children);
+class ReserveNowRoute extends PageRouteInfo<ReserveNowRouteArgs> {
+  ReserveNowRoute({
+    Key? key,
+    int stadiumId = 0,
+    String? date,
+    List<PageRouteInfo>? children,
+  }) : super(
+         ReserveNowRoute.name,
+         args: ReserveNowRouteArgs(key: key, stadiumId: stadiumId, date: date),
+         initialChildren: children,
+       );
 
   static const String name = 'ReserveNowRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const ReserveNowScreen();
+      final args = data.argsAs<ReserveNowRouteArgs>(
+        orElse: () => const ReserveNowRouteArgs(),
+      );
+      return ReserveNowScreen(
+        key: args.key,
+        stadiumId: args.stadiumId,
+        date: args.date,
+      );
     },
   );
+}
+
+class ReserveNowRouteArgs {
+  const ReserveNowRouteArgs({this.key, this.stadiumId = 0, this.date});
+
+  final Key? key;
+
+  final int stadiumId;
+
+  final String? date;
+
+  @override
+  String toString() {
+    return 'ReserveNowRouteArgs{key: $key, stadiumId: $stadiumId, date: $date}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ReserveNowRouteArgs) return false;
+    return key == other.key &&
+        stadiumId == other.stadiumId &&
+        date == other.date;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ stadiumId.hashCode ^ date.hashCode;
 }
 
 /// generated route for

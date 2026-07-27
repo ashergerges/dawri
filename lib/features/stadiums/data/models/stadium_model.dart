@@ -1,42 +1,89 @@
-// lib/features/stadiums/data/stadium_model.dart
+// lib/features/stadiums/data/models/stadium_model.dart
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:dawri/core/utils/constants/app_colors.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
 
-class StadiumModel {
-  final String titleKey;
-  final String locationKey;
-  final String rating;
-  final String price;
-  final String imageUrl;
-  final String badgeKey;
-  final Color badgeColor;
-  final bool isFavorite;
-  final List<(IconData, String)> amenityKeys;
+part 'stadium_model.g.dart';
 
-  const StadiumModel({
-    required this.titleKey,
-    required this.locationKey,
-    required this.rating,
-    required this.price,
-    required this.imageUrl,
-    required this.badgeKey,
-    required this.badgeColor,
-    required this.isFavorite,
-    required this.amenityKeys,
+// ─── Stadium ────────────────────────────────────────────────────────────────
+@JsonSerializable()
+class StadiumModel {
+  final int? id;
+  final String? name;
+  final String? city;
+  final String? neighborhood;
+
+  /// Comes back as a String from the API — convert on use via [ratingValue].
+  final String? rating;
+  @JsonKey(name: 'price_per_hour')
+  final num? pricePerHour;
+  @JsonKey(name: 'discount_percentage')
+  final int? discountPercentage;
+  final String? image;
+  @JsonKey(name: 'opening_time')
+  final String? openingTime;
+  @JsonKey(name: 'closing_time')
+  final String? closingTime;
+  final List<StadiumFeatureModel>? features;
+
+  StadiumModel({
+    this.id,
+    this.name,
+    this.city,
+    this.neighborhood,
+    this.rating,
+    this.pricePerHour,
+    this.discountPercentage,
+    this.image,
+    this.openingTime,
+    this.closingTime,
+    this.features,
   });
 
-  String get title => titleKey.tr();
-  String get location => locationKey.tr();
-  String get badge => badgeKey.tr();
-  List<(IconData, String)> get amenities =>
-      amenityKeys.map((a) => (a.$1, a.$2.tr())).toList();
+  double get ratingValue => double.tryParse(rating ?? '') ?? 0;
+
+  bool get hasDiscount => (discountPercentage ?? 0) > 0;
+
+  String get location => [neighborhood, city]
+      .where((e) => (e ?? '').trim().isNotEmpty)
+      .join('، ');
+
+  factory StadiumModel.fromJson(Map<String, dynamic> json) =>
+      _$StadiumModelFromJson(json);
+  Map<String, dynamic> toJson() => _$StadiumModelToJson(this);
 }
 
-/// Day index (0 = Monday ... 6 = Sunday) → translation key.
- const _weekDayKeys = [
+@JsonSerializable()
+class StadiumFeatureModel {
+  final int? id;
+  final String? name;
+
+  /// May be a `.png` or a `.svg` — render with CustomNetworkImage (handles both).
+  final String? icon;
+
+  StadiumFeatureModel({this.id, this.name, this.icon});
+
+  factory StadiumFeatureModel.fromJson(Map<String, dynamic> json) =>
+      _$StadiumFeatureModelFromJson(json);
+  Map<String, dynamic> toJson() => _$StadiumFeatureModelToJson(this);
+}
+
+// ─── Sport filter (from GET /api/app/sports) ─────────────────────────────────
+@JsonSerializable()
+class SportModel {
+  final int? id;
+  final String? title;
+  final String? icon;
+
+  SportModel({this.id, this.title, this.icon});
+
+  factory SportModel.fromJson(Map<String, dynamic> json) =>
+      _$SportModelFromJson(json);
+  Map<String, dynamic> toJson() => _$SportModelToJson(this);
+}
+
+// ─── Date slider options ─────────────────────────────────────────────────────
+const _weekDayKeys = [
   LocaleKeys.stadiumsMonday,
   LocaleKeys.stadiumsTuesday,
   LocaleKeys.stadiumsWednesday,
@@ -58,14 +105,21 @@ class DateOption {
   });
 
   String get dayLabel => dayLabelKey.tr();
+
+  /// API date param format: yyyy-MM-dd.
+  String get apiDate {
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${date.year}-${two(date.month)}-${two(date.day)}';
+  }
 }
 
 class DateOptionsBuilder {
-  /// Builds 7 days starting today, with "اليوم"/"غداً" labels like the HTML.
+  /// Builds 7 days starting today, with "today"/"tomorrow" labels.
   static List<DateOption> buildWeek({DateTime? from}) {
     final today = from ?? DateTime.now();
     return List.generate(7, (i) {
-      final date = DateTime(today.year, today.month, today.day).add(Duration(days: i));
+      final date =
+          DateTime(today.year, today.month, today.day).add(Duration(days: i));
       final labelKey = switch (i) {
         0 => LocaleKeys.stadiumsToday,
         1 => LocaleKeys.stadiumsTomorrow,
@@ -78,47 +132,4 @@ class DateOptionsBuilder {
       );
     });
   }
-}
-
-class StadiumsMockData {
-  static const sportKeys = [
-    LocaleKeys.allKey,
-    LocaleKeys.stadiumsSportFootball,
-    LocaleKeys.stadiumsSportPadel,
-    LocaleKeys.stadiumsSportVolleyball,
-    LocaleKeys.stadiumsSportIndoor,
-  ];
-
-  static const stadiums = [
-    StadiumModel(
-      titleKey: LocaleKeys.stadiumsArenaTitle,
-      locationKey: LocaleKeys.stadiumsArenaLocation,
-      rating: '4.8',
-      price: '250 رس',
-      imageUrl: 'https://images.unsplash.com/photo-1614632537190-23e4146777db?w=300&q=80',
-      badgeKey: LocaleKeys.stadiumsBadgeAvailableToday,
-      badgeColor: AppColors.primary,
-      isFavorite: false,
-      amenityKeys: [
-        (FontAwesomeIcons.squareParking, LocaleKeys.stadiumsAmenityParking),
-        (FontAwesomeIcons.shower, LocaleKeys.stadiumsAmenityChangingRooms),
-        (FontAwesomeIcons.lightbulb, LocaleKeys.stadiumsAmenityLedLighting),
-      ],
-    ),
-    StadiumModel(
-      titleKey: LocaleKeys.stadiumsPadelProTitle,
-      locationKey: LocaleKeys.stadiumsPadelProLocation,
-      rating: '4.9',
-      price: '180 رس',
-      imageUrl: 'https://images.unsplash.com/photo-1622281549424-fd9aaea1fd43?w=500&q=80',
-      badgeKey: LocaleKeys.stadiumsBadgeDiscount20,
-      badgeColor: AppColors.warning600,
-      isFavorite: true,
-      amenityKeys: [
-        (FontAwesomeIcons.squareParking, LocaleKeys.stadiumsAmenityParking),
-        (FontAwesomeIcons.mugHot, LocaleKeys.stadiumsAmenityCafe),
-        (FontAwesomeIcons.shop, LocaleKeys.stadiumsAmenityEquipmentShop),
-      ],
-    ),
-  ];
 }

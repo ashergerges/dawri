@@ -29,6 +29,10 @@ import 'core/utils/helper/error_handler.dart' as _i785;
 import 'features/cart/data/repositories/interfaces/i_cart_repository.dart'
     as _i775;
 import 'features/cart/data/repositories/remote/cart_repository.dart' as _i48;
+import 'features/champ_profile/data/repositories/interfaces/i_champ_profile_repository.dart'
+    as _i312;
+import 'features/champ_profile/data/repositories/remote/champ_profile_repository.dart'
+    as _i722;
 import 'features/championship_add_team/data/repositories/interfaces/i_championship_add_team_repository.dart'
     as _i598;
 import 'features/championship_add_team/data/repositories/remote/championship_add_team_repository.dart'
@@ -78,11 +82,19 @@ import 'features/product_details/data/repositories/interfaces/i_product_details_
     as _i873;
 import 'features/product_details/data/repositories/remote/product_details_repository.dart'
     as _i442;
+import 'features/reserve/data/repositories/interfaces/i_reserve_repository.dart'
+    as _i817;
+import 'features/reserve/data/repositories/remote/reserve_repository.dart'
+    as _i124;
 import 'features/splash/cubits/splash_cubit/splash_cubit.dart' as _i331;
 import 'features/splash/data/repositories/interfaces/i_splash_repository.dart'
     as _i561;
 import 'features/splash/data/repositories/remote/splash_repository.dart'
     as _i120;
+import 'features/stadiums/data/repositories/interfaces/i_stadiums_repository.dart'
+    as _i547;
+import 'features/stadiums/data/repositories/remote/stadiums_repository.dart'
+    as _i400;
 import 'features/store/data/repository/interface/i_store_repository.dart'
     as _i255;
 import 'features/store/data/repository/remote/store_repository.dart' as _i77;
@@ -144,6 +156,11 @@ _i174.GetIt $initGetIt(
       networkService: gh<_i969.NetworkService>(),
     ),
   );
+  gh.factory<_i312.IChampProfileRepository>(
+    () => _i722.ChampProfileRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
+  );
   gh.factory<_i493.INotificationRepository>(
     () => _i782.NotificationRepository(
       networkService: gh<_i969.NetworkService>(),
@@ -169,6 +186,9 @@ _i174.GetIt $initGetIt(
       networkService: gh<_i969.NetworkService>(),
     ),
   );
+  gh.factory<_i547.IStadiumsRepository>(
+    () => _i400.StadiumsRepository(networkService: gh<_i969.NetworkService>()),
+  );
   gh.factory<_i255.IStoreRepository>(
     () => _i77.StoreRepository(networkService: gh<_i969.NetworkService>()),
   );
@@ -176,6 +196,9 @@ _i174.GetIt $initGetIt(
     () => _i442.ProductDetailsRepository(
       networkService: gh<_i969.NetworkService>(),
     ),
+  );
+  gh.factory<_i817.IReserveRepository>(
+    () => _i124.ReserveRepository(networkService: gh<_i969.NetworkService>()),
   );
   gh.factory<_i967.IMainRepository>(
     () => _i210.MainRepository(networkService: gh<_i969.NetworkService>()),

@@ -76,7 +76,7 @@ class Endpoints {
 
   //championship control
   String get championshipControlOverviewUrl => r'api/app/championship/control/overview';
-  String get championshipApprovedTeamsUrl => r'api/app/championship/teams';
+  String get championshipApprovedTeamsUrl => r'api/app/championship/approved-participants';
   String get championshipMatchesUrl => r'api/app/championship/matches';
   String get championshipMatchResultUrl => r'api/app/championship/matches/result';
   String get championshipRequestUpdateStatusUrl => r'api/app/championship/requests/update-status';
@@ -86,5 +86,16 @@ class Endpoints {
   //my championships
   String get myChampionshipsStatsUrl => r'api/app/my-championships/stats';
   String get myChampionshipsUrl => r'api/app/my-championships';
+
+  //stadiums
+  String get stadiumsUrl => r'api/app/stadiums';
+  String get stadiumDetailsUrl => r'api/app/stadiums/details';
+  String get stadiumSlotsUrl => r'api/app/stadiums/slots';
+  String get bookingDurationsUrl => r'api/app/booking-durations';
+  String get bookingsUrl => r'api/app/bookings';
+
+  //championship details (champ profile)
+  String get championshipDetailsUrl => r'api/app/championships/details';
+  String get championshipApprovedParticipantsUrl => r'api/app/championship/approved-participants';
 
 }

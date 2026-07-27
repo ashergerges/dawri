@@ -1,11 +1,13 @@
 import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
+import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
 import 'package:dawri/features/stadiums/data/models/stadium_model.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:dawri/core/utils/common_widgets/custom_network_image.dart';
 import 'package:dawri/core/utils/constants/app_colors.dart';
@@ -21,7 +23,7 @@ class StadiumsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => StadiumsCubit(),
+      create: (_) => StadiumsCubit()..init(),
       child: const _StadiumsView(),
     );
   }
@@ -197,21 +199,34 @@ class _SportFilters extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<StadiumsCubit, StadiumsState>(
-      buildWhen: (p, c) => p.selectedSportIndex != c.selectedSportIndex,
+      buildWhen: (p, c) =>
+          p.selectedSportIndex != c.selectedSportIndex ||
+          p.sports != c.sports ||
+          p.status != c.status,
       builder: (context, state) {
+        if (state.sports.isEmpty && state.status is StadiumsStatusLoading) {
+          return const _SportFiltersShimmer();
+        }
+        // Index 0 = "All", then one chip per fetched sport.
+        final labels = <String>[
+          LocaleKeys.allKey.tr(),
+          ...state.sports.map((s) => s.title ?? ''),
+        ];
         return SizedBox(
           height: 52.h,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.only(right: 20.w, left: 20.w, bottom: 16.h),
-            itemCount: state.sports.length,
+            itemCount: labels.length,
             separatorBuilder: (_, __) => 10.w.sizedWidth,
             itemBuilder: (_, i) {
               final isActive = i == state.selectedSportIndex;
+              // Index 0 = "All" (no icon); otherwise the fetched sport's svg icon.
+              final iconUrl = i == 0 ? null : state.sports[i - 1].icon;
               return OnTap(
                 onTap: () => context.read<StadiumsCubit>().selectSport(i),
                 child: Container(
-                  padding: 16.padHorizontal+4.padVertical,
+                  padding: 16.padHorizontal + 4.padVertical,
                   decoration: BoxDecoration(
                     color: isActive ? AppColors.secondary15 : AppColors.white,
                     borderRadius: BorderRadius.circular(20.r),
@@ -219,14 +234,31 @@ class _SportFilters extends StatelessWidget {
                       color: isActive ? AppColors.primary : AppColors.slate200,
                     ),
                   ),
-                  child: Center(
-                    child: Text(
-                      state.sports[i].tr(),
-                      style: AppTextTheme.bodyXSmall(context).copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: isActive ? AppColors.primary : AppColors.textMuted,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if ((iconUrl ?? '').isNotEmpty) ...[
+                        SvgPicture.network(
+                          iconUrl!,
+                          width: 16.sp,
+                          height: 16.sp,
+                          colorFilter:  ColorFilter.mode(
+                            isActive ? AppColors.primary : AppColors.textMuted,
+                            BlendMode.srcIn,
+                          ),
+                          placeholderBuilder: (_) =>
+                              SizedBox(width: 16.sp, height: 16.sp),
+                        ),
+                        6.w.sizedWidth,
+                      ],
+                      Text(
+                        labels[i],
+                        style: AppTextTheme.bodyXSmall(context).copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: isActive ? AppColors.primary : AppColors.textMuted,
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               );
@@ -245,8 +277,60 @@ class _StadiumsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<StadiumsCubit, StadiumsState>(
-      buildWhen: (p, c) => p.stadiums != c.stadiums,
+      buildWhen: (p, c) => p.stadiums != c.stadiums || p.status != c.status,
       builder: (context, state) {
+        if (state.status is StadiumsStatusLoading && state.stadiums.isEmpty) {
+          return const _StadiumsShimmer();
+        }
+        if (state.status is StadiumsStatusError && state.stadiums.isEmpty) {
+          return Padding(
+            padding: EdgeInsets.symmetric(vertical: 50.h),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  FaIcon(FontAwesomeIcons.circleExclamation,
+                      size: 44.sp, color: AppColors.slate300),
+                  10.h.sizedHeight,
+                  Text(
+                    LocaleKeys.errorGeneric.tr(),
+                    style: AppTextTheme.bodyMedium(context).copyWith(
+                        fontWeight: FontWeight.w700, color: AppColors.textMuted),
+                  ),
+                  6.h.sizedHeight,
+                  TextButton(
+                    onPressed: () => context.read<StadiumsCubit>().getStadiums(),
+                    child: Text(
+                      LocaleKeys.tryAgain.tr(),
+                      style: AppTextTheme.bodySmallSemiBold(context).copyWith(
+                          fontWeight: FontWeight.w800, color: AppColors.primary),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+        if (state.stadiums.isEmpty) {
+          return Padding(
+            padding: EdgeInsets.symmetric(vertical: 60.h),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  FaIcon(FontAwesomeIcons.futbol, size: 46.sp, color: AppColors.slate300),
+                  12.h.sizedHeight,
+                  Text(
+                    LocaleKeys.stadiumsEmpty.tr(),
+                    style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
+                        fontWeight: FontWeight.w700, color: AppColors.textMuted),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
         return ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -299,7 +383,7 @@ class _StadiumCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              stadium.title,
+                              stadium.name ?? '',
                               style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
                                 fontWeight: FontWeight.w900,
                                 color: AppColors.textDark,
@@ -328,11 +412,11 @@ class _StadiumCard extends StatelessWidget {
                         ),
                       ),
                       8.w.sizedWidth,
-                      _RatingBadge(rating: stadium.rating),
+                      _RatingBadge(rating: stadium.rating ?? '0'),
                     ],
                   ),
                   12.h.sizedHeight,
-                  _AmenitiesRow(amenities: stadium.amenities),
+                  _AmenitiesRow(features: stadium.features ?? const []),
                   14.h.sizedHeight,
                   DottedLine(
                     dashLength: 5,
@@ -356,7 +440,7 @@ class _StadiumCard extends StatelessWidget {
                           ),
                           2.h.sizedHeight,
                           Text(
-                            stadium.price,
+                            '${stadium.pricePerHour ?? 0} ${LocaleKeys.cartCurrency.tr()}',
                             style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
                               fontWeight: FontWeight.w900,
                               color: AppColors.primary,
@@ -365,7 +449,15 @@ class _StadiumCard extends StatelessWidget {
                         ],
                       ),
                       OnTap(
-                        onTap: () {ReserveNowRoute().push(context);},
+                        onTap: () {
+                          final s = context.read<StadiumsCubit>().state;
+                          ReserveNowRoute(
+                            stadiumId: stadium.id ?? 0,
+                            date: s.dates.isNotEmpty
+                                ? s.dates[s.selectedDateIndex].apiDate
+                                : null,
+                          ).push(context);
+                        },
                         child: DecoratedBox(
                           decoration: BoxDecoration(
                             color: AppColors.primary,
@@ -416,35 +508,36 @@ class _StadiumImage extends StatelessWidget {
       child: Stack(
         children: [
           CustomNetworkImage(
-            imageUrl: stadium.imageUrl,
+            imageUrl: stadium.image ?? '',
             width: double.infinity,
             height: 160.h,
             fit: BoxFit.cover,
           ),
-          Positioned(
-            top: 12.h,
-            right: 12.w,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(20.r),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-                child: Text(
-                  stadium.badge,
-                  style: AppTextTheme.bodyXXSmall(context).copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: stadium.badgeColor,
+          if (stadium.hasDiscount)
+            Positioned(
+              top: 12.h,
+              right: 12.w,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                  child: Text(
+                    '-${stadium.discountPercentage}%',
+                    style: AppTextTheme.bodyXXSmall(context).copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.warning600,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
           Positioned(
             top: 12.h,
             left: 12.w,
-            child: _FavoriteButton(isFavorite: stadium.isFavorite),
+            child: const _FavoriteButton(isFavorite: false),
           ),
         ],
       ),
@@ -510,32 +603,83 @@ class _RatingBadge extends StatelessWidget {
 }
 
 class _AmenitiesRow extends StatelessWidget {
-  final List<(IconData, String)> amenities;
-  const _AmenitiesRow({required this.amenities});
+  final List<StadiumFeatureModel> features;
+  const _AmenitiesRow({required this.features});
 
   @override
   Widget build(BuildContext context) {
+    if (features.isEmpty) return const SizedBox.shrink();
     return Wrap(
       spacing: 14.w,
       runSpacing: 6.h,
-      children: amenities
+      children: features
           .map(
-            (a) => Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FaIcon(a.$1, size: 12.sp, color: AppColors.primaryLight),
-            4.w.sizedWidth,
-            Text(
-              a.$2,
-              style: AppTextTheme.bodyXXSmall(context).copyWith(
-                color: AppColors.textMuted,
-                fontWeight: FontWeight.w600,
-              ),
+            (f) => Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // CustomNetworkImage renders both .png and .svg icons.
+                CustomNetworkImage(
+                  imageUrl: f.icon ?? '',
+                  width: 14.sp,
+                  height: 14.sp,
+                ),
+                4.w.sizedWidth,
+                Text(
+                  f.name ?? '',
+                  style: AppTextTheme.bodyXXSmall(context).copyWith(
+                    color: AppColors.textMuted,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      )
+          )
           .toList(),
+    );
+  }
+}
+
+// ─── SHIMMER ────────────────────────────────────────────────────────────────
+class _SportFiltersShimmer extends StatelessWidget {
+  const _SportFiltersShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 52.h,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.only(right: 20.w, left: 20.w, bottom: 16.h),
+        itemCount: 4,
+        separatorBuilder: (_, __) => 10.w.sizedWidth,
+        itemBuilder: (_, __) => ShimmerWidget.rectangular(
+          width: 80.w,
+          height: 36.h,
+          shapeBorder: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StadiumsShimmer extends StatelessWidget {
+  const _StadiumsShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: 20.w.padHorizontal,
+      child: Column(
+        children: [
+          for (int i = 0; i < 3; i++)
+            Padding(
+              padding: EdgeInsets.only(bottom: 18.h),
+              child: ShimmerWidget.rectangular(width: double.infinity, height: 300.h),
+            ),
+        ],
+      ),
     );
   }
 }
