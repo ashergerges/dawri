@@ -35,8 +35,8 @@ class ChampProfileRepository implements IChampProfileRepository {
   @override
   Future<Result<String>> toggleWishlist({required int championshipId}) async {
     final response = await networkService.postAsync(
-      url: AppStrings.urls.wishlistToggleUrl,
-      body: {'id': championshipId, 'type': 2},
+      url: AppStrings.urls.championshipFavoriteToggleUrl,
+      body: {'id': championshipId, },
     );
     if (response.isError) return Result.error(response.asError!.error);
     return Result.value(response.asValue?.value.data['message'] ?? '');

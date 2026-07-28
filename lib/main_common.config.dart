@@ -91,6 +91,10 @@ import 'features/splash/data/repositories/interfaces/i_splash_repository.dart'
     as _i561;
 import 'features/splash/data/repositories/remote/splash_repository.dart'
     as _i120;
+import 'features/stadium_profile/data/repositories/interfaces/i_stadium_profile_repository.dart'
+    as _i1053;
+import 'features/stadium_profile/data/repositories/remote/stadium_profile_repository.dart'
+    as _i44;
 import 'features/stadiums/data/repositories/interfaces/i_stadiums_repository.dart'
     as _i547;
 import 'features/stadiums/data/repositories/remote/stadiums_repository.dart'
@@ -205,6 +209,11 @@ _i174.GetIt $initGetIt(
   );
   gh.factory<_i545.IChampionshipRegisterRepository>(
     () => _i307.ChampionshipRegisterRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
+  );
+  gh.factory<_i1053.IStadiumProfileRepository>(
+    () => _i44.StadiumProfileRepository(
       networkService: gh<_i969.NetworkService>(),
     ),
   );

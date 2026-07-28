@@ -940,5 +940,13 @@
   "pleaseSelectRegion": "Please select a region",
   "registrationFailed": "Registration failed",
   "pleaseSelectTeam": "Please select a team",
-  "minimumPlayersRequired": "You must select at least {} players"
+  "minimumPlayersRequired": "You must select at least {} players",
+  "stadiumProfileNoReviews": "No reviews yet",
+  "stadiumProfileRateThisStadium": "Rate this stadium",
+  "stadiumProfileCommentHint": "Share your experience...",
+  "stadiumProfileSubmitRating": "Submit Rating",
+  "pleaseSelectRating": "Please select a rating",
+  "pleaseWriteComment": "Please write a comment",
+  "failedToSubmitRating": "Failed to submit your rating"
+
 }

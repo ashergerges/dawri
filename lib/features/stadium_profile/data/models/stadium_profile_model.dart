@@ -1,61 +1,183 @@
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-class AmenityItem {
-  final IconData icon;
-  final String labelKey;
-  const AmenityItem({required this.icon, required this.labelKey});
+part 'stadium_profile_model.g.dart';
+
+@JsonSerializable()
+class StadiumRatingModel {
+  final double? average;
+  final int? count;
+
+  StadiumRatingModel({this.average, this.count});
+
+  factory StadiumRatingModel.fromJson(Map<String, dynamic> json) =>
+      _$StadiumRatingModelFromJson(json);
+  Map<String, dynamic> toJson() => _$StadiumRatingModelToJson(this);
 }
 
+@JsonSerializable()
+class StadiumPriceModel {
+  final num? amount;
+  final String? currency;
+  final String? unit;
+
+  StadiumPriceModel({this.amount, this.currency, this.unit});
+
+  factory StadiumPriceModel.fromJson(Map<String, dynamic> json) =>
+      _$StadiumPriceModelFromJson(json);
+  Map<String, dynamic> toJson() => _$StadiumPriceModelToJson(this);
+}
+
+@JsonSerializable()
+class StadiumFacilityModel {
+  final int? id;
+  final String? title;
+  final String? icon;
+
+  StadiumFacilityModel({this.id, this.title, this.icon});
+
+  factory StadiumFacilityModel.fromJson(Map<String, dynamic> json) =>
+      _$StadiumFacilityModelFromJson(json);
+  Map<String, dynamic> toJson() => _$StadiumFacilityModelToJson(this);
+}
+
+@JsonSerializable()
+class StadiumFacilitiesModel {
+  final String? title;
+  final List<StadiumFacilityModel>? items;
+
+  StadiumFacilitiesModel({this.title, this.items});
+
+  factory StadiumFacilitiesModel.fromJson(Map<String, dynamic> json) =>
+      _$StadiumFacilitiesModelFromJson(json);
+  Map<String, dynamic> toJson() => _$StadiumFacilitiesModelToJson(this);
+}
+
+@JsonSerializable()
+class StadiumLocationModel {
+  final String? title;
+  final String? address;
+  final double? lat;
+  final double? long;
+  @JsonKey(name: 'map_image_url')
+  final String? mapImageUrl;
+
+  StadiumLocationModel({this.title, this.address, this.lat, this.long, this.mapImageUrl});
+
+  factory StadiumLocationModel.fromJson(Map<String, dynamic> json) =>
+      _$StadiumLocationModelFromJson(json);
+  Map<String, dynamic> toJson() => _$StadiumLocationModelToJson(this);
+}
+
+@JsonSerializable()
+class StadiumRuleModel {
+  final String? text;
+  final bool? strict;
+
+  StadiumRuleModel({this.text, this.strict});
+
+  factory StadiumRuleModel.fromJson(Map<String, dynamic> json) =>
+      _$StadiumRuleModelFromJson(json);
+  Map<String, dynamic> toJson() => _$StadiumRuleModelToJson(this);
+}
+
+@JsonSerializable()
+class StadiumRulesModel {
+  final String? title;
+  final List<StadiumRuleModel>? items;
+
+  StadiumRulesModel({this.title, this.items});
+
+  factory StadiumRulesModel.fromJson(Map<String, dynamic> json) =>
+      _$StadiumRulesModelFromJson(json);
+  Map<String, dynamic> toJson() => _$StadiumRulesModelToJson(this);
+}
+
+@JsonSerializable()
 class StadiumReviewModel {
-  final String name;
-  final String avatarUrl;
-  final String timeAgoKey;
-  final int rating;
-  final String textKey;
-  const StadiumReviewModel({
-    required this.name,
-    required this.avatarUrl,
-    required this.timeAgoKey,
-    required this.rating,
-    required this.textKey,
+  final int? id;
+  @JsonKey(name: 'user_name')
+  final String? userName;
+  @JsonKey(name: 'avatar_url')
+  final String? avatarUrl;
+  final String? date;
+  final int? stars;
+  final String? comment;
+
+  StadiumReviewModel({
+    this.id,
+    this.userName,
+    this.avatarUrl,
+    this.date,
+    this.stars,
+    this.comment,
   });
+
+  factory StadiumReviewModel.fromJson(Map<String, dynamic> json) =>
+      _$StadiumReviewModelFromJson(json);
+  Map<String, dynamic> toJson() => _$StadiumReviewModelToJson(this);
 }
 
-class StadiumProfileMockData {
-  static const galleryUrls = [
-    'https://images.unsplash.com/photo-1599474924187-334a4ae5bd3c?w=600&q=80',
-    'https://images.unsplash.com/photo-1599474924187-334a4ae5bd3c?w=600&q=80',
-    'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=600&q=80',
-  ];
+@JsonSerializable()
+class StadiumReviewsViewAllModel {
+  final String? label;
+  final String? endpoint;
 
-  static const mapImageUrl = 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=600&q=80';
+  StadiumReviewsViewAllModel({this.label, this.endpoint});
 
-  static const amenities = [
-    AmenityItem(icon: FontAwesomeIcons.rulerCombined, labelKey: 'stadiumProfileAmenitySize'),
-    AmenityItem(icon: FontAwesomeIcons.squareParking, labelKey: 'stadiumProfileAmenityParking'),
-    AmenityItem(icon: FontAwesomeIcons.shower, labelKey: 'stadiumProfileAmenityChangingRooms'),
-    AmenityItem(icon: FontAwesomeIcons.lightbulb, labelKey: 'stadiumProfileAmenityLed'),
-    AmenityItem(icon: FontAwesomeIcons.shirt, labelKey: 'stadiumProfileAmenityShirts'),
-    AmenityItem(icon: FontAwesomeIcons.bottleWater, labelKey: 'stadiumProfileAmenityWater'),
-    AmenityItem(icon: FontAwesomeIcons.video, labelKey: 'stadiumProfileAmenityFilming'),
-    AmenityItem(icon: FontAwesomeIcons.mugHot, labelKey: 'stadiumProfileAmenityCafe'),
-  ];
+  factory StadiumReviewsViewAllModel.fromJson(Map<String, dynamic> json) =>
+      _$StadiumReviewsViewAllModelFromJson(json);
+  Map<String, dynamic> toJson() => _$StadiumReviewsViewAllModelToJson(this);
+}
 
-  static const reviews = [
-    StadiumReviewModel(
-      name: 'أحمد الدوسري',
-      avatarUrl: 'https://i.pravatar.cc/150?img=11',
-      timeAgoKey: 'stadiumProfileReview1Time',
-      rating: 5,
-      textKey: 'stadiumProfileReview1Text',
-    ),
-    StadiumReviewModel(
-      name: 'سعد المطيري',
-      avatarUrl: 'https://i.pravatar.cc/150?img=33',
-      timeAgoKey: 'stadiumProfileReview2Time',
-      rating: 4,
-      textKey: 'stadiumProfileReview2Text',
-    ),
-  ];
+@JsonSerializable()
+class StadiumReviewsModel {
+  final String? title;
+  final int? count;
+  @JsonKey(name: 'view_all')
+  final StadiumReviewsViewAllModel? viewAll;
+  final List<StadiumReviewModel>? items;
+
+  StadiumReviewsModel({this.title, this.count, this.viewAll, this.items});
+
+  factory StadiumReviewsModel.fromJson(Map<String, dynamic> json) =>
+      _$StadiumReviewsModelFromJson(json);
+  Map<String, dynamic> toJson() => _$StadiumReviewsModelToJson(this);
+}
+
+@JsonSerializable()
+class StadiumDetailsModel {
+  final int? id;
+  final String? name;
+  final bool? verified;
+  final bool? isFav;
+  final List<String>? images;
+  final StadiumRatingModel? rating;
+  @JsonKey(name: 'distance_km')
+  final double? distanceKm;
+  final String? description;
+  final StadiumPriceModel? price;
+  final StadiumFacilitiesModel? facilities;
+  final StadiumLocationModel? location;
+  final StadiumRulesModel? rules;
+  final StadiumReviewsModel? reviews;
+
+  StadiumDetailsModel({
+    this.id,
+    this.name,
+    this.verified,
+    this.isFav,
+    this.images,
+    this.rating,
+    this.distanceKm,
+    this.description,
+    this.price,
+    this.facilities,
+    this.location,
+    this.rules,
+    this.reviews,
+  });
+
+  factory StadiumDetailsModel.fromJson(Map<String, dynamic> json) =>
+      _$StadiumDetailsModelFromJson(json);
+  Map<String, dynamic> toJson() => _$StadiumDetailsModelToJson(this);
 }

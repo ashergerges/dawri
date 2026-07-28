@@ -960,18 +960,49 @@ class SplashRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [StadiumProfileScreen]
-class StadiumProfileRoute extends PageRouteInfo<void> {
-  const StadiumProfileRoute({List<PageRouteInfo>? children})
-    : super(StadiumProfileRoute.name, initialChildren: children);
+class StadiumProfileRoute extends PageRouteInfo<StadiumProfileRouteArgs> {
+  StadiumProfileRoute({
+    Key? key,
+    required int stadiumId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         StadiumProfileRoute.name,
+         args: StadiumProfileRouteArgs(key: key, stadiumId: stadiumId),
+         initialChildren: children,
+       );
 
   static const String name = 'StadiumProfileRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const StadiumProfileScreen();
+      final args = data.argsAs<StadiumProfileRouteArgs>();
+      return StadiumProfileScreen(key: args.key, stadiumId: args.stadiumId);
     },
   );
+}
+
+class StadiumProfileRouteArgs {
+  const StadiumProfileRouteArgs({this.key, required this.stadiumId});
+
+  final Key? key;
+
+  final int stadiumId;
+
+  @override
+  String toString() {
+    return 'StadiumProfileRouteArgs{key: $key, stadiumId: $stadiumId}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! StadiumProfileRouteArgs) return false;
+    return key == other.key && stadiumId == other.stadiumId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ stadiumId.hashCode;
 }
 
 /// generated route for

@@ -941,5 +941,13 @@
   "pleaseSelectRegion": "يرجى اختيار المنطقة",
   "registrationFailed": "فشل التسجيل",
   "pleaseSelectTeam": "يرجى اختيار فريق",
-  "minimumPlayersRequired": "يجب اختيار {} لاعبين على الأقل"
+  "minimumPlayersRequired": "يجب اختيار {} لاعبين على الأقل",
+  "stadiumProfileNoReviews": "لا توجد تقييمات حتى الآن",
+  "stadiumProfileRateThisStadium": "قيّم هذا الملعب",
+  "stadiumProfileCommentHint": "شاركنا تجربتك...",
+  "stadiumProfileSubmitRating": "إرسال التقييم",
+  "pleaseSelectRating": "يرجى اختيار تقييم",
+  "pleaseWriteComment": "يرجى كتابة تعليق",
+  "failedToSubmitRating": "فشل في إرسال التقييم"
+
 }

@@ -58,6 +58,7 @@ class Endpoints {
   //product details
   String get productDetailsUrl  => r'api/app/products/details';
   String get wishlistToggleUrl => r'api/app/user/wishlist/toggle';
+  String get championshipFavoriteToggleUrl => r'api/app/championships/favorite';
 
   // create championship
   String get sportsUrl => r'api/app/sports';
@@ -90,6 +91,8 @@ class Endpoints {
   //stadiums
   String get stadiumsUrl => r'api/app/stadiums';
   String get stadiumDetailsUrl => r'api/app/stadiums/details';
+  String get stadiumReviewsUrl => r'api/app/stadiums/reviews';
+  String get stadiumRateUrl => r'api/app/stadiums/rate';
   String get stadiumSlotsUrl => r'api/app/stadiums/slots';
   String get bookingDurationsUrl => r'api/app/booking-durations';
   String get bookingsUrl => r'api/app/bookings';

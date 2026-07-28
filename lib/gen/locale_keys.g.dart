@@ -939,5 +939,12 @@ abstract class  LocaleKeys {
   static const registrationFailed = 'registrationFailed';
   static const pleaseSelectTeam = 'pleaseSelectTeam';
   static const minimumPlayersRequired = 'minimumPlayersRequired';
+  static const stadiumProfileNoReviews = 'stadiumProfileNoReviews';
+  static const stadiumProfileRateThisStadium = 'stadiumProfileRateThisStadium';
+  static const stadiumProfileCommentHint = 'stadiumProfileCommentHint';
+  static const stadiumProfileSubmitRating = 'stadiumProfileSubmitRating';
+  static const pleaseSelectRating = 'pleaseSelectRating';
+  static const pleaseWriteComment = 'pleaseWriteComment';
+  static const failedToSubmitRating = 'failedToSubmitRating';
 
 }

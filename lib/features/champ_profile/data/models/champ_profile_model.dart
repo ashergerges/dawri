@@ -63,6 +63,8 @@ class ChampionshipDetailsModel {
   final ChampRefModel? status;
   @JsonKey(name: 'is_favorite')
   final bool? isFavorite;
+  @JsonKey(name: 'can_register')
+  final bool? canRegister;
   @JsonKey(name: 'is_registered')
   final bool? isRegistered;
   final String? address;
@@ -102,6 +104,7 @@ class ChampionshipDetailsModel {
     this.status,
     this.isFavorite,
     this.isRegistered,
+    this.canRegister,
     this.address,
     this.city,
     this.startDate,

@@ -811,24 +811,29 @@ class _BottomBar extends StatelessWidget {
     final name = details.title ?? '';
     final fees = details.entryFee ?? 0;
     final date = details.startDate ?? '';
-
+    ChampionshipRegisterRoute(
+      id: id,
+      type: type,
+      championName: name,
+      fees: fees,
+    ).push(context);
     // Registered → add your team; otherwise the normal register flow.
-    if ((details.isRegistered ?? false) || details.isTeamMode) {
-      ChampionshipAddTeamRoute(
-        id: id,
-        type: type,
-        championName: name,
-        fees: fees,
-        date: date,
-      ).push(context);
-    } else {
-      ChampionshipRegisterRoute(
-        id: id,
-        type: type,
-        championName: name,
-        fees: fees,
-      ).push(context);
-    }
+    // if ((details.canRegister ?? false) || details.isTeamMode) {
+    //   ChampionshipAddTeamRoute(
+    //     id: id,
+    //     type: type,
+    //     championName: name,
+    //     fees: fees,
+    //     date: date,
+    //   ).push(context);
+    // } else {
+    //   ChampionshipRegisterRoute(
+    //     id: id,
+    //     type: type,
+    //     championName: name,
+    //     fees: fees,
+    //   ).push(context);
+    // }
   }
 
   @override
@@ -880,36 +885,36 @@ class _BottomBar extends StatelessWidget {
                 ],
               ),
               20.w.sizedWidth,
-              Expanded(
-                child: OnTap(
-                  onTap: () => _onRegisterTap(context),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(16.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withOpacity(0.25),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.h),
-                      child: Center(
-                        child: Text(
-                          LocaleKeys.champProfileRegisterBtn.tr(),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTextTheme.bodyLargeSemiBold(context)
-                              .copyWith(fontWeight: FontWeight.w900, color: AppColors.white),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+             if(details.canRegister??false) ...[Expanded(
+               child: OnTap(
+                 onTap: () => _onRegisterTap(context),
+                 child: DecoratedBox(
+                   decoration: BoxDecoration(
+                     color: AppColors.primary,
+                     borderRadius: BorderRadius.circular(16.r),
+                     boxShadow: [
+                       BoxShadow(
+                         color: AppColors.primary.withOpacity(0.25),
+                         blurRadius: 20,
+                         offset: const Offset(0, 8),
+                       ),
+                     ],
+                   ),
+                   child: Padding(
+                     padding: EdgeInsets.symmetric(vertical: 16.h),
+                     child: Center(
+                       child: Text(
+                         LocaleKeys.champProfileRegisterBtn.tr(),
+                         maxLines: 1,
+                         overflow: TextOverflow.ellipsis,
+                         style: AppTextTheme.bodyLargeSemiBold(context)
+                             .copyWith(fontWeight: FontWeight.w900, color: AppColors.white),
+                       ),
+                     ),
+                   ),
+                 ),
+               ),
+             )],
             ],
           ),
         ),

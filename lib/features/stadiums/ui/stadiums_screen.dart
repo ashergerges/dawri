@@ -221,7 +221,6 @@ class _SportFilters extends StatelessWidget {
             separatorBuilder: (_, __) => 10.w.sizedWidth,
             itemBuilder: (_, i) {
               final isActive = i == state.selectedSportIndex;
-              // Index 0 = "All" (no icon); otherwise the fetched sport's svg icon.
               final iconUrl = i == 0 ? null : state.sports[i - 1].icon;
               return OnTap(
                 onTap: () => context.read<StadiumsCubit>().selectSport(i),
@@ -352,7 +351,7 @@ class _StadiumCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return OnTap(
       onTap: (){
-        StadiumProfileRoute().push(context);
+        StadiumProfileRoute(stadiumId: stadium.id??0).push(context);
       },
       child: DecoratedBox(
         decoration: BoxDecoration(
