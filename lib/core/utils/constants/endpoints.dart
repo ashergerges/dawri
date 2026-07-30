@@ -109,7 +109,10 @@ class Endpoints {
   String get matchesTicketsUrl  => r'api/app/championship/matches/tickets';
   String get myTicketsUrl  => r'api/app/championship/matches/my-tickets';
 
-
+  String get challengeLevelsUrl  => r'api/app/challenge-levels';
+  String get createChallengeUrl  => r'api/app/challenges';
+  String get challengesUrl  => r'api/app/challenges';
+  String get acceptChallengeUrl  => r'api/app/challenges/join';
 
 
 

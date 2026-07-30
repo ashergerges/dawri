@@ -371,6 +371,22 @@ class ContractsRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [CreateChallengeScreen]
+class CreateChallengeRoute extends PageRouteInfo<void> {
+  const CreateChallengeRoute({List<PageRouteInfo>? children})
+    : super(CreateChallengeRoute.name, initialChildren: children);
+
+  static const String name = 'CreateChallengeRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const CreateChallengeScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [CreateChampionshipScreen]
 class CreateChampionshipRoute extends PageRouteInfo<void> {
   const CreateChampionshipRoute({List<PageRouteInfo>? children})

@@ -7,7 +7,7 @@ part 'stadium_model.g.dart';
 
 // ─── Stadium ────────────────────────────────────────────────────────────────
 @JsonSerializable()
-class StadiumModel {
+class   StadiumModel {
   final int? id;
   final String? name;
   final String? city;

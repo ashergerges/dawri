@@ -29,6 +29,10 @@ import 'core/utils/helper/error_handler.dart' as _i785;
 import 'features/cart/data/repositories/interfaces/i_cart_repository.dart'
     as _i775;
 import 'features/cart/data/repositories/remote/cart_repository.dart' as _i48;
+import 'features/challenges/data/repositories/interfaces/i_challenges_repository.dart'
+    as _i618;
+import 'features/challenges/data/repositories/remote/challenges_repository.dart'
+    as _i730;
 import 'features/champ_profile/data/repositories/interfaces/i_champ_profile_repository.dart'
     as _i312;
 import 'features/champ_profile/data/repositories/remote/champ_profile_repository.dart'
@@ -56,6 +60,10 @@ import 'features/common/data/local/repositories/token_repository.dart' as _i723;
 import 'features/common/data/repositories/interfaces/i_main_repository.dart'
     as _i967;
 import 'features/common/data/repositories/remote/main_repository.dart' as _i210;
+import 'features/create_challenge/data/repositories/interfaces/i_challenge_repository.dart'
+    as _i1022;
+import 'features/create_challenge/data/repositories/remote/challenge_repository.dart'
+    as _i690;
 import 'features/create_championship/data/repositories/interfaces/i_create_championship_repository.dart'
     as _i93;
 import 'features/create_championship/data/repositories/remote/create_championship_repository.dart'
@@ -160,6 +168,9 @@ _i174.GetIt $initGetIt(
   gh.factory<_i775.ICartRepository>(
     () => _i48.CartRepository(networkService: gh<_i969.NetworkService>()),
   );
+  gh.factory<_i1022.IChallengeRepository>(
+    () => _i690.ChallengeRepository(networkService: gh<_i969.NetworkService>()),
+  );
   gh.factory<_i773.ITicketsRepository>(
     () => _i305.TicketsRepository(networkService: gh<_i969.NetworkService>()),
   );
@@ -170,6 +181,10 @@ _i174.GetIt $initGetIt(
   );
   gh.factory<_i185.IHomeRepository>(
     () => _i975.HomeRepository(networkService: gh<_i969.NetworkService>()),
+  );
+  gh.factory<_i618.IChallengesRepository>(
+    () =>
+        _i730.ChallengesRepository(networkService: gh<_i969.NetworkService>()),
   );
   gh.factory<_i779.IChampionshipControlRepository>(
     () => _i22.ChampionshipControlRepository(

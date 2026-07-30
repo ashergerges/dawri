@@ -37,6 +37,7 @@ import 'package:dawri/features/notification/ui/notification_screen.dart';
 import 'package:dawri/features/splash/ui/no_internet_splash.dart';
 import 'package:dawri/features/Tabs/ui/home_bottom_tabs_screen.dart';
 import 'package:dawri/features/splash/ui/splash_screen.dart';
+import '../../features/create_challenge/ui/create_challenge_screen.dart';
 import '../services/ui/not_found_screen.dart';
 import '../utils/common_widgets/image_viewer_screen.dart';
 
@@ -95,6 +96,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute( page: ChargeWalletRoute.page),
     AutoRoute( page: HelpCenterRoute.page),
     AutoRoute( page: MyChampionshipsRoute.page),
+    AutoRoute( page: CreateChallengeRoute.page),
     AutoRoute(path: '*', page: NotFoundRoute.page), // this must be last route
 
   ];

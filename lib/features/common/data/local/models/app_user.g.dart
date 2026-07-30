@@ -21,6 +21,7 @@ AppUser _$AppUserFromJson(Map<String, dynamic> json) => AppUser(
 Map<String, dynamic> _$AppUserToJson(AppUser instance) => <String, dynamic>{
   'id': instance.id,
   'phone': instance.phone,
+  'balance': instance.balance,
   'status': instance.status,
   'status_text': instance.statusText,
   'profile': instance.profile?.toJson(),

@@ -272,19 +272,19 @@ class _ParticipationsTab extends StatelessWidget {
           );
         }
 
-        return SmartRefresher(
-          key: ValueKey('my_champ_participations_$isHistory'),
-          controller: controller,
-          enablePullUp: true,
-          enablePullDown: true,
-          onRefresh: () => isHistory ? cubit.getHistory() : cubit.getParticipations(),
-          onLoading: () =>
-              isHistory ? cubit.loadMoreHistory() : cubit.loadMoreParticipations(),
-          header: PullRefresh.pullRefresh,
-          footer: const ClassicFooter(
-            loadStyle: LoadStyle.ShowAlways,
-            completeDuration: Duration(milliseconds: 500),
-          ),
+          return SmartRefresher(
+            key: ValueKey('my_champ_participations_$isHistory'),
+            controller: controller,
+            enablePullUp: true,
+            enablePullDown: true,
+            onRefresh: () => isHistory ? cubit.getHistory() : cubit.getParticipations(),
+            onLoading: () =>
+                isHistory ? cubit.loadMoreHistory() : cubit.loadMoreParticipations(),
+            header: PullRefresh.pullRefresh,
+            footer: const ClassicFooter(
+              loadStyle: LoadStyle.ShowAlways,
+              completeDuration: Duration(milliseconds: 500),
+            ),
           child: items.isEmpty
               ? _EmptyState(message: LocaleKeys.myChampEmptyTitle.tr())
               : ListView(

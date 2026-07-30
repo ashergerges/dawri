@@ -47,7 +47,7 @@ Map<String, dynamic> _$UpcomingMatchModelToJson(UpcomingMatchModel instance) =>
       'away': instance.away,
       'date_text': instance.dateText,
       'time': instance.time,
-      'stadium': instance.stadium,
+      'stadium_name': instance.stadium,
       'remaining_tickets': instance.remainingTickets,
       'is_sold_out': instance.isSoldOut,
       'ticket_price': instance.ticketPrice,

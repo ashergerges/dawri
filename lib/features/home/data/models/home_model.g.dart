@@ -98,7 +98,7 @@ Map<String, dynamic> _$TicketModelToJson(TicketModel instance) =>
       'title': instance.title,
       'time': instance.time,
       'date_text': instance.dateText,
-      'stadium': instance.stadium,
-      'price': instance.price,
+      'stadium_name': instance.stadium,
+      'ticket_price': instance.price,
       'currency': instance.currency,
     };

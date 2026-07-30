@@ -1,119 +1,175 @@
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter/material.dart';
-import 'package:dawri/core/utils/constants/app_colors.dart';
-import 'package:dawri/gen/locale_keys.g.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-enum ChallengeCategory { all, football, esports, padel }
+part 'challenges_model.g.dart';
 
-enum SportBadgeType { football, esports, padel }
+// ─── MAIN CHALLENGE MODEL ──────────────────────────────────────────────────
+@JsonSerializable()
+class ChallengeModel {
+  final int? id;
+  final String? description;
+  final ChallengeSport? sport;
+  final ChallengeCity? city;
+  final ChallengeStadium? stadium;
+  @JsonKey(name: 'registration_mode')
+  final ChallengeRegistrationMode? registrationMode;
+  final ChallengeStatusInfo? status;
+  final ChallengeLevelInfo? level;
+  @JsonKey(name: 'players_needed')
+  final int? playersNeeded;
+  final String? date;
+  final String? time;
+  final num? prize;
+  @JsonKey(name: 'participants_count')
+  final int? participantsCount;
+  @JsonKey(name: 'average_rating')
+  final num? averageRating;
+  @JsonKey(name: 'is_joined')
+  final bool? isJoined;
+  @JsonKey(name: 'is_favorite')
+  final bool? isFavorite;
+  @JsonKey(name: 'can_join')
+  final bool? canJoin;
+  final ChallengeOrganizer? organizer;
 
-extension SportBadgeColors on SportBadgeType {
-  Color get color {
-    switch (this) {
-      case SportBadgeType.football:
-        return AppColors.primaryLight;
-      case SportBadgeType.esports:
-        return AppColors.purple;
-      case SportBadgeType.padel:
-        return AppColors.warning;
-    }
-  }
-
-  IconData get icon {
-    switch (this) {
-      case SportBadgeType.football:
-        return FontAwesomeIcons.futbol;
-      case SportBadgeType.esports:
-        return FontAwesomeIcons.gamepad;
-      case SportBadgeType.padel:
-        return FontAwesomeIcons.tableTennisPaddleBall;
-    }
-  }
-}
-
-class CategoryChipData {
-  final ChallengeCategory category;
-  final IconData? icon;
-  final String labelKey;
-
-  const CategoryChipData({required this.category, this.icon, required this.labelKey});
-}
-
-class ChallengeDetailData {
-  final IconData icon;
-  final String labelKey;
-
-  const ChallengeDetailData({required this.icon, required this.labelKey});
-}
-
-class ChallengeData {
-  final String id;
-  final String imageUrl;
-  final String nameKey;
-  final String levelKey;
-  final SportBadgeType sportType;
-  final ChallengeCategory category;
-  final List<ChallengeDetailData> details;
-
-  const ChallengeData({
-    required this.id,
-    required this.imageUrl,
-    required this.nameKey,
-    required this.levelKey,
-    required this.sportType,
-    required this.category,
-    required this.details,
+  ChallengeModel({
+    this.id,
+    this.description,
+    this.sport,
+    this.city,
+    this.stadium,
+    this.registrationMode,
+    this.status,
+    this.level,
+    this.playersNeeded,
+    this.date,
+    this.time,
+    this.prize,
+    this.participantsCount,
+    this.averageRating,
+    this.isJoined,
+    this.isFavorite,
+    this.canJoin,
+    this.organizer,
   });
+
+  factory ChallengeModel.fromJson(Map<String, dynamic> json) =>
+      _$ChallengeModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ChallengeModelToJson(this);
+
+  // ─── Helper Properties ──────────────────────────────────────────────────
+  String get displayName => description ?? 'تحدي بدون وصف';
+  String get levelTitle => level?.title ?? 'غير محدد';
+  String get sportTitle => sport?.title ?? 'غير محدد';
+  String get location => [city?.title, stadium?.title]
+      .where((e) => e != null && e!.isNotEmpty)
+      .join(' - ');
+  String get formattedDate => date ?? '';
+  String get formattedTime => time != null && time!.length >= 5
+      ? time!.substring(0, 5)
+      : time ?? '';
+  String get organizerName => organizer?.name ?? 'مجهول';
+  String get organizerAvatar => organizer?.avatar ?? '';
+  bool get isTeamMode => registrationMode?.id == 2;
+  bool get hasPrize => prize != null && prize! > 0;
+  bool get isAvailable => canJoin == true && isJoined != true;
 }
 
-class ChallengesMockData {
-  static const categoryChips = [
-    CategoryChipData(category: ChallengeCategory.all, labelKey: LocaleKeys.challengesCatAll),
-    CategoryChipData(
-      category: ChallengeCategory.football,
-      icon: FontAwesomeIcons.futbol,
-      labelKey: LocaleKeys.challengesCatFootball,
-    ),
-    CategoryChipData(
-      category: ChallengeCategory.esports,
-      icon: FontAwesomeIcons.gamepad,
-      labelKey: LocaleKeys.challengesCatEsports,
-    ),
-    CategoryChipData(
-      category: ChallengeCategory.padel,
-      icon: FontAwesomeIcons.tableTennisPaddleBall,
-      labelKey: LocaleKeys.challengesCatPadel,
-    ),
-  ];
+// ─── SPORT ──────────────────────────────────────────────────────────────────
+@JsonSerializable()
+class ChallengeSport {
+  final int? id;
+  final String? title;
 
-  static const challenges = [
-    ChallengeData(
-      id: 'challenge-1',
-      imageUrl: 'https://images.unsplash.com/photo-1599474924187-334a4ae5bd3c?w=100&q=80',
-      nameKey: LocaleKeys.challengesChallenge1Name,
-      levelKey: LocaleKeys.challengesChallenge1Level,
-      sportType: SportBadgeType.football,
-      category: ChallengeCategory.football,
-      details: [
-        ChallengeDetailData(icon: FontAwesomeIcons.users, labelKey: LocaleKeys.challengesChallenge1Format),
-        ChallengeDetailData(icon: FontAwesomeIcons.locationDot, labelKey: LocaleKeys.challengesChallenge1Location),
-        ChallengeDetailData(icon: FontAwesomeIcons.calendar, labelKey: LocaleKeys.challengesChallenge1Date),
-        ChallengeDetailData(icon: FontAwesomeIcons.moneyBillWave, labelKey: LocaleKeys.challengesChallenge1Fee),
-      ],
-    ),
-    ChallengeData(
-      id: 'challenge-2',
-      imageUrl: 'https://i.pravatar.cc/150?img=11',
-      nameKey: LocaleKeys.challengesChallenge2Name,
-      levelKey: LocaleKeys.challengesChallenge2Level,
-      sportType: SportBadgeType.esports,
-      category: ChallengeCategory.esports,
-      details: [
-        ChallengeDetailData(icon: FontAwesomeIcons.gamepad, labelKey: LocaleKeys.challengesChallenge2Game),
-        ChallengeDetailData(icon: FontAwesomeIcons.globe, labelKey: LocaleKeys.challengesChallenge2Mode),
-        ChallengeDetailData(icon: FontAwesomeIcons.clock, labelKey: LocaleKeys.challengesChallenge2Time),
-        ChallengeDetailData(icon: FontAwesomeIcons.trophy, labelKey: LocaleKeys.challengesChallenge2Purpose),
-      ],
-    ),
-  ];
+  ChallengeSport({this.id, this.title});
+
+  factory ChallengeSport.fromJson(Map<String, dynamic> json) =>
+      _$ChallengeSportFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ChallengeSportToJson(this);
+}
+
+// ─── CITY ──────────────────────────────────────────────────────────────────
+@JsonSerializable()
+class ChallengeCity {
+  final int? id;
+  final String? title;
+
+  ChallengeCity({this.id, this.title});
+
+  factory ChallengeCity.fromJson(Map<String, dynamic> json) =>
+      _$ChallengeCityFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ChallengeCityToJson(this);
+}
+
+// ─── STADIUM ───────────────────────────────────────────────────────────────
+@JsonSerializable()
+class ChallengeStadium {
+  final int? id;
+  final String? title;
+
+  ChallengeStadium({this.id, this.title});
+
+  factory ChallengeStadium.fromJson(Map<String, dynamic> json) =>
+      _$ChallengeStadiumFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ChallengeStadiumToJson(this);
+}
+
+// ─── REGISTRATION MODE ────────────────────────────────────────────────────
+@JsonSerializable()
+class ChallengeRegistrationMode {
+  final int? id;
+  final String? title;
+
+  ChallengeRegistrationMode({this.id, this.title});
+
+  factory ChallengeRegistrationMode.fromJson(Map<String, dynamic> json) =>
+      _$ChallengeRegistrationModeFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ChallengeRegistrationModeToJson(this);
+}
+
+// ─── STATUS ────────────────────────────────────────────────────────────────
+@JsonSerializable()
+class ChallengeStatusInfo {
+  final int? id;
+  final String? title;
+
+  ChallengeStatusInfo({this.id, this.title});
+
+  factory ChallengeStatusInfo.fromJson(Map<String, dynamic> json) =>
+      _$ChallengeStatusInfoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ChallengeStatusInfoToJson(this);
+}
+
+// ─── LEVEL ─────────────────────────────────────────────────────────────────
+@JsonSerializable()
+class ChallengeLevelInfo {
+  final int? id;
+  final String? title;
+
+  ChallengeLevelInfo({this.id, this.title});
+
+  factory ChallengeLevelInfo.fromJson(Map<String, dynamic> json) =>
+      _$ChallengeLevelInfoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ChallengeLevelInfoToJson(this);
+}
+
+// ─── ORGANIZER ─────────────────────────────────────────────────────────────
+@JsonSerializable()
+class ChallengeOrganizer {
+  final int? id;
+  final String? name;
+  final String? avatar;
+
+  ChallengeOrganizer({this.id, this.name, this.avatar});
+
+  factory ChallengeOrganizer.fromJson(Map<String, dynamic> json) =>
+      _$ChallengeOrganizerFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ChallengeOrganizerToJson(this);
 }

@@ -970,5 +970,36 @@ abstract class  LocaleKeys {
   static const ticketsQuantity = 'ticketsQuantity';
   static const ticketsTotal = 'ticketsTotal';
   static const ticketsConfirmBooking = 'ticketsConfirmBooking';
+  static const createChallengeTitle = 'createChallengeTitle';
+  static const createChallengeLaunch = 'createChallengeLaunch';
+  static const createChallengeSelectSport = 'createChallengeSelectSport';
+  static const createChallengePlayersLabel = 'createChallengePlayersLabel';
+  static const createChallengePerTeam = 'createChallengePerTeam';
+  static const createChallengePlayersHint = 'createChallengePlayersHint';
+  static const createChallengeDetails = 'createChallengeDetails';
+  static const createChallengeLocation = 'createChallengeLocation';
+  static const createChallengeStadium = 'createChallengeStadium';
+  static const createChallengeStadiumHint = 'createChallengeStadiumHint';
+  static const createChallengeDate = 'createChallengeDate';
+  static const createChallengeTime = 'createChallengeTime';
+  static const createChallengeDescription = 'createChallengeDescription';
+  static const createChallengeDescriptionHint = 'createChallengeDescriptionHint';
+  static const createChallengeLevelLabel = 'createChallengeLevelLabel';
+  static const createChallengeFee = 'createChallengeFee';
+  static const createChallengePrize = 'createChallengePrize';
+  static const createChallengeSuccessTitle = 'createChallengeSuccessTitle';
+  static const createChallengeSuccessDesc = 'createChallengeSuccessDesc';
+  static const createChallengeSport = 'createChallengeSport';
+  static const createChallengePlayers = 'createChallengePlayers';
+  static const createChallengeDateTime = 'createChallengeDateTime';
+  static const createChallengeClose = 'createChallengeClose';
+  static const createChallengeView = 'createChallengeView';
+  static const createChallengeViewChallenge = 'createChallengeViewChallenge';
+  static const challengesEmpty = 'challengesEmpty';
+  static const challengesAvailable = 'challengesAvailable';
+  static const challengesUnavailable = 'challengesUnavailable';
+  static const challengesJoined = 'challengesJoined';
+  static const challengesPlayersNeeded = 'challengesPlayersNeeded';
+  static const challengesIndividual = 'challengesIndividual';
 
 }
