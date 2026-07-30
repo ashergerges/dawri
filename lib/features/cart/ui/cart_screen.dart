@@ -648,7 +648,8 @@ class _OrderSummary extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: BlocBuilder<CartCubit, CartState>(
-        buildWhen: (p, c) => p.items != c.items || p.discountAmount != c.discountAmount || p.isCouponApplied != c.isCouponApplied,        builder: (context, state) {
+        // buildWhen: (p, c) => p.items != c.items || p.discountAmount != c.discountAmount || p.isCouponApplied != c.isCouponApplied,
+        builder: (context, state) {
           final cubit = context.read<CartCubit>();
           return DecoratedBox(
             decoration: BoxDecoration(

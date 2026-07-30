@@ -67,7 +67,6 @@ Map<String, dynamic> _$PendingRequestModelToJson(
 ApprovedTeamModel _$ApprovedTeamModelFromJson(Map<String, dynamic> json) =>
     ApprovedTeamModel(
       id: (json['id'] as num?)?.toInt(),
-      teamId: (json['team_id'] as num?)?.toInt(),
       name: json['name'] as String?,
       logo: json['logo'] as String?,
       captainName: json['captain_name'] as String?,
@@ -77,7 +76,6 @@ ApprovedTeamModel _$ApprovedTeamModelFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$ApprovedTeamModelToJson(ApprovedTeamModel instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'team_id': instance.teamId,
       'name': instance.name,
       'logo': instance.logo,
       'captain_name': instance.captainName,

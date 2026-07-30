@@ -9,6 +9,7 @@ part of 'app_user.dart';
 AppUser _$AppUserFromJson(Map<String, dynamic> json) => AppUser(
   id: (json['id'] as num).toInt(),
   phone: json['phone'] as String?,
+  balance: json['balance'] as String?,
   status: (json['status'] as num?)?.toInt(),
   statusText: json['status_text'] as String?,
   profile: json['profile'] == null

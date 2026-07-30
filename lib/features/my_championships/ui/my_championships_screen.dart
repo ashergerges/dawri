@@ -255,7 +255,9 @@ class _ParticipationsTab extends StatelessWidget {
 
     return BlocBuilder<MyChampionshipsCubit, MyChampionshipsState>(
       builder: (context, state) {
-        final items = isHistory ? state.history : state.participations;
+        final items = isHistory
+            ? (state.history.where((e) => e.achievement != null).toList())
+            : state.participations;
         final status = isHistory ? state.historyStatus : state.participationsStatus;
         final controller = isHistory
             ? cubit.historyRefreshController

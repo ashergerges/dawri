@@ -1,5 +1,6 @@
 // lib/features/purchase_history/ui/purchase_history_screen.dart
 import 'package:auto_route/auto_route.dart';
+import 'package:dawri/core/utils/constants/pull_refresh.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,9 +10,11 @@ import 'package:dawri/core/utils/constants/app_colors.dart';
 import 'package:dawri/core/utils/constants/app_text_them.dart';
 import 'package:dawri/core/utils/extensions/padding_extensions.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../cubit/purchase_history_cubit.dart';
 import '../data/models/purchase_history_model.dart';
+import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
 
 @RoutePage()
 class PurchaseHistoryScreen extends StatelessWidget {
@@ -20,7 +23,7 @@ class PurchaseHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => PurchaseHistoryCubit(),
+      create: (_) => PurchaseHistoryCubit()..getTransactions(),
       child: const _PurchaseHistoryView(),
     );
   }
@@ -36,13 +39,12 @@ class _PurchaseHistoryView extends StatelessWidget {
         children: [
           const _SubHeader(),
           const _CleanTabs(),
-          const Expanded(child: SingleChildScrollView(child: _RecordsList())),
+          const Expanded(child: _RecordsList()), // بدون SingleChildScrollView
         ],
       ),
     );
   }
 }
-
 // ─── SUB HEADER ─────────────────────────────────────────────────────────────
 class _SubHeader extends StatelessWidget {
   const _SubHeader();
@@ -98,7 +100,7 @@ class _CleanTabs extends StatelessWidget {
             border: Border(bottom: BorderSide(color: AppColors.slate200, width: 1)),
           ),
           child: Row(
-            children: PurchaseHistoryMockData.tabs.map((tabData) {
+            children: PurchaseHistoryTabsData.tabs.map((tabData) {
               final isActive = state.selectedTab == tabData.tab;
               return Expanded(
                 child: GestureDetector(
@@ -143,15 +145,54 @@ class _CleanTabs extends StatelessWidget {
 class _RecordsList extends StatelessWidget {
   const _RecordsList();
 
+  ({IconData icon, Color color}) _iconFor(int? type) {
+    switch (type) {
+      case 1:
+        return (icon: FontAwesomeIcons.bagShopping, color: AppColors.primary);
+      case 2:
+        return (icon: FontAwesomeIcons.ticket, color: AppColors.warning);
+      case 3:
+        return (icon: FontAwesomeIcons.trophy, color: AppColors.primaryLight);
+      default:
+        return (icon: FontAwesomeIcons.receipt, color: AppColors.textMuted);
+    }
+  }
+
+  ({Color bg, Color text, String labelKey}) _statusStyle(String? status) {
+    switch (status) {
+      case 'completed':
+      case 'success':
+        return (bg: AppColors.success.withOpacity(0.15), text: AppColors.success, labelKey: LocaleKeys.purchaseHistoryStatusCompleted);
+      case 'failed':
+        return (bg: AppColors.danger.withOpacity(0.15), text: AppColors.danger, labelKey: LocaleKeys.purchaseHistoryStatusFailed);
+      default: // pending
+        return (bg: AppColors.warning.withOpacity(0.15), text: AppColors.warning, labelKey: LocaleKeys.purchaseHistoryStatusPending);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PurchaseHistoryCubit, PurchaseHistoryState>(
       builder: (context, state) {
-        final filtered = state.selectedTab == RecordTab.all
-            ? PurchaseHistoryMockData.records
-            : PurchaseHistoryMockData.records.where((r) => r.category == state.selectedTab).toList();
+        final cubit = context.read<PurchaseHistoryCubit>();
 
-        if (filtered.isEmpty) {
+        if (state.status is Loading && state.transactions.isEmpty) {
+          return const _PurchaseHistoryShimmer();
+        }
+
+        if (state.status is Error && state.transactions.isEmpty) {
+          return Padding(
+            padding: EdgeInsets.only(top: 80.h),
+            child: Center(
+              child: TextButton(
+                onPressed: cubit.getTransactions,
+                child: Text(LocaleKeys.somethingWentWrongRetry.tr()),
+              ),
+            ),
+          );
+        }
+
+        if (state.transactions.isEmpty) {
           return Padding(
             padding: EdgeInsets.only(top: 80.h),
             child: Center(
@@ -166,29 +207,70 @@ class _RecordsList extends StatelessWidget {
           );
         }
 
-        return Padding(
-          padding: 20.w.padAll,
-          child: Column(
-            children: filtered
-                .map((r) => Padding(
-              padding: EdgeInsets.only(bottom: 15.h),
-              child: _RecordCard(record: r),
-            ))
-                .toList(),
+        return SmartRefresher(
+          controller: cubit.refreshController,
+          enablePullUp: true,
+          enablePullDown: true,
+          onRefresh: cubit.getTransactions,
+          onLoading: cubit.loadMoreTransactions,
+          header: PullRefresh.pullRefresh,
+          footer: const ClassicFooter(
+            loadStyle: LoadStyle.ShowAlways,
+            completeDuration: Duration(milliseconds: 500),
+          ),
+          child: ListView.builder(
+            padding: 20.w.padAll,
+            itemCount: state.transactions.length,
+            itemBuilder: (_, i) {
+              final tx = state.transactions[i];
+              final iconData = _iconFor(tx.type);
+              final statusData = _statusStyle(tx.status);
+              return Padding(
+                padding: EdgeInsets.only(bottom: 15.h),
+                child: _RecordCard(
+                  icon: iconData.icon,
+                  iconColor: iconData.color,
+                  title: tx.description ?? tx.typeText ?? '',
+                  date: tx.createdAt ?? '',
+                  amount: tx.amount,
+                  currency: tx.currency,
+                  statusBg: statusData.bg,
+                  statusText: statusData.text,
+                  statusLabel: statusData.labelKey.tr(),
+                ),
+              );
+            },
           ),
         );
       },
     );
   }
 }
-
 class _RecordCard extends StatelessWidget {
-  final RecordData record;
-  const _RecordCard({required this.record});
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String date;
+  final String? amount;
+  final String? currency;
+  final Color statusBg;
+  final Color statusText;
+  final String statusLabel;
+
+  const _RecordCard({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.date,
+    required this.amount,
+    required this.currency,
+    required this.statusBg,
+    required this.statusText,
+    required this.statusLabel,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final isCompleted = record.status == RecordStatus.completed;
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -210,7 +292,7 @@ class _RecordCard extends StatelessWidget {
               child: SizedBox(
                 width: 50.w,
                 height: 50.w,
-                child: Center(child: FaIcon(record.icon, size: 19.sp, color: record.iconColor)),
+                child: Center(child: FaIcon(icon, size: 19.sp, color: iconColor)),
               ),
             ),
             15.w.sizedWidth,
@@ -219,7 +301,9 @@ class _RecordCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    record.titleKey.tr(),
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: AppTextTheme.bodyMediumMediumWeight(context).copyWith(
                       fontWeight: FontWeight.w800,
                       color: AppColors.textDark,
@@ -227,33 +311,58 @@ class _RecordCard extends StatelessWidget {
                   ),
                   2.h.sizedHeight,
                   Text(
-                    record.dateKey.tr(),
+                    date,
                     style: AppTextTheme.bodyXSmall(context).copyWith(
                       fontWeight: FontWeight.w600,
                       color: AppColors.textMuted,
                     ),
                   ),
+                  if (amount != null) ...[
+                    2.h.sizedHeight,
+                    Text(
+                      '$amount ${currency ?? ''}',
+                      style: AppTextTheme.bodyXSmall(context).copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
             DecoratedBox(
               decoration: BoxDecoration(
-                color: isCompleted ? AppColors.success.withOpacity(0.15) : AppColors.warning.withOpacity(0.15),
+                color: statusBg,
                 borderRadius: BorderRadius.circular(6.r),
               ),
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
                 child: Text(
-                  isCompleted ? LocaleKeys.purchaseHistoryStatusCompleted.tr() : LocaleKeys.purchaseHistoryStatusPending.tr(),
+                  statusLabel,
                   style: AppTextTheme.bodyXXSmall(context).copyWith(
                     fontWeight: FontWeight.w800,
-                    color: isCompleted ? AppColors.success : AppColors.warning,
+                    color: statusText,
                   ),
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+class _PurchaseHistoryShimmer extends StatelessWidget {
+  const _PurchaseHistoryShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: 20.w.padAll,
+      itemCount: 5,
+      itemBuilder: (_, __) => Padding(
+        padding: EdgeInsets.only(bottom: 15.h),
+        child: ShimmerWidget.rectangular(width: double.infinity, height: 80.h),
       ),
     );
   }

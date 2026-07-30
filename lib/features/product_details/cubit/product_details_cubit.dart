@@ -48,11 +48,12 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
   ProductVariantModel? get selectedVariant {
     final variants = state.product?.variants ?? [];
     try {
-      return variants.firstWhere(
-            (v) =>
-        v.size?.id == state.selectedSizeId &&
-            (state.selectedColorId == null || v.color?.id == state.selectedColorId),
-      );
+      return variants.first;
+      // return variants.firstWhere(
+      //       (v) =>
+      //   v.size?.id == state.selectedSizeId &&
+      //       (state.selectedColorId == null || v.color?.id == state.selectedColorId),
+      // );
     } catch (_) {
       return null;
     }
@@ -75,6 +76,7 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
     emit(state.copyWith(
       currState: const ProductDetailsStateStatus.success(),
       product: product,
+      isWishlisted:product?.isFavorite??false,
       selectedSizeId: firstVariant?.size?.id,
       selectedColorId: firstVariant?.color?.id,
     ));

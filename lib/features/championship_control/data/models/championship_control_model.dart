@@ -71,8 +71,6 @@ class PendingRequestModel {
 class ApprovedTeamModel {
   /// Participation id — used when deleting the participation.
   final int? id;
-  @JsonKey(name: 'team_id')
-  final int? teamId;
   final String? name;
   final String? logo;
   @JsonKey(name: 'captain_name')
@@ -82,7 +80,6 @@ class ApprovedTeamModel {
 
   ApprovedTeamModel({
     this.id,
-    this.teamId,
     this.name,
     this.logo,
     this.captainName,

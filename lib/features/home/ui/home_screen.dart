@@ -2,6 +2,7 @@
 import 'dart:developer';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:dawri/core/interfaces/i_local_preference.dart';
 import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
 import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
@@ -101,6 +102,7 @@ class _HomeHeader extends StatelessWidget {
                 return Column(
                   children: [
                     30.verticalSpace,
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -108,8 +110,8 @@ class _HomeHeader extends StatelessWidget {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(16.r),
-                              child: Image.network(
-                                'https://i.pravatar.cc/150?img=11',
+                              child: CustomNetworkImage(
+                                imageUrl: (getIt<ILocalPreference>().appUser.value?.profile?.avatar)??"",
                                 width: 52.w,
                                 height: 52.w,
                                 fit: BoxFit.cover,
@@ -121,7 +123,7 @@ class _HomeHeader extends StatelessWidget {
                               children: [
                                 Text(
                                   LocaleKeys.homeGreeting.tr(
-                                    namedArgs: {'name': state.userName},
+                                    namedArgs: {'name':  (getIt<ILocalPreference>().appUser.value?.profile?.fullName)??""},
                                   ),
                                   style:
                                       AppTextTheme.bodyXSmallMediumWeight(
@@ -130,15 +132,15 @@ class _HomeHeader extends StatelessWidget {
                                         color: AppColors.white.withOpacity(0.9),
                                       ),
                                 ),
-                                Text(
-                                  HomeMockData.userName,
-                                  style: AppTextTheme.headingSmall(context)
-                                      .copyWith(
-                                        fontWeight: FontWeight.w900,
-                                        color: AppColors.white,
-                                        letterSpacing: 0.5,
-                                      ),
-                                ),
+                                // Text(
+                                //   HomeMockData.userName,
+                                //   style: AppTextTheme.headingSmall(context)
+                                //       .copyWith(
+                                //         fontWeight: FontWeight.w900,
+                                //         color: AppColors.white,
+                                //         letterSpacing: 0.5,
+                                //       ),
+                                // ),
                               ],
                             ),
                           ],
@@ -513,7 +515,7 @@ class _ProductsSection extends StatelessWidget {
                   productId: state.products[i].id??0,
                   onTapAddedToCart: (){
                     log("HIII");
-                    context.read<HomeCubit>().addedToCart(id:state.products[i].id??0);
+                    context.read<HomeCubit>().addedToCart(id:(state.products[i].variants?.first.id)??0);
                   },
                   imageUrl: state.products[i].image??"",
                   title: state.products[i].name??"",

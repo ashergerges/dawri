@@ -53,11 +53,13 @@ class Endpoints {
   String get cartUrl => r'api/app/cart';
   String get cartDeleteUrl => r'api/app/cart/delete';
   String get cartUpdateUrl => r'api/app/cart/update';
+  String get cartCheckoutUrl => r'api/app/cart/checkout';
   String get couponsApplyUrl => r'api/app/coupons/apply';
 
   //product details
   String get productDetailsUrl  => r'api/app/products/details';
-  String get wishlistToggleUrl => r'api/app/user/wishlist/toggle';
+  String get productFavToggleUrl => r'api/app/product/favorite';
+  String get stadiumsFavToggleUrl => r'api/app/stadiums/favorite';
   String get championshipFavoriteToggleUrl => r'api/app/championships/favorite';
 
   // create championship
@@ -100,5 +102,15 @@ class Endpoints {
   //championship details (champ profile)
   String get championshipDetailsUrl => r'api/app/championships/details';
   String get championshipApprovedParticipantsUrl => r'api/app/championship/approved-participants';
+
+
+
+  String get financialTransactionsUrl => r'api/app/user/financial-transactions';
+  String get matchesTicketsUrl  => r'api/app/championship/matches/tickets';
+  String get myTicketsUrl  => r'api/app/championship/matches/my-tickets';
+
+
+
+
 
 }

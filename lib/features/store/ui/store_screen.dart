@@ -505,7 +505,7 @@ class _ProductCard extends StatelessWidget {
                       color: AppColors.primary,
                     ),
                   ),
-                  _AddToCartButton(product.id??0),
+                  _AddToCartButton((product.variants?.first.id)??0),
                 ],
               ),
             ],

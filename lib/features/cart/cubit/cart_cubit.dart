@@ -29,9 +29,9 @@ class CartCubit extends Cubit<CartState> {
   double get tax => subTotal * _taxRate;
 
   double get finalTotal {
-    if (state.isCouponApplied && state.apiFinalTotal != null) {
-      return state.apiFinalTotal!.toDouble();
-    }
+    // if (state.isCouponApplied && state.apiFinalTotal != null) {
+    //   return state.apiFinalTotal!.toDouble();
+    // }
     return subTotal + tax - state.discountAmount;
   }
 
@@ -131,7 +131,7 @@ class CartCubit extends Cubit<CartState> {
     final result = await _cartRepo.applyCoupon(code: code.trim());
 
     if (result.isError) {
-      emit(state.copyWith(isCouponLoading: false, couponErrorKey: LocaleKeys.errorGeneric));
+      emit(state.copyWith(isCouponLoading: false, couponErrorKey: result.asError?.error?.toString()));
       return;
     }
 
@@ -163,8 +163,7 @@ class CartCubit extends Cubit<CartState> {
   Future<void> checkout() async {
     if (state.items.isEmpty) return;
     emit(state.copyWith(isCheckoutLoading: true));
-    // TODO: replace with real checkout endpoint
-    await Future.delayed(const Duration(seconds: 1));
+    final result = await _cartRepo.checkout();
     emit(state.copyWith(isCheckoutLoading: false, isCheckoutSuccess: true));
   }
 }

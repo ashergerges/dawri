@@ -20,6 +20,8 @@ import 'package:dawri/gen/locale_keys.g.dart';
 
 import '../cubit/account_cubit.dart';
 import '../data/models/account_model.dart';
+import 'package:dawri/core/interfaces/i_local_preference.dart';
+import 'package:dawri/main_common.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -133,7 +135,7 @@ class _ProfileHeader extends StatelessWidget {
                 clipBehavior: Clip.none,
                 children: [
                   CustomNetworkImage(
-                    imageUrl: 'https://i.pravatar.cc/150?img=33',
+                    imageUrl: getIt<ILocalPreference>().appUser.value?.profile?.avatar??"",
                     width: 75.w,
                     height: 75.w,
                     fit: BoxFit.cover,
@@ -167,7 +169,7 @@ class _ProfileHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      LocaleKeys.accountUserName.tr(),
+                    getIt<ILocalPreference>().appUser.value?.profile?.fullName??"",
                       style: AppTextTheme.headingSmall(context).copyWith(
                         fontWeight: FontWeight.w900,
                         color: AppColors.white,
@@ -243,7 +245,8 @@ class _WalletCard extends StatelessWidget {
                       textBaseline: TextBaseline.alphabetic,
                       children: [
                         Text(
-                          state.walletBalance.toStringAsFixed(2),
+                          getIt<ILocalPreference>().appUser.value?.balance??'',
+                          // state.walletBalance.toStringAsFixed(2),
                           style: AppTextTheme.headingSmall(context).copyWith(
                             fontWeight: FontWeight.w900,
                             color: AppColors.textDark,

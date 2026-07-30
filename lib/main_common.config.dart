@@ -82,6 +82,10 @@ import 'features/product_details/data/repositories/interfaces/i_product_details_
     as _i873;
 import 'features/product_details/data/repositories/remote/product_details_repository.dart'
     as _i442;
+import 'features/purchase_history/data/repositories/interfaces/i_purchase_history_repository.dart'
+    as _i359;
+import 'features/purchase_history/data/repositories/remote/purchase_history_repository.dart'
+    as _i72;
 import 'features/reserve/data/repositories/interfaces/i_reserve_repository.dart'
     as _i817;
 import 'features/reserve/data/repositories/remote/reserve_repository.dart'
@@ -102,6 +106,10 @@ import 'features/stadiums/data/repositories/remote/stadiums_repository.dart'
 import 'features/store/data/repository/interface/i_store_repository.dart'
     as _i255;
 import 'features/store/data/repository/remote/store_repository.dart' as _i77;
+import 'features/tickets/data/repository/interface/i_tickets_repository.dart'
+    as _i773;
+import 'features/tickets/data/repository/remote/tickets_repository.dart'
+    as _i305;
 
 // initializes the registration of main-scope dependencies inside of GetIt
 _i174.GetIt $initGetIt(
@@ -141,11 +149,19 @@ _i174.GetIt $initGetIt(
       aliceService: gh<_i854.AliceService>(),
     ),
   );
+  gh.factory<_i359.IPurchaseHistoryRepository>(
+    () => _i72.PurchaseHistoryRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
+  );
   gh.factory<_i561.ISplashRepository>(
     () => _i120.SplashRepository(networkService: gh<_i969.NetworkService>()),
   );
   gh.factory<_i775.ICartRepository>(
     () => _i48.CartRepository(networkService: gh<_i969.NetworkService>()),
+  );
+  gh.factory<_i773.ITicketsRepository>(
+    () => _i305.TicketsRepository(networkService: gh<_i969.NetworkService>()),
   );
   gh.factory<_i735.IMyChampionshipsRepository>(
     () => _i730.MyChampionshipsRepository(

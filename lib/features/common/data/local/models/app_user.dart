@@ -6,6 +6,7 @@ part 'app_user.g.dart';
 class AppUser {
   final int id;
   final String? phone;
+  final String? balance;
   final int? status;
 
   @JsonKey(name: 'status_text')
@@ -27,6 +28,7 @@ class AppUser {
   const AppUser({
     required this.id,
     this.phone,
+    this.balance,
     this.status,
     this.statusText,
     this.profile,
@@ -38,6 +40,7 @@ class AppUser {
   AppUser copyWith({
     int? id,
     String? phone,
+    String? balance,
     int? status,
     String? statusText,
     Profile? profile,
@@ -48,6 +51,7 @@ class AppUser {
     return AppUser(
       id: id ?? this.id,
       phone: phone ?? this.phone,
+      balance: balance ?? this.balance,
       status: status ?? this.status,
       statusText: statusText ?? this.statusText,
       profile: profile ?? this.profile,

@@ -8,6 +8,7 @@ abstract class ICartRepository {
   Future<Result<String>> deleteCart({int? cartItemId, required bool deleteAll});
 
   Future<Result<String>> updateQuantity({required int cartItemId, required int quantity});
+  Future<Result<String>> checkout();
 
   Future<Result<CartCouponModel>> applyCoupon({required String code});
 }

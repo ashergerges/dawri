@@ -84,7 +84,11 @@ class TicketModel {
   final String? time;
   @JsonKey(name: 'date_text')
   final String? dateText;
+  @JsonKey(name: 'stadium_name')
+
   final String? stadium;
+  @JsonKey(name: 'ticket_price')
+
   final num? price;
   final String? currency;
 

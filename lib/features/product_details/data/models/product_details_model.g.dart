@@ -16,6 +16,7 @@ ProductDetailsModel _$ProductDetailsModelFromJson(Map<String, dynamic> json) =>
       variants: (json['variants'] as List<dynamic>?)
           ?.map((e) => ProductVariantModel.fromJson(e as Map<String, dynamic>))
           .toList(),
+      isFavorite: json['is_favorite'] as bool?,
     );
 
 Map<String, dynamic> _$ProductDetailsModelToJson(
@@ -25,6 +26,7 @@ Map<String, dynamic> _$ProductDetailsModelToJson(
   'name': instance.name,
   'description': instance.description,
   'image': instance.image,
+  'is_favorite': instance.isFavorite,
   'price': instance.price,
   'variants': instance.variants,
 };

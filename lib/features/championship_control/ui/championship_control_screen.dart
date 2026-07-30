@@ -1505,9 +1505,9 @@ class _TeamDropdownField extends StatelessWidget {
             ),
             dropdownColor: AppColors.white,
             items: teams
-                .where((t) => t.teamId != null)
+                .where((t) => t.id != null)
                 .map((t) => DropdownMenuItem(
-                      value: t.teamId,
+                      value: (t.id),
                       child: Text(t.name ?? '', overflow: TextOverflow.ellipsis),
                     ))
                 .toList(),

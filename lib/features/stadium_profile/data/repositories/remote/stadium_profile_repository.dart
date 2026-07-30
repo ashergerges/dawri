@@ -75,8 +75,8 @@ class StadiumProfileRepository implements IStadiumProfileRepository {
   @override
   Future<Result<String>> toggleWishlist({required int id}) async {
     final response = await networkService.postAsync(
-      url: AppStrings.urls.wishlistToggleUrl,
-      body: {'id': id, 'type': 2},
+      url: AppStrings.urls.stadiumsFavToggleUrl,
+      body: {'id': id, },
     );
     if (response.isError) return Result.error(response.asError!.error);
     return Result.value(response.asValue?.value.data['message'] ?? '');

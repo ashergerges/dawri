@@ -9,6 +9,8 @@ class ProductDetailsModel {
   final String? name;
   final String? description;
   final String? image;
+  @JsonKey(name: 'is_favorite')
+  final bool? isFavorite;
   final num? price;
   final List<ProductVariantModel>? variants;
 
@@ -19,6 +21,7 @@ class ProductDetailsModel {
     this.image,
     this.price,
     this.variants,
+    this.isFavorite,
   });
 
   factory ProductDetailsModel.fromJson(Map<String, dynamic> json) =>

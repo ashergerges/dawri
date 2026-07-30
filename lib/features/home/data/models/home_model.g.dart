@@ -87,8 +87,8 @@ TicketModel _$TicketModelFromJson(Map<String, dynamic> json) => TicketModel(
   title: json['title'] as String?,
   time: json['time'] as String?,
   dateText: json['date_text'] as String?,
-  stadium: json['stadium'] as String?,
-  price: json['price'] as num?,
+  stadium: json['stadium_name'] as String?,
+  price: json['ticket_price'] as num?,
   currency: json['currency'] as String?,
 );
 

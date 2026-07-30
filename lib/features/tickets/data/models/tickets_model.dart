@@ -1,103 +1,121 @@
-// lib/features/tickets/data/tickets_model.dart
+import 'package:json_annotation/json_annotation.dart';
+
+part 'tickets_model.g.dart';
+
+@JsonSerializable()
+class TeamMiniModel {
+  final int? id;
+  final String? name;
+  final String? logo;
+
+  TeamMiniModel({this.id, this.name, this.logo});
+
+  factory TeamMiniModel.fromJson(Map<String, dynamic> json) =>
+      _$TeamMiniModelFromJson(json);
+  Map<String, dynamic> toJson() => _$TeamMiniModelToJson(this);
+}
+
+@JsonSerializable()
 class UpcomingMatchModel {
-  final String id;
-  final String? badgeKey;
-  final String teamAName;
-  final String teamALogoUrl;
-  final String teamBName;
-  final String teamBLogoUrl;
-  final String dateLabelKey;
-  final String timeLabelKey;
-  final String venueLabelKey;
-  final String? seatsLeftLabelKey;
-  final bool isFree;
-  final double? price;
+  final int? id;
+  final String? title;
+  final TeamMiniModel? home;
+  final TeamMiniModel? away;
+  @JsonKey(name: 'date_text')
+  final String? dateText;
+  final String? time;
+  @JsonKey(name: 'stadium_name')
+  final String? stadium;
+  @JsonKey(name: 'remaining_tickets')
+  final int? remainingTickets;
+  @JsonKey(name: 'is_sold_out')
+  final bool? isSoldOut;
+  @JsonKey(name: 'ticket_price')
+  final num? ticketPrice;
+  @JsonKey(name: 'is_free')
+  final bool? isFree;
 
-  const UpcomingMatchModel({
-    required this.id,
-    this.badgeKey,
-    required this.teamAName,
-    required this.teamALogoUrl,
-    required this.teamBName,
-    required this.teamBLogoUrl,
-    required this.dateLabelKey,
-    required this.timeLabelKey,
-    required this.venueLabelKey,
-    this.seatsLeftLabelKey,
-    this.isFree = false,
-    this.price,
+  UpcomingMatchModel({
+    this.id,
+    this.title,
+    this.home,
+    this.away,
+    this.dateText,
+    this.time,
+    this.stadium,
+    this.remainingTickets,
+    this.isSoldOut,
+    this.ticketPrice,
+    this.isFree,
   });
+
+  factory UpcomingMatchModel.fromJson(Map<String, dynamic> json) =>
+      _$UpcomingMatchModelFromJson(json);
+  Map<String, dynamic> toJson() => _$UpcomingMatchModelToJson(this);
 }
 
+@JsonSerializable()
+class TicketStatusModel {
+  final int? id;
+  final String? title;
+
+  TicketStatusModel({this.id, this.title});
+
+  factory TicketStatusModel.fromJson(Map<String, dynamic> json) =>
+      _$TicketStatusModelFromJson(json);
+  Map<String, dynamic> toJson() => _$TicketStatusModelToJson(this);
+}
+
+@JsonSerializable()
+class TicketMatchModel {
+  final int? id;
+  final String? title;
+  final TeamMiniModel? home;
+  final TeamMiniModel? away;
+  final String? stadium;
+  @JsonKey(name: 'date_text')
+  final String? dateText;
+  final String? time;
+
+  TicketMatchModel({
+    this.id,
+    this.title,
+    this.home,
+    this.away,
+    this.stadium,
+    this.dateText,
+    this.time,
+  });
+
+  factory TicketMatchModel.fromJson(Map<String, dynamic> json) =>
+      _$TicketMatchModelFromJson(json);
+  Map<String, dynamic> toJson() => _$TicketMatchModelToJson(this);
+}
+
+@JsonSerializable()
 class MyTicketModel {
-  final String id;
-  final String tournamentName;
-  final String venue;
-  final String statusKey;
-  final String teamAName;
-  final String teamBName;
-  final String dateLabelKey;
-  final String timeLabelKey;
-  final String gate;
-  final String seat;
-  final String qrData;
+  final int? id;
+  final String? code;
+  @JsonKey(name: 'qr_payload')
+  final String? qrPayload;
+  final String? seat;
+  final String? gate;
+  final num? price;
+  final TicketStatusModel? status;
+  final TicketMatchModel? match;
 
-  const MyTicketModel({
-    required this.id,
-    required this.tournamentName,
-    required this.venue,
-    required this.statusKey,
-    required this.teamAName,
-    required this.teamBName,
-    required this.dateLabelKey,
-    required this.timeLabelKey,
-    required this.gate,
-    required this.seat,
-    required this.qrData,
+  MyTicketModel({
+    this.id,
+    this.code,
+    this.qrPayload,
+    this.seat,
+    this.gate,
+    this.price,
+    this.status,
+    this.match,
   });
-}
 
-class TicketsMockData {
-  static const upcomingMatches = [
-    UpcomingMatchModel(
-      id: 'match-1',
-      badgeKey: 'ticketsFinalBadge',
-      teamAName: 'الصقور',
-      teamALogoUrl: 'https://images.unsplash.com/photo-1599474924187-334a4ae5bd3c?w=100&q=80',
-      teamBName: 'أكاديمية المجد',
-      teamBLogoUrl: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=100&q=80',
-      dateLabelKey: 'ticketsMatch1Date',
-      timeLabelKey: 'ticketsMatch1Time',
-      venueLabelKey: 'ticketsMatch1Venue',
-      seatsLeftLabelKey: 'ticketsMatch1Seats',
-      price: 35,
-    ),
-    UpcomingMatchModel(
-      id: 'match-2',
-      teamAName: 'شباب الرياض',
-      teamALogoUrl: 'https://images.unsplash.com/photo-1599474924187-334a4ae5bd3c?w=100&q=80',
-      teamBName: 'اتحاد طويق',
-      teamBLogoUrl: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=100&q=80',
-      dateLabelKey: 'ticketsMatch2Date',
-      timeLabelKey: 'ticketsMatch2Time',
-      venueLabelKey: 'ticketsMatch2Venue',
-      isFree: true,
-    ),
-  ];
-
-  static const myTickets = [
-    MyTicketModel(
-      id: 'ticket-1',
-      tournamentName: 'نهائي دوري الأحياء',
-      venue: 'ملعب أرينا الرياض',
-      statusKey: 'ticketsStatusValid',
-      teamAName: 'الصقور',
-      teamBName: 'أكاديمية المجد',
-      dateLabelKey: '20 نوفمبر',
-      timeLabelKey: '08:30 م',
-      gate: 'Gate 4',
-      seat: 'B-12',
-      qrData: 'Ticket-DW-8492',
-    ),
-  ];
+  factory MyTicketModel.fromJson(Map<String, dynamic> json) =>
+      _$MyTicketModelFromJson(json);
+  Map<String, dynamic> toJson() => _$MyTicketModelToJson(this);
 }

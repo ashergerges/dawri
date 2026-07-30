@@ -1,4 +1,4 @@
-// lib/features/product_details/data/interfaces/i_product_details_repository.dart
+// lib/features/product_details/data/interfaces/i_purchase_history_repository.dart
 import 'package:async/async.dart';
 import 'package:dawri/features/product_details/data/models/product_details_model.dart';
 

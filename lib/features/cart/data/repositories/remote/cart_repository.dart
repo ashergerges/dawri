@@ -22,10 +22,11 @@ class CartRepository implements ICartRepository {
 
   @override
   Future<Result<String>> deleteCart({int? cartItemId, required bool deleteAll}) async {
-    final response = await networkService.postAsync(
+    final response = await networkService.deleteAsync(
       url: AppStrings.urls.cartDeleteUrl,
       body: {
-        'cart_item_id': cartItemId,
+        if(cartItemId!=null)'cart_item_id': cartItemId,
+
         'delete_all': deleteAll ? 1 : 0,
       },
     );
@@ -38,6 +39,14 @@ class CartRepository implements ICartRepository {
     final response = await networkService.postAsync(
       url: AppStrings.urls.cartUpdateUrl,
       body: {'cart_item_id': cartItemId, 'quantity': quantity},
+    );
+    if (response.isError) return Result.error(response.asError!.error);
+    return Result.value(response.asValue?.value.data['message']);
+  }
+  @override
+  Future<Result<String>> checkout() async {
+    final response = await networkService.postAsync(
+      url: AppStrings.urls.cartCheckoutUrl,
     );
     if (response.isError) return Result.error(response.asError!.error);
     return Result.value(response.asValue?.value.data['message']);

@@ -1,4 +1,4 @@
-// lib/features/store/data/repository/interface/i_store_repository.dart
+// lib/features/store/data/repository/interface/i_tickets_repository.dart
 import 'package:async/async.dart';
 import 'package:dawri/features/store/data/models/store_model.dart';
 

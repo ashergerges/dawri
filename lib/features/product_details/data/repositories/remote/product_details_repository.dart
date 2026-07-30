@@ -1,4 +1,4 @@
-// lib/features/product_details/data/repository/product_details_repository.dart
+// lib/features/product_details/data/repository/purchase_history_repository.dart
 import 'package:async/async.dart';
 import 'package:injectable/injectable.dart';
 import 'package:dawri/core/utils/constants/constants.dart';
@@ -26,8 +26,8 @@ class ProductDetailsRepository implements IProductDetailsRepository {
   @override
   Future<Result<String>> toggleWishlist({required int id}) async {
     final response = await networkService.postAsync(
-      url: AppStrings.urls.wishlistToggleUrl,
-      body: {'id': id, 'type': 1},
+      url: AppStrings.urls.productFavToggleUrl,
+      body: {'id': id,},
     );
     if (response.isError) return Result.error(response.asError!.error);
     return Result.value(response.asValue?.value.data['message']);

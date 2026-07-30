@@ -946,5 +946,29 @@ abstract class  LocaleKeys {
   static const pleaseSelectRating = 'pleaseSelectRating';
   static const pleaseWriteComment = 'pleaseWriteComment';
   static const failedToSubmitRating = 'failedToSubmitRating';
+  static const purchaseHistoryStatusFailed = 'purchaseHistoryStatusFailed';
+  static const ticketsVenueTba = 'ticketsVenueTba';
+  static const ticketsDateTba = 'ticketsDateTba';
+  static const ticketsTimeTba = 'ticketsTimeTba';
+  static const ticketsMatchTitleTba = 'ticketsMatchTitleTba';
+  static const ticketsTeamTba = 'ticketsTeamTba';
+  static const ticketsPriceTba = 'ticketsPriceTba';
+  static const ticketsSoldOut = 'ticketsSoldOut';
+  static const ticketsSeatsLeft = 'ticketsSeatsLeft';
+  static const ticketsStatusUnknown = 'ticketsStatusUnknown';
+  static const ticketsErrorTitle = 'ticketsErrorTitle';
+  static const ticketsErrorDesc = 'ticketsErrorDesc';
+  static const ticketsRetry = 'ticketsRetry';
+  static const ticketsNoMatchesTitle = 'ticketsNoMatchesTitle';
+  static const ticketsNoMatchesDesc = 'ticketsNoMatchesDesc';
+  static const ticketsMatchTitleTBA = 'ticketsMatchTitleTBA';
+  static const ticketsVenueTBA = 'ticketsVenueTBA';
+  static const ticketsDateTBA = 'ticketsDateTBA';
+  static const ticketsTimeTBA = 'ticketsTimeTBA';
+  static const ticketsPriceTBA = 'ticketsPriceTBA';
+  static const ticketsTeamTBA = 'ticketsTeamTBA';
+  static const ticketsQuantity = 'ticketsQuantity';
+  static const ticketsTotal = 'ticketsTotal';
+  static const ticketsConfirmBooking = 'ticketsConfirmBooking';
 
 }
