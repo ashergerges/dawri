@@ -13,6 +13,7 @@ import 'package:dawri/features/contract_details/ui/contract_details_screen.dart'
 import 'package:dawri/features/contracts/ui/contract_screen.dart';
 import 'package:dawri/features/create_championship/ui/create_championship_screen.dart';
 import 'package:dawri/features/create_contract/ui/create_contract_screen.dart';
+import 'package:dawri/features/create_team/ui/create_team_screen.dart';
 import 'package:dawri/features/help_center/ui/help_center_screen.dart';
 import 'package:dawri/features/invite_player/ui/invite_player_screen.dart';
 import 'package:dawri/features/login/cubit/login_cubit.dart';
@@ -26,6 +27,7 @@ import 'package:dawri/features/partner_details/ui/partner_details_screen.dart';
 import 'package:dawri/features/partners/ui/partners_screen.dart';
 import 'package:dawri/features/product_details/ui/product_details_screen.dart';
 import 'package:dawri/features/purchase_history/ui/purchase_history_screen.dart';
+import 'package:dawri/features/register/ui/register_screen.dart';
 import 'package:dawri/features/reserve/ui/reserve_now_screen.dart';
 import 'package:dawri/features/search/ui/search_screen.dart';
 import 'package:dawri/features/stadium_profile/ui/stadium_profile_screen.dart';
@@ -38,6 +40,7 @@ import 'package:dawri/features/splash/ui/no_internet_splash.dart';
 import 'package:dawri/features/Tabs/ui/home_bottom_tabs_screen.dart';
 import 'package:dawri/features/splash/ui/splash_screen.dart';
 import '../../features/create_challenge/ui/create_challenge_screen.dart';
+import '../../features/manage_team/ui/empty_my_team_screen.dart' show EmptyMyTeamScreen;
 import '../services/ui/not_found_screen.dart';
 import '../utils/common_widgets/image_viewer_screen.dart';
 
@@ -97,6 +100,9 @@ class AppRouter extends RootStackRouter {
     AutoRoute( page: HelpCenterRoute.page),
     AutoRoute( page: MyChampionshipsRoute.page),
     AutoRoute( page: CreateChallengeRoute.page),
+    AutoRoute( page: CreateTeamRoute.page),
+    AutoRoute( page: EmptyMyTeamRoute.page),
+    AutoRoute( page: RegisterRoute.page),
     AutoRoute(path: '*', page: NotFoundRoute.page), // this must be last route
 
   ];

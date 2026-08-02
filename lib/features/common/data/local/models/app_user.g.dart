@@ -16,6 +16,8 @@ AppUser _$AppUserFromJson(Map<String, dynamic> json) => AppUser(
       ? null
       : Profile.fromJson(json['profile'] as Map<String, dynamic>),
   createdAt: json['created_at'] as String?,
+  hasProfile: json['has_profile'] as bool?,
+  haveTeam: json['haveTeam'] as bool?,
 );
 
 Map<String, dynamic> _$AppUserToJson(AppUser instance) => <String, dynamic>{
@@ -26,6 +28,8 @@ Map<String, dynamic> _$AppUserToJson(AppUser instance) => <String, dynamic>{
   'status_text': instance.statusText,
   'profile': instance.profile?.toJson(),
   'created_at': instance.createdAt,
+  'has_profile': instance.hasProfile,
+  'haveTeam': instance.haveTeam,
   'token': instance.token,
   'refreshToken': instance.refreshToken,
 };
@@ -36,7 +40,9 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) => Profile(
   birthDate: json['birth_date'] as String?,
   cityId: (json['city_id'] as num?)?.toInt(),
   avatar: json['avatar'] as String?,
-  type: json['type'] as String?,
+  type: json['type'] == null
+      ? null
+      : SportModel.fromJson(json['type'] as Map<String, dynamic>),
   title: json['title'] as String?,
   license: json['license'] as String?,
   isAvailableForContract: json['is_available_for_contract'] as bool?,

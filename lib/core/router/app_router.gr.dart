@@ -419,6 +419,38 @@ class CreateContractRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [CreateTeamScreen]
+class CreateTeamRoute extends PageRouteInfo<void> {
+  const CreateTeamRoute({List<PageRouteInfo>? children})
+    : super(CreateTeamRoute.name, initialChildren: children);
+
+  static const String name = 'CreateTeamRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const CreateTeamScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [EmptyMyTeamScreen]
+class EmptyMyTeamRoute extends PageRouteInfo<void> {
+  const EmptyMyTeamRoute({List<PageRouteInfo>? children})
+    : super(EmptyMyTeamRoute.name, initialChildren: children);
+
+  static const String name = 'EmptyMyTeamRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const EmptyMyTeamScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [HelpCenterScreen]
 class HelpCenterRoute extends PageRouteInfo<void> {
   const HelpCenterRoute({List<PageRouteInfo>? children})
@@ -529,18 +561,54 @@ class ImageViewerRouteArgs {
 
 /// generated route for
 /// [InvitePlayerScreen]
-class InvitePlayerRoute extends PageRouteInfo<void> {
-  const InvitePlayerRoute({List<PageRouteInfo>? children})
-    : super(InvitePlayerRoute.name, initialChildren: children);
+class InvitePlayerRoute extends PageRouteInfo<InvitePlayerRouteArgs> {
+  InvitePlayerRoute({
+    Key? key,
+    String? invitationLink,
+    List<PageRouteInfo>? children,
+  }) : super(
+         InvitePlayerRoute.name,
+         args: InvitePlayerRouteArgs(key: key, invitationLink: invitationLink),
+         initialChildren: children,
+       );
 
   static const String name = 'InvitePlayerRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const InvitePlayerScreen();
+      final args = data.argsAs<InvitePlayerRouteArgs>(
+        orElse: () => const InvitePlayerRouteArgs(),
+      );
+      return InvitePlayerScreen(
+        key: args.key,
+        invitationLink: args.invitationLink,
+      );
     },
   );
+}
+
+class InvitePlayerRouteArgs {
+  const InvitePlayerRouteArgs({this.key, this.invitationLink});
+
+  final Key? key;
+
+  final String? invitationLink;
+
+  @override
+  String toString() {
+    return 'InvitePlayerRouteArgs{key: $key, invitationLink: $invitationLink}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! InvitePlayerRouteArgs) return false;
+    return key == other.key && invitationLink == other.invitationLink;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ invitationLink.hashCode;
 }
 
 /// generated route for
@@ -833,6 +901,22 @@ class PurchaseHistoryRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const PurchaseHistoryScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [RegisterScreen]
+class RegisterRoute extends PageRouteInfo<void> {
+  const RegisterRoute({List<PageRouteInfo>? children})
+    : super(RegisterRoute.name, initialChildren: children);
+
+  static const String name = 'RegisterRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const RegisterScreen();
     },
   );
 }

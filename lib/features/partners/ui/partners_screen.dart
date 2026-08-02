@@ -1,7 +1,13 @@
 // lib/features/partners/ui/partners_screen.dart
 import 'package:auto_route/auto_route.dart';
+import 'package:dawri/core/interfaces/i_local_preference.dart';
 import 'package:dawri/core/router/app_router.dart';
+import 'package:dawri/core/utils/common_widgets/custom_network_image.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
+import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
+import 'package:dawri/core/utils/constants/pull_refresh.dart';
+import 'package:dawri/features/partners/data/models/partners_model.dart';
+import 'package:dawri/main_common.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,9 +17,9 @@ import 'package:dawri/core/utils/constants/app_colors.dart';
 import 'package:dawri/core/utils/constants/app_text_them.dart';
 import 'package:dawri/core/utils/extensions/padding_extensions.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../cubit/partners_cubit.dart';
-import '../data/models/partners_model.dart';
 
 @RoutePage()
 class PartnersScreen extends StatelessWidget {
@@ -22,7 +28,7 @@ class PartnersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => PartnersCubit(),
+      create: (_) => PartnersCubit()..init(),
       child: const _PartnersView(),
     );
   }
@@ -33,23 +39,16 @@ class _PartnersView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasProfile = getIt<ILocalPreference>().appUser.value?.hasProfile ?? false;
+
     return Scaffold(
       body: Column(
         children: [
           const _SubHeader(),
           const _SearchBox(),
           const _CleanTabs(),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  const _RegisterBanner(),
-                  const _ParticipantsList(),
-                  20.h.sizedHeight,
-                ],
-              ),
-            ),
-          ),
+          if (!hasProfile) const _RegisterBanner(),
+          const Expanded(child: _ListArea()),
         ],
       ),
     );
@@ -64,7 +63,6 @@ class _SubHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(20.w, 50.h, 20.w, 10.h),
-
       decoration: const BoxDecoration(color: AppColors.white),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -114,14 +112,16 @@ class _SearchBox extends StatelessWidget {
                 12.w.sizedWidth,
                 Expanded(
                   child: TextField(
-                    onChanged: (v) => context.read<PartnersCubit>().updateSearchQuery(v),
+                    onChanged: (v) => context.read<PartnersCubit>().onSearchChanged(v),
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       isCollapsed: true,
                       hintText: LocaleKeys.partnersSearchHint.tr(),
-                      hintStyle: AppTextTheme.bodySmallMediumWeight(context).copyWith(color: AppColors.textMuted),
+                      hintStyle: AppTextTheme.bodySmallMediumWeight(context)
+                          .copyWith(color: AppColors.textMuted),
                     ),
-                    style: AppTextTheme.bodySmallMediumWeight(context).copyWith(color: AppColors.textDark),
+                    style: AppTextTheme.bodySmallMediumWeight(context)
+                        .copyWith(color: AppColors.textDark),
                   ),
                 ),
                 FaIcon(FontAwesomeIcons.sliders, size: 15.sp, color: AppColors.primary),
@@ -134,70 +134,82 @@ class _SearchBox extends StatelessWidget {
   }
 }
 
-// ─── CLEAN TABS ─────────────────────────────────────────────────────────────
+// ─── CLEAN TABS (dynamic participant types) ──────────────────────────────────
 class _CleanTabs extends StatelessWidget {
   const _CleanTabs();
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PartnersCubit, PartnersState>(
+      buildWhen: (p, c) =>
+          p.types != c.types ||
+          p.typesStatus != c.typesStatus ||
+          p.selectedTypeId != c.selectedTypeId,
       builder: (context, state) {
         return DecoratedBox(
           decoration: BoxDecoration(
             color: AppColors.white,
             border: Border(bottom: BorderSide(color: AppColors.slate200, width: 1)),
           ),
-          child: Row(
-            children: ParticipantTab.values.map((tab) {
-              final isActive = state.selectedTab == tab;
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () => context.read<PartnersCubit>().selectTab(tab),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 15.h, bottom: 12.h),
-                        child: Text(
-                          _tabLabel(tab),
-                          style: AppTextTheme.bodyMediumMediumWeight(context).copyWith(
-                            fontWeight: isActive ? FontWeight.w800 : FontWeight.w700,
-                            color: isActive ? AppColors.primary : AppColors.textMuted,
-                          ),
+          child: state.types.isEmpty && state.typesStatus is PartnersStatusLoading
+              ? Padding(
+                  padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 20.w),
+                  child: Row(
+                    children: List.generate(
+                      3,
+                      (_) => Expanded(
+                        child: Padding(
+                          padding: 8.padHorizontal,
+                          child: ShimmerWidget.rectangular(width: double.infinity, height: 18.h),
                         ),
                       ),
-                      FractionallySizedBox(
-                        widthFactor: 0.7,
-                        child: Container(
-                          height: 3.h,
-                          decoration: BoxDecoration(
-                            color: isActive ? AppColors.primary : AppColors.transparent,
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(3.r)),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
+                )
+              : Row(
+                  children: state.types.map((type) {
+                    final isActive = state.selectedTypeId == type.id;
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () => context.read<PartnersCubit>().selectType(type.id ?? 0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(top: 15.h, bottom: 12.h),
+                              child: Text(
+                                type.title ?? '',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTextTheme.bodyMediumMediumWeight(context).copyWith(
+                                  fontWeight: isActive ? FontWeight.w800 : FontWeight.w700,
+                                  color: isActive ? AppColors.primary : AppColors.textMuted,
+                                ),
+                              ),
+                            ),
+                            FractionallySizedBox(
+                              widthFactor: 0.7,
+                              child: Container(
+                                height: 3.h,
+                                decoration: BoxDecoration(
+                                  color: isActive ? AppColors.primary : AppColors.transparent,
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(3.r)),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
-              );
-            }).toList(),
-          ),
         );
       },
     );
   }
+}
 
-  String _tabLabel(ParticipantTab tab) {
-    switch (tab) {
-      case ParticipantTab.players:
-        return LocaleKeys.partnersTabPlayers.tr();
-      case ParticipantTab.coaches:
-        return LocaleKeys.partnersTabCoaches.tr();
-      case ParticipantTab.referees:
-        return LocaleKeys.partnersTabReferees.tr();
-    }
-  }
-}// ─── REGISTER BANNER ────────────────────────────────────────────────────────
+// ─── REGISTER BANNER ────────────────────────────────────────────────────────
 class _RegisterBanner extends StatelessWidget {
   const _RegisterBanner();
 
@@ -247,14 +259,15 @@ class _RegisterBanner extends StatelessWidget {
                         4.h.sizedHeight,
                         Text(
                           LocaleKeys.partnersBannerDesc.tr(),
-                          style: AppTextTheme.bodyXXSmall(context).copyWith(color: AppColors.white.withOpacity(0.9)),
+                          style: AppTextTheme.bodyXXSmall(context)
+                              .copyWith(color: AppColors.white.withOpacity(0.9)),
                         ),
                       ],
                     ),
                   ),
                   4.horizontalSpace,
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () => const RegisterRoute().push(context),
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         color: AppColors.white,
@@ -291,41 +304,94 @@ class _RegisterBanner extends StatelessWidget {
   }
 }
 
-// ─── PARTICIPANTS LIST ──────────────────────────────────────────────────────
-class _ParticipantsList extends StatelessWidget {
-  const _ParticipantsList();
+// ─── LIST AREA ────────────────────────────────────────────────────────────────
+class _ListArea extends StatelessWidget {
+  const _ListArea();
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<PartnersCubit>();
+
     return BlocBuilder<PartnersCubit, PartnersState>(
       builder: (context, state) {
-        final list = PartnersMockData.forTab(state.selectedTab);
-        return Padding(
-          padding: EdgeInsets.fromLTRB(20.w, 15.h, 20.w, 0),
-          child: Column(
-            children: list
-                .map((p) => Padding(
-              padding: EdgeInsets.only(bottom: 15.h),
-              child: _ParticipantCard(participant: p),
-            ))
-                .toList(),
+        final isEmpty = state.isTeamType ? state.teams.isEmpty : state.individuals.isEmpty;
+
+        if (state.listStatus is PartnersStatusLoading && isEmpty) {
+          return const _ListShimmer();
+        }
+        if (state.listStatus is PartnersStatusError && isEmpty) {
+          return _ErrorRetry(onRetry: cubit.getList);
+        }
+
+        return SmartRefresher(
+          controller: cubit.refreshController,
+          enablePullUp: true,
+          enablePullDown: true,
+          onRefresh: cubit.getList,
+          onLoading: cubit.loadMore,
+          header: PullRefresh.pullRefresh,
+          footer: const ClassicFooter(
+            loadStyle: LoadStyle.ShowAlways,
+            completeDuration: Duration(milliseconds: 500),
           ),
+          child: isEmpty
+              ? ListView(
+                  children: [
+                    SizedBox(height: 120.h),
+                    Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          FaIcon(FontAwesomeIcons.users, size: 46.sp, color: AppColors.slate300),
+                          12.h.sizedHeight,
+                          Text(
+                            LocaleKeys.partnersEmpty.tr(),
+                            style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : ListView(
+                  padding: EdgeInsets.fromLTRB(20.w, 15.h, 20.w, 20.h),
+                  children: state.isTeamType
+                      ? [
+                          for (final team in state.teams)
+                            Padding(
+                              padding: EdgeInsets.only(bottom: 15.h),
+                              child: _TeamCard(
+                                team: team,
+                                joining: state.joiningTeamIds.contains(team.id),
+                              ),
+                            ),
+                        ]
+                      : [
+                          for (final p in state.individuals)
+                            Padding(
+                              padding: EdgeInsets.only(bottom: 15.h),
+                              child: _IndividualCard(participant: p),
+                            ),
+                        ],
+                ),
         );
       },
     );
   }
 }
 
-class _ParticipantCard extends StatelessWidget {
-  final ParticipantData participant;
-  const _ParticipantCard({required this.participant});
+// ─── INDIVIDUAL CARD ──────────────────────────────────────────────────────────
+class _IndividualCard extends StatelessWidget {
+  final ParticipantIndividualModel participant;
+  const _IndividualCard({required this.participant});
 
   @override
   Widget build(BuildContext context) {
     return OnTap(
-      onTap: (){
-        PartnerDetailsRoute().push(context);
-      },
+      onTap: () => PartnerDetailsRoute().push(context),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -342,14 +408,11 @@ class _ParticipantCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(16.r),
-                child: Container(
-                  decoration: BoxDecoration(border: Border.all(color: AppColors.slate100, width: 2)),
-                  child: Image.network(
-                    participant.imageUrl,
-                    width: 75.w,
-                    height: 75.w,
-                    fit: BoxFit.cover,
-                  ),
+                child: CustomNetworkImage(
+                  imageUrl: participant.avatar ?? '',
+                  width: 75.w,
+                  height: 75.w,
+                  fit: BoxFit.cover,
                 ),
               ),
               15.w.sizedWidth,
@@ -362,64 +425,48 @@ class _ParticipantCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            participant.nameKey.tr(),
+                            participant.name ?? '',
                             style: AppTextTheme.bodyLargeSemiBold(context).copyWith(
                               fontWeight: FontWeight.w800,
                               color: AppColors.textDark,
                             ),
                           ),
                         ),
-                        DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: AppColors.ratingAmberBg,
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
-                            child: Row(
-                              children: [
-                                FaIcon(FontAwesomeIcons.star, size: 11.sp, color: AppColors.ratingAmber),
-                                4.w.sizedWidth,
-                                Text(
-                                  participant.rating.toString(),
-                                  style: AppTextTheme.bodyXSmall(context).copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.ratingAmber,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        _RatingChip(rating: participant.rating),
                       ],
                     ),
                     4.h.sizedHeight,
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween ,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          participant.roleKey.tr(),
-                          style: AppTextTheme.bodyXSmall(context).copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textMuted,
+                        Expanded(
+                          child: Text(
+                            participant.role?.name ?? '',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextTheme.bodyXSmall(context).copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textMuted,
+                            ),
                           ),
                         ),
                         10.w.sizedWidth,
+                        // TODO: navigate to create contract screen
                         GestureDetector(
                           onTap: () {},
                           child: DecoratedBox(
                             decoration: BoxDecoration(
-                              color: participant.actionColor,
+                              color: AppColors.primary,
                               borderRadius: BorderRadius.circular(10.r),
                               boxShadow: [
-                                BoxShadow(color: participant.actionColor.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4)),
+                                BoxShadow(color: AppColors.primary.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4)),
                               ],
                             ),
                             child: SizedBox(
                               width: 36.w,
                               height: 36.w,
                               child: Center(
-                                child: FaIcon(participant.actionIcon, size: 14.sp, color: AppColors.white),
+                                child: FaIcon(FontAwesomeIcons.fileSignature, size: 14.sp, color: AppColors.white),
                               ),
                             ),
                           ),
@@ -431,47 +478,272 @@ class _ParticipantCard extends StatelessWidget {
                       spacing: 6.w,
                       runSpacing: 6.h,
                       children: [
-                        DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: participant.sportTag.color.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8.r),
+                        if ((participant.sport?.name ?? '').isNotEmpty)
+                          _Chip(
+                            label: participant.sport!.name!,
+                            color: AppColors.primaryLight,
                           ),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                            child: Text(
-                              participant.sportTag.labelKey.tr(),
-                              style: AppTextTheme.bodyXXSmall(context).copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: participant.sportTag.color,
-                              ),
-                            ),
-                          ),
+                        _Chip(
+                          label: (participant.isAvailable ?? false)
+                              ? LocaleKeys.partnersStatusAvailable.tr()
+                              : LocaleKeys.partnersNotAvailable.tr(),
+                          color: (participant.isAvailable ?? false)
+                              ? AppColors.success
+                              : AppColors.textMuted,
                         ),
-                        DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: AppColors.slate100,
-                            borderRadius: BorderRadius.circular(8.r),
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                            child: Text(
-                              participant.statusKey.tr(),
-                              style: AppTextTheme.bodyXXSmall(context).copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textMuted,
-                              ),
-                            ),
-                          ),
-                        ),
+                        for (final tag in (participant.tags ?? []))
+                          if ((tag.name ?? '').isNotEmpty)
+                            _Chip(label: tag.name!, color: AppColors.textMuted),
                       ],
                     ),
                   ],
                 ),
               ),
-      
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _RatingChip extends StatelessWidget {
+  final num? rating;
+  const _RatingChip({required this.rating});
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.ratingAmberBg,
+        borderRadius: BorderRadius.circular(10.r),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+        child: Row(
+          children: [
+            FaIcon(FontAwesomeIcons.star, size: 11.sp, color: AppColors.ratingAmber),
+            4.w.sizedWidth,
+            Text(
+              '${rating ?? 0}',
+              style: AppTextTheme.bodyXSmall(context).copyWith(
+                fontWeight: FontWeight.w800,
+                color: AppColors.ratingAmber,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  final String label;
+  final Color color;
+  const _Chip({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+        child: Text(
+          label,
+          style: AppTextTheme.bodyXXSmall(context).copyWith(
+            fontWeight: FontWeight.w700,
+            color: color,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── TEAM CARD ──────────────────────────────────────────────────────────────
+class _TeamCard extends StatelessWidget {
+  final ParticipantTeamModel team;
+  final bool joining;
+  const _TeamCard({required this.team, required this.joining});
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(18.r),
+        border: Border.all(color: AppColors.slate200),
+        boxShadow: [
+          BoxShadow(color: AppColors.black.withOpacity(0.02), blurRadius: 15, offset: const Offset(0, 4)),
+        ],
+      ),
+      child: Padding(
+        padding: 15.w.padAll,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16.r),
+              child: CustomNetworkImage(
+                imageUrl: team.logo ?? '',
+                width: 65.w,
+                height: 65.w,
+                fit: BoxFit.cover,
+              ),
+            ),
+            15.w.sizedWidth,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          team.name ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextTheme.bodyLargeSemiBold(context).copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                      ),
+                      _RatingChip(rating: team.rating),
+                    ],
+                  ),
+                  4.h.sizedHeight,
+                  Row(
+                    children: [
+                      FaIcon(FontAwesomeIcons.locationDot, size: 11.sp, color: AppColors.textMuted),
+                      4.w.sizedWidth,
+                      Expanded(
+                        child: Text(
+                          [team.city?.title, team.sport?.title]
+                              .where((e) => (e ?? '').isNotEmpty)
+                              .join(' • '),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextTheme.bodyXSmall(context).copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textMuted,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  8.h.sizedHeight,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _Chip(
+                        label: '${team.membersCount ?? team.members?.length ?? 0} '
+                            '${LocaleKeys.manageTeamStatPlayers.tr()}',
+                        color: AppColors.primaryLight,
+                      ),
+                      _JoinButton(team: team, joining: joining),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _JoinButton extends StatelessWidget {
+  final ParticipantTeamModel team;
+  final bool joining;
+  const _JoinButton({required this.team, required this.joining});
+
+  @override
+  Widget build(BuildContext context) {
+    final joined = team.isJoined;
+    final color = joined ? AppColors.textMuted : AppColors.primary;
+
+    return GestureDetector(
+      onTap: (joined || joining) ? null : () => context.read<PartnersCubit>().joinTeam(team.id ?? 0),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: joined ? AppColors.slate100 : color,
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+        child: SizedBox(
+          width: 36.w,
+          height: 36.w,
+          child: Center(
+            child: joining
+                ? SizedBox(
+                    width: 14.sp,
+                    height: 14.sp,
+                    child: const CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
+                  )
+                : FaIcon(
+                    joined ? FontAwesomeIcons.check : FontAwesomeIcons.userPlus,
+                    size: 14.sp,
+                    color: joined ? AppColors.textMuted : AppColors.white,
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── STATES ────────────────────────────────────────────────────────────────────
+class _ListShimmer extends StatelessWidget {
+  const _ListShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: EdgeInsets.fromLTRB(20.w, 15.h, 20.w, 20.h),
+      children: [
+        for (int i = 0; i < 5; i++)
+          Padding(
+            padding: EdgeInsets.only(bottom: 15.h),
+            child: ShimmerWidget.rectangular(width: double.infinity, height: 110.h),
+          ),
+      ],
+    );
+  }
+}
+
+class _ErrorRetry extends StatelessWidget {
+  final VoidCallback onRetry;
+  const _ErrorRetry({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FaIcon(FontAwesomeIcons.circleExclamation, size: 46.sp, color: AppColors.slate300),
+          10.h.sizedHeight,
+          Text(
+            LocaleKeys.errorGeneric.tr(),
+            style: AppTextTheme.bodyMedium(context)
+                .copyWith(fontWeight: FontWeight.w700, color: AppColors.textMuted),
+          ),
+          6.h.sizedHeight,
+          TextButton(
+            onPressed: onRetry,
+            child: Text(
+              LocaleKeys.tryAgain.tr(),
+              style: AppTextTheme.bodySmallSemiBold(context)
+                  .copyWith(fontWeight: FontWeight.w800, color: AppColors.primary),
+            ),
+          ),
+        ],
       ),
     );
   }

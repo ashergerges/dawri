@@ -775,6 +775,7 @@ class _MatchCard extends StatelessWidget {
             ),
             12.h.sizedHeight,
             DottedLine(
+
               dashLength: 5,
               dashGapLength: 4,
               lineThickness: 1,

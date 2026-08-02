@@ -77,6 +77,22 @@ class Endpoints {
   String get teamsUrl => r'api/app/teams';
   String get championshipRegisterTeamUrl => r'api/app/championships/register-team';
 
+  //participants (partners)
+  String get participantsUrl => r'api/app/participants';
+  String get teamJoinRequestCreateUrl => r'api/app/user/team/join-requests';
+
+  //complete profile (register) — reuse participantTypesUrl / sportsUrl / citiesUrl
+  String get playerPositionsUrl => r'api/lookups/player-positions';
+  String get refereeRolesUrl => r'api/app/referee-roles';
+  String get coachSpecializationsUrl => r'api/app/coach-specializations';
+  String get completeProfileUrl => r'api/app/user/complete-profile';
+
+  //my team (manage team)
+  String get myTeamUrl => r'api/app/user/myteam';
+  String get createTeamUrl => r'api/app/user/team';
+  String get teamJoinRequestRespondUrl => r'api/app/user/team/join-requests/respond';
+  String get teamRemoveMemberUrl => r'api/app/team/remove-member';
+
   //championship control
   String get championshipControlOverviewUrl => r'api/app/championship/control/overview';
   String get championshipApprovedTeamsUrl => r'api/app/championship/approved-participants';

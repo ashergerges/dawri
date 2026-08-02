@@ -68,12 +68,20 @@ import 'features/create_championship/data/repositories/interfaces/i_create_champ
     as _i93;
 import 'features/create_championship/data/repositories/remote/create_championship_repository.dart'
     as _i638;
+import 'features/create_team/data/repositories/interfaces/i_create_team_repository.dart'
+    as _i369;
+import 'features/create_team/data/repositories/remote/create_team_repository.dart'
+    as _i334;
 import 'features/home/data/repositories/interfaces/i_home_repository.dart'
     as _i185;
 import 'features/home/data/repositories/remote/home_repository.dart' as _i975;
 import 'features/login/data/repository/interface/i_login_repository.dart'
     as _i772;
 import 'features/login/data/repository/remote/login_repository.dart' as _i413;
+import 'features/manage_team/data/repositories/interfaces/i_manage_team_repository.dart'
+    as _i778;
+import 'features/manage_team/data/repositories/remote/manage_team_repository.dart'
+    as _i57;
 import 'features/my_championships/data/repositories/interfaces/i_my_championships_repository.dart'
     as _i735;
 import 'features/my_championships/data/repositories/remote/my_championships_repository.dart'
@@ -86,6 +94,10 @@ import 'features/notifications/data/repositories/interfaces/i_notifications_repo
     as _i97;
 import 'features/notifications/data/repositories/remote/notifications_repository.dart'
     as _i192;
+import 'features/partners/data/repositories/interfaces/i_partners_repository.dart'
+    as _i828;
+import 'features/partners/data/repositories/remote/partners_repository.dart'
+    as _i1020;
 import 'features/product_details/data/repositories/interfaces/i_product_details_repository.dart'
     as _i873;
 import 'features/product_details/data/repositories/remote/product_details_repository.dart'
@@ -94,6 +106,10 @@ import 'features/purchase_history/data/repositories/interfaces/i_purchase_histor
     as _i359;
 import 'features/purchase_history/data/repositories/remote/purchase_history_repository.dart'
     as _i72;
+import 'features/register/data/repositories/interfaces/i_register_repository.dart'
+    as _i720;
+import 'features/register/data/repositories/remote/register_repository.dart'
+    as _i423;
 import 'features/reserve/data/repositories/interfaces/i_reserve_repository.dart'
     as _i817;
 import 'features/reserve/data/repositories/remote/reserve_repository.dart'
@@ -174,10 +190,17 @@ _i174.GetIt $initGetIt(
   gh.factory<_i773.ITicketsRepository>(
     () => _i305.TicketsRepository(networkService: gh<_i969.NetworkService>()),
   );
+  gh.factory<_i828.IPartnersRepository>(
+    () => _i1020.PartnersRepository(networkService: gh<_i969.NetworkService>()),
+  );
   gh.factory<_i735.IMyChampionshipsRepository>(
     () => _i730.MyChampionshipsRepository(
       networkService: gh<_i969.NetworkService>(),
     ),
+  );
+  gh.factory<_i369.ICreateTeamRepository>(
+    () =>
+        _i334.CreateTeamRepository(networkService: gh<_i969.NetworkService>()),
   );
   gh.factory<_i185.IHomeRepository>(
     () => _i975.HomeRepository(networkService: gh<_i969.NetworkService>()),
@@ -200,6 +223,9 @@ _i174.GetIt $initGetIt(
     () => _i782.NotificationRepository(
       networkService: gh<_i969.NetworkService>(),
     ),
+  );
+  gh.factory<_i778.IManageTeamRepository>(
+    () => _i57.ManageTeamRepository(networkService: gh<_i969.NetworkService>()),
   );
   gh.factory<_i598.IChampionshipAddTeamRepository>(
     () => _i747.ChampionshipAddTeamRepository(
@@ -242,6 +268,9 @@ _i174.GetIt $initGetIt(
     () => _i307.ChampionshipRegisterRepository(
       networkService: gh<_i969.NetworkService>(),
     ),
+  );
+  gh.factory<_i720.IRegisterRepository>(
+    () => _i423.RegisterRepository(networkService: gh<_i969.NetworkService>()),
   );
   gh.factory<_i1053.IStadiumProfileRepository>(
     () => _i44.StadiumProfileRepository(

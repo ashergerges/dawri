@@ -15,12 +15,14 @@ import '../data/models/invite_player_model.dart';
 
 @RoutePage()
 class InvitePlayerScreen extends StatelessWidget {
-  const InvitePlayerScreen({super.key});
+  const InvitePlayerScreen({super.key, this.invitationLink});
+
+  final String? invitationLink;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => InvitePlayerCubit(),
+      create: (_) => InvitePlayerCubit(invitationLink: invitationLink),
       child: const _InvitePlayerView(),
     );
   }
@@ -43,9 +45,9 @@ class _InvitePlayerView extends StatelessWidget {
                 child: Column(
                   children: [
                     const _ShareCard(),
-                    const _SearchSection(),
-                    15.h.sizedHeight,
-                    const _ScoutedPlayersList(),
+                    // const _SearchSection(),
+                    // 15.h.sizedHeight,
+                    // const _ScoutedPlayersList(),
                     20.h.sizedHeight,
                   ],
                 ),
@@ -171,7 +173,7 @@ class _ShareCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: GestureDetector(
-                          onTap: () {},
+                          onTap: () => context.read<InvitePlayerCubit>().shareWhatsApp(),
                           child: DecoratedBox(
                             decoration: BoxDecoration(
                               color: AppColors.whatsappGreen,

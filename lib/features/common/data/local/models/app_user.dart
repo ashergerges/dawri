@@ -1,3 +1,4 @@
+import 'package:dawri/features/create_championship/data/models/championship_option_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'app_user.g.dart';
@@ -16,6 +17,9 @@ class AppUser {
 
   @JsonKey(name: 'created_at')
   final String? createdAt;
+  @JsonKey(name: 'has_profile')
+  final bool? hasProfile;
+  final bool? haveTeam;
 
   /// Stored locally only.
   @JsonKey(includeFromJson: false, includeToJson: true)
@@ -34,6 +38,8 @@ class AppUser {
     this.profile,
     this.createdAt,
     this.token,
+    this.hasProfile,
+    this.haveTeam,
     this.refreshToken,
   });
 
@@ -47,6 +53,8 @@ class AppUser {
     String? createdAt,
     String? token,
     String? refreshToken,
+    bool? hasProfile,
+    bool? haveTeam,
   }) {
     return AppUser(
       id: id ?? this.id,
@@ -57,6 +65,8 @@ class AppUser {
       profile: profile ?? this.profile,
       createdAt: createdAt ?? this.createdAt,
       token: token ?? this.token,
+      haveTeam: haveTeam ?? this.haveTeam,
+      hasProfile: hasProfile ?? this.hasProfile,
       refreshToken: refreshToken ?? this.refreshToken,
     );
   }
@@ -89,7 +99,7 @@ class Profile {
   final int? cityId;
 
   final String? avatar;
-  final String? type;
+  final SportModel? type;
   final String? title;
   final String? license;
 
