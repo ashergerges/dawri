@@ -79,7 +79,7 @@ ParticipantTeamModel _$ParticipantTeamModelFromJson(
   id: (json['id'] as num?)?.toInt(),
   name: json['name'] as String?,
   logo: json['logo'] as String?,
-  joined: _readJoined(json, 'joined') as bool?,
+  joined: _readJoined(json, 'joinedTeam') as bool?,
   city: json['city'] == null
       ? null
       : CityModel.fromJson(json['city'] as Map<String, dynamic>),
@@ -101,7 +101,7 @@ Map<String, dynamic> _$ParticipantTeamModelToJson(
   'id': instance.id,
   'name': instance.name,
   'logo': instance.logo,
-  'joined': instance.joined,
+  'joinedTeam': instance.joined,
   'city': instance.city,
   'sport': instance.sport,
   'bio': instance.bio,

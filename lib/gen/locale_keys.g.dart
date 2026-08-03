@@ -168,6 +168,8 @@ abstract class  LocaleKeys {
   static const validatorDateRequired = 'validatorDateRequired';
   static const validatorDateRange = 'validatorDateRange';
   static const validatorPrizeNegative = 'validatorPrizeNegative';
+  static const validatorAmountPositive = 'validatorAmountPositive';
+  static const validatorHoursPositive = 'validatorHoursPositive';
   static const createChampionshipSelectDate = 'createChampionshipSelectDate';
   static const createChampionshipDateError = 'createChampionshipDateError';
   static const createChampionshipStartDateError = 'createChampionshipStartDateError';
@@ -450,6 +452,14 @@ abstract class  LocaleKeys {
   static const contractsTabPending = 'contractsTabPending';
   static const contractsTabActive = 'contractsTabActive';
   static const contractsTabHistory = 'contractsTabHistory';
+  static const contractsTabRejected = 'contractsTabRejected';
+  static const contractsStatusPending = 'contractsStatusPending';
+  static const contractsStatusRejected = 'contractsStatusRejected';
+  static const contractsLabelSalaryType = 'contractsLabelSalaryType';
+  static const contractsLabelStartDate = 'contractsLabelStartDate';
+  static const contractsEmptyRejectedTitle = 'contractsEmptyRejectedTitle';
+  static const contractsEmptyRejectedDesc = 'contractsEmptyRejectedDesc';
+  static const contractsRespondSuccess = 'contractsRespondSuccess';
   static const contractsTypePlayerOffer = 'contractsTypePlayerOffer';
   static const contractsTypePersonalCoaching = 'contractsTypePersonalCoaching';
   static const contractsTypeTournamentRefereeing = 'contractsTypeTournamentRefereeing';
@@ -610,6 +620,11 @@ abstract class  LocaleKeys {
   static const purchaseHistoryRecord3Title = 'purchaseHistoryRecord3Title';
   static const purchaseHistoryRecord3Date = 'purchaseHistoryRecord3Date';
   static const createContractTitle = 'createContractTitle';
+  static const createContractTargetLabel = 'createContractTargetLabel';
+  static const createContractSelectTypeError = 'createContractSelectTypeError';
+  static const createContractSelectSalaryTypeError = 'createContractSelectSalaryTypeError';
+  static const createContractStartDateRequired = 'createContractStartDateRequired';
+  static const createContractEndDateRequired = 'createContractEndDateRequired';
   static const createContractRoleBadgeCoach = 'createContractRoleBadgeCoach';
   static const createContractSpecialty = 'createContractSpecialty';
   static const createContractTypeTitle = 'createContractTypeTitle';

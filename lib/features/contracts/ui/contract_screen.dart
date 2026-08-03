@@ -1,6 +1,9 @@
 // lib/features/contracts/ui/contracts_screen.dart
 import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/router/app_router.dart';
+import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
+import 'package:dawri/core/utils/constants/pull_refresh.dart';
+import 'package:dawri/core/utils/helper/fa_icon_mapper.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +15,7 @@ import 'package:dawri/core/utils/constants/app_colors.dart';
 import 'package:dawri/core/utils/constants/app_text_them.dart';
 import 'package:dawri/core/utils/extensions/padding_extensions.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../cubit/contracts_cubit.dart';
 import '../data/models/contracts_model.dart';
@@ -23,7 +27,7 @@ class ContractsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ContractsCubit(),
+      create: (_) => ContractsCubit()..init(),
       child: const _ContractsView(),
     );
   }
@@ -49,7 +53,7 @@ class _ContractsView extends StatelessWidget {
                   children: const [
                     _PendingTab(),
                     _ActiveTab(),
-                    _HistoryTab(),
+                    _RejectedTab(),
                   ],
                 );
               },
@@ -86,11 +90,8 @@ class _SubHeader extends StatelessWidget {
               color: AppColors.textDark,
             ),
           ),
-          _CircleIconButton(
-            icon: FontAwesomeIcons.fileSignature,
-            background: Colors.transparent,
-            onTap: () {},
-          ),
+          // Keeps the title centred now that the create-contract action is gone.
+          SizedBox(width: 40.w, height: 40.w),
         ],
       ),
     );
@@ -149,26 +150,35 @@ class _DashboardSummary extends StatelessWidget {
       ),
       child: Padding(
         padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 15.h),
-        child: Row(
-          children: [
-            Expanded(
-              child: _SummaryCard(
-                titleKey: LocaleKeys.contractsActiveContracts,
-                value: '${ContractsMockData.activeCount}',
-                trailingIcon: FontAwesomeIcons.fileContract,
-                isHighlighted: true,
-              ),
-            ),
-            15.w.sizedWidth,
-            Expanded(
-              child: _SummaryCard(
-                titleKey: LocaleKeys.contractsPendingRequests,
-                value: '${ContractsMockData.pendingCount}',
-                trailingIcon: FontAwesomeIcons.clockRotateLeft,
-                trailingIconColor: AppColors.warning600,
-              ),
-            ),
-          ],
+        child: BlocBuilder<ContractsCubit, ContractsState>(
+          buildWhen: (p, c) => p.summary != c.summary || p.summaryStatus != c.summaryStatus,
+          builder: (context, state) {
+            final isLoading = state.isLoadingSummary && state.summary == null;
+
+            return Row(
+              children: [
+                Expanded(
+                  child: _SummaryCard(
+                    titleKey: LocaleKeys.contractsActiveContracts,
+                    value: '${state.activeCount}',
+                    isLoading: isLoading,
+                    trailingIcon: FontAwesomeIcons.fileContract,
+                    isHighlighted: true,
+                  ),
+                ),
+                15.w.sizedWidth,
+                Expanded(
+                  child: _SummaryCard(
+                    titleKey: LocaleKeys.contractsPendingRequests,
+                    value: '${state.pendingCount}',
+                    isLoading: isLoading,
+                    trailingIcon: FontAwesomeIcons.clockRotateLeft,
+                    trailingIconColor: AppColors.warning600,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -178,6 +188,7 @@ class _DashboardSummary extends StatelessWidget {
 class _SummaryCard extends StatelessWidget {
   final String titleKey;
   final String value;
+  final bool isLoading;
   final IconData trailingIcon;
   final Color? trailingIconColor;
   final bool isHighlighted;
@@ -186,6 +197,7 @@ class _SummaryCard extends StatelessWidget {
     required this.titleKey,
     required this.value,
     required this.trailingIcon,
+    this.isLoading = false,
     this.trailingIconColor,
     this.isHighlighted = false,
   });
@@ -230,13 +242,16 @@ class _SummaryCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  value,
-                  style: AppTextTheme.headingSmall(context).copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: isHighlighted ? AppColors.white : AppColors.textDark,
+                if (isLoading)
+                  ShimmerWidget.rectangular(width: 30.w, height: 24.h)
+                else
+                  Text(
+                    value,
+                    style: AppTextTheme.headingSmall(context).copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: isHighlighted ? AppColors.white : AppColors.textDark,
+                    ),
                   ),
-                ),
                 FaIcon(
                   trailingIcon,
                   size: 25.sp,
@@ -261,7 +276,7 @@ class _CleanTabs extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ContractsCubit, ContractsState>(
       buildWhen: (p, c) =>
-      p.selectedTabIndex != c.selectedTabIndex || p.pendingContracts != c.pendingContracts,
+      p.selectedTabIndex != c.selectedTabIndex || p.summary != c.summary,
       builder: (context, state) {
         return Padding(
           padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 0),
@@ -269,7 +284,7 @@ class _CleanTabs extends StatelessWidget {
             children: [
               _TabItem(
                 label: LocaleKeys.contractsTabPending.tr(),
-                badgeCount: state.pendingContracts.length,
+                badgeCount: state.pendingCount,
                 isActive: state.selectedTabIndex == 0,
                 onTap: () => context.read<ContractsCubit>().selectTab(0),
               ),
@@ -281,7 +296,7 @@ class _CleanTabs extends StatelessWidget {
               ),
               20.w.sizedWidth,
               _TabItem(
-                label: LocaleKeys.contractsTabHistory.tr(),
+                label: LocaleKeys.contractsTabRejected.tr(),
                 isActive: state.selectedTabIndex == 2,
                 onTap: () => context.read<ContractsCubit>().selectTab(2),
               ),
@@ -358,155 +373,208 @@ class _TabItem extends StatelessWidget {
     );
   }
 }
-// ─── PENDING TAB ────────────────────────────────────────────────────────────
+
+// ─── PENDING TAB (status = 1) ───────────────────────────────────────────────
 class _PendingTab extends StatelessWidget {
   const _PendingTab();
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<ContractsCubit>();
+
     return BlocBuilder<ContractsCubit, ContractsState>(
-      buildWhen: (p, c) => p.pendingContracts != c.pendingContracts,
+      buildWhen: (p, c) =>
+          p.pendingContracts != c.pendingContracts ||
+          p.pendingStatus != c.pendingStatus ||
+          p.responseStatus != c.responseStatus ||
+          p.respondingContractId != c.respondingContractId,
       builder: (context, state) {
-        if (state.pendingContracts.isEmpty) {
-          return _EmptyState(
-            icon: FontAwesomeIcons.fileCircleCheck,
-            titleKey: LocaleKeys.contractsEmptyPendingTitle,
-            descKey: LocaleKeys.contractsEmptyPendingDesc,
-          );
+        final items = state.pendingContracts;
+
+        if (state.pendingStatus is ContractsStatusLoading && items.isEmpty) {
+          return const _CardsShimmer();
         }
-        return SingleChildScrollView(
-          child: Padding(
-            padding: 20.w.padAll,
-            child: Column(
-              children: state.pendingContracts
-                  .map((c) => Padding(
-                padding: EdgeInsets.only(bottom: 15.h),
-                child: _PendingContractCard(contract: c),
-              ))
-                  .toList(),
-            ),
+        if (state.pendingStatus is ContractsStatusError && items.isEmpty) {
+          return _RetryState(onRetry: cubit.getPending);
+        }
+
+        return SmartRefresher(
+          controller: cubit.pendingRefreshController,
+          enablePullUp: true,
+          enablePullDown: true,
+          onRefresh: () => cubit.getPending(),
+          onLoading: () => cubit.loadMorePending(),
+          header: PullRefresh.pullRefresh,
+          footer: const ClassicFooter(
+            loadStyle: LoadStyle.ShowAlways,
+            completeDuration: Duration(milliseconds: 500),
           ),
+          child: items.isEmpty
+              ? _EmptyState(
+                  icon: FontAwesomeIcons.fileCircleCheck,
+                  titleKey: LocaleKeys.contractsEmptyPendingTitle,
+                  descKey: LocaleKeys.contractsEmptyPendingDesc,
+                )
+              : ListView(
+                  padding: 20.w.padAll,
+                  children: [
+                    for (final contract in items)
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 15.h),
+                        child: _ContractCard(
+                          contract: contract,
+                          showActions: true,
+                          isResponding: state.isResponding,
+                          isThisResponding: state.respondingContractId == contract.id,
+                        ),
+                      ),
+                  ],
+                ),
         );
       },
     );
   }
 }
 
-class _PendingContractCard extends StatelessWidget {
-  final PendingContractModel contract;
-  const _PendingContractCard({required this.contract});
-
-  @override
-  Widget build(BuildContext context) {
-    return _ContractCardShell(
-      header: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12.r),
-            child: CustomNetworkImage(
-              imageUrl: contract.partyLogoUrl,
-              width: 45.w,
-              height: 45.w,
-              fit: BoxFit.cover,
-            ),
-          ),
-          12.w.sizedWidth,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _TypeBadge(labelKey: contract.typeKey, color: AppColors.primaryLight, bg: AppColors.secondary50),
-                4.h.sizedHeight,
-                Text(
-                  contract.partyName,
-                  style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.textDark,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      body: _DetailsGrid(details: contract.details),
-      footer: Row(
-        children: [
-          Expanded(
-            flex: 1,
-            child: _ActionButton(
-              labelKey: LocaleKeys.contractsAcceptOffer,
-              icon: FontAwesomeIcons.check,
-              bg: AppColors.primary,
-              fg: AppColors.white,
-              onTap: () => context.read<ContractsCubit>().acceptOffer(contract.id),
-            ),
-          ),
-          10.w.sizedWidth,
-          Expanded(
-            child: _ActionButton(
-              labelKey: LocaleKeys.contractsReject,
-              icon: FontAwesomeIcons.xmark,
-              bg: AppColors.contractsReject,
-              fg: AppColors.danger,
-              onTap: () => context.read<ContractsCubit>().rejectOffer(contract.id),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── ACTIVE TAB ─────────────────────────────────────────────────────────────
+// ─── ACTIVE TAB (status = 2) ────────────────────────────────────────────────
 class _ActiveTab extends StatelessWidget {
   const _ActiveTab();
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<ContractsCubit>();
+
     return BlocBuilder<ContractsCubit, ContractsState>(
-      buildWhen: (p, c) => p.activeContracts != c.activeContracts,
+      buildWhen: (p, c) =>
+          p.activeContracts != c.activeContracts || p.activeStatus != c.activeStatus,
       builder: (context, state) {
-        if (state.activeContracts.isEmpty) {
-          return _EmptyState(
-            icon: FontAwesomeIcons.fileContract,
-            titleKey: LocaleKeys.contractsEmptyActiveTitle,
-            descKey: LocaleKeys.contractsEmptyActiveDesc,
-          );
+        final items = state.activeContracts;
+
+        if (state.activeStatus is ContractsStatusLoading && items.isEmpty) {
+          return const _CardsShimmer();
         }
-        return SingleChildScrollView(
-          child: Padding(
-            padding: 20.w.padAll,
-            child: Column(
-              children: state.activeContracts
-                  .map((c) => Padding(
-                padding: EdgeInsets.only(bottom: 15.h),
-                child: _ActiveContractCard(contract: c),
-              ))
-                  .toList(),
-            ),
+        if (state.activeStatus is ContractsStatusError && items.isEmpty) {
+          return _RetryState(onRetry: cubit.getActive);
+        }
+
+        return SmartRefresher(
+          controller: cubit.activeRefreshController,
+          enablePullUp: true,
+          enablePullDown: true,
+          onRefresh: () => cubit.getActive(),
+          onLoading: () => cubit.loadMoreActive(),
+          header: PullRefresh.pullRefresh,
+          footer: const ClassicFooter(
+            loadStyle: LoadStyle.ShowAlways,
+            completeDuration: Duration(milliseconds: 500),
           ),
+          child: items.isEmpty
+              ? _EmptyState(
+                  icon: FontAwesomeIcons.fileContract,
+                  titleKey: LocaleKeys.contractsEmptyActiveTitle,
+                  descKey: LocaleKeys.contractsEmptyActiveDesc,
+                )
+              : ListView(
+                  padding: 20.w.padAll,
+                  children: [
+                    for (final contract in items)
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 15.h),
+                        child: _ContractCard(contract: contract),
+                      ),
+                  ],
+                ),
         );
       },
     );
   }
 }
 
-class _ActiveContractCard extends StatelessWidget {
-  final ActiveContractModel contract;
-  const _ActiveContractCard({required this.contract});
+// ─── REJECTED TAB (status = 3) ──────────────────────────────────────────────
+class _RejectedTab extends StatelessWidget {
+  const _RejectedTab();
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<ContractsCubit>();
+
+    return BlocBuilder<ContractsCubit, ContractsState>(
+      buildWhen: (p, c) =>
+          p.rejectedContracts != c.rejectedContracts || p.rejectedStatus != c.rejectedStatus,
+      builder: (context, state) {
+        final items = state.rejectedContracts;
+
+        if (state.rejectedStatus is ContractsStatusLoading && items.isEmpty) {
+          return const _CardsShimmer();
+        }
+        if (state.rejectedStatus is ContractsStatusError && items.isEmpty) {
+          return _RetryState(onRetry: cubit.getRejected);
+        }
+
+        return SmartRefresher(
+          controller: cubit.rejectedRefreshController,
+          enablePullUp: true,
+          enablePullDown: true,
+          onRefresh: () => cubit.getRejected(),
+          onLoading: () => cubit.loadMoreRejected(),
+          header: PullRefresh.pullRefresh,
+          footer: const ClassicFooter(
+            loadStyle: LoadStyle.ShowAlways,
+            completeDuration: Duration(milliseconds: 500),
+          ),
+          child: items.isEmpty
+              ? _EmptyState(
+                  icon: FontAwesomeIcons.clockRotateLeft,
+                  titleKey: LocaleKeys.contractsEmptyRejectedTitle,
+                  descKey: LocaleKeys.contractsEmptyRejectedDesc,
+                )
+              : ListView(
+                  padding: 20.w.padAll,
+                  children: [
+                    for (final contract in items)
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 15.h),
+                        child: Opacity(
+                          opacity: 0.7,
+                          child: _ContractCard(contract: contract),
+                        ),
+                      ),
+                  ],
+                ),
+        );
+      },
+    );
+  }
+}
+
+// ─── CONTRACT CARD ──────────────────────────────────────────────────────────
+class _ContractCard extends StatelessWidget {
+  final ContractModel contract;
+  final bool showActions;
+  final bool isResponding;
+  final bool isThisResponding;
+
+  const _ContractCard({
+    required this.contract,
+    this.showActions = false,
+    this.isResponding = false,
+    this.isThisResponding = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final status = _statusStyle(contract.status);
+    final logo = contract.team?.image ?? '';
+
     return _ContractCardShell(
       header: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (contract.partyLogoUrl != null)
+          if (logo.isNotEmpty)
             ClipRRect(
               borderRadius: BorderRadius.circular(12.r),
               child: CustomNetworkImage(
-                imageUrl: contract.partyLogoUrl!,
+                imageUrl: logo,
                 width: 45.w,
                 height: 45.w,
                 fit: BoxFit.cover,
@@ -515,14 +583,19 @@ class _ActiveContractCard extends StatelessWidget {
           else
             DecoratedBox(
               decoration: BoxDecoration(
-                color: contract.fallbackIconBg ?? AppColors.slate800,
+                color: AppColors.slate800,
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: SizedBox(
                 width: 45.w,
                 height: 45.w,
                 child: Center(
-                  child: FaIcon(contract.fallbackIcon, size: 18.sp, color: AppColors.white),
+                  child: FaIcon(
+                    // contractType.icon may be null → safe fallback.
+                    contract.contractType?.icon.toFaIcon(),
+                    size: 18.sp,
+                    color: AppColors.white,
+                  ),
                 ),
               ),
             ),
@@ -531,153 +604,198 @@ class _ActiveContractCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _TypeBadge(labelKey: contract.typeKey, color: contract.typeColor, bg: contract.typeBg),
-                16.verticalSpace,
+                if ((contract.contractType?.name ?? '').isNotEmpty)
+                  _TypeBadge(
+                    label: contract.contractType!.name!,
+                    color: AppColors.primaryLight,
+                    bg: AppColors.secondary50,
+                  ),
+                6.h.sizedHeight,
                 Text(
-                  contract.partyName,
+                  contract.team?.name ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: AppTextTheme.bodySmallSemiBold(context).copyWith(
                     fontWeight: FontWeight.w900,
                     color: AppColors.textDark,
                   ),
                 ),
+                if ((contract.contractNumber ?? '').isNotEmpty) ...[
+                  2.h.sizedHeight,
+                  Text(
+                    contract.contractNumber!,
+                    style: AppTextTheme.bodyXXSmall(context).copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
+          8.w.sizedWidth,
           DecoratedBox(
             decoration: BoxDecoration(
-              color: AppColors.contractsStatusActive,
+              color: status.bg,
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
               child: Text(
-                LocaleKeys.contractsStatusActive.tr(),
+                status.labelKey.tr(),
                 style: AppTextTheme.bodyXXSmall(context).copyWith(
                   fontWeight: FontWeight.w800,
-                  color: AppColors.success,
+                  color: status.fg,
                 ),
               ),
             ),
           ),
         ],
       ),
-      body: _DetailsGrid(details: contract.details),
-      footer: Row(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 5,
-            child: _ActionButton(
-              labelKey: LocaleKeys.contractsViewDetails,
-              icon: FontAwesomeIcons.fileInvoice,
-              bg: AppColors.slate100,
-              fg: AppColors.textDark,
-              onTap: () {
-                ContractDetailsRoute().push(context);
-              },
-              flex: contract.hasChat ? 1 : 0,
-              fillWidth: !contract.hasChat,
-            ),
-          ),
-          if (contract.hasChat) ...[
-            10.w.sizedWidth,
-            Expanded(
-              flex: 2,
-              child: _ActionButton(
-                icon: FontAwesomeIcons.commentDots,
-                bg: AppColors.chat,
-                fg: AppColors.blue500,
-                onTap: () {
-                  PartnerChatRoute().push(context);
-                },
-                iconOnly: true,
+          _DetailsGrid(details: _details()),
+          if ((contract.notes ?? '').trim().isNotEmpty) ...[
+            8.h.sizedHeight,
+            Text(
+              contract.notes!.trim(),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextTheme.bodyXXSmall(context).copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppColors.textMuted,
               ),
             ),
           ],
         ],
       ),
+      footer: showActions ? _pendingActions(context) : _viewDetailsAction(context),
     );
   }
-}
 
-// ─── HISTORY TAB ────────────────────────────────────────────────────────────
-class _HistoryTab extends StatelessWidget {
-  const _HistoryTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<ContractsCubit, ContractsState>(
-      buildWhen: (p, c) => p.historyContracts != c.historyContracts,
-      builder: (context, state) {
-        if (state.historyContracts.isEmpty) {
-          return _EmptyState(
-            icon: FontAwesomeIcons.clockRotateLeft,
-            titleKey: LocaleKeys.contractsEmptyHistoryTitle,
-            descKey: LocaleKeys.contractsEmptyHistoryDesc,
-          );
-        }
-        return SingleChildScrollView(
-          child: Padding(
-            padding: 20.w.padAll,
-            child: Column(
-              children: state.historyContracts
-                  .map((c) => Padding(
-                padding: EdgeInsets.only(bottom: 15.h),
-                child: Opacity(opacity: 0.7, child: _HistoryContractCard(contract: c)),
-              ))
-                  .toList(),
-            ),
+  List<ContractDetailItem> _details() => [
+        ContractDetailItem(
+          labelKey: LocaleKeys.contractsLabelValue,
+          value: '${_formatAmount(contract.amount)} ${LocaleKeys.createContractCurrency.tr()}',
+          icon: FontAwesomeIcons.sackDollar,
+          valueColor: AppColors.primary,
+        ),
+        if ((contract.salaryType?.name ?? '').isNotEmpty)
+          ContractDetailItem(
+            labelKey: LocaleKeys.contractsLabelSalaryType,
+            value: contract.salaryType!.name!,
+            // "fa-coins" → FontAwesomeIcons.coins (falls back when unknown).
+            icon: contract.salaryType?.icon.toFaIcon(fallback: FontAwesomeIcons.coins),
           ),
+        ContractDetailItem(
+          labelKey: LocaleKeys.contractsLabelStartDate,
+          value: contract.startDate ?? '-',
+          icon: FontAwesomeIcons.calendar,
+        ),
+        ContractDetailItem(
+          labelKey: LocaleKeys.contractsLabelEndDate,
+          value: contract.endDate ?? '-',
+          icon: FontAwesomeIcons.calendarCheck,
+        ),
+        ContractDetailItem(
+          labelKey: LocaleKeys.contractsLabelTotalHours,
+          value: '${contract.totalHours ?? 0}',
+          icon: FontAwesomeIcons.clock,
+        ),
+        ContractDetailItem(
+          labelKey: LocaleKeys.contractsLabelOfferDate,
+          value: contract.createdAt ?? '-',
+        ),
+        if (contract.rating != null)
+          ContractDetailItem(
+            labelKey: LocaleKeys.contractsLabelYourRating,
+            value: '${contract.rating}',
+            icon: FontAwesomeIcons.solidStar,
+            valueColor: AppColors.warning600,
+          ),
+      ];
+
+  Widget _pendingActions(BuildContext context) {
+    final cubit = context.read<ContractsCubit>();
+    final contractId = contract.id;
+
+    return Row(
+      children: [
+        Expanded(
+          child: _ActionButton(
+            labelKey: LocaleKeys.contractsAcceptOffer,
+            icon: FontAwesomeIcons.check,
+            bg: AppColors.primary,
+            fg: AppColors.white,
+            isLoading: isThisResponding,
+            onTap: (isResponding || contractId == null)
+                ? null
+                : () => cubit.acceptContract(contractId),
+          ),
+        ),
+        10.w.sizedWidth,
+        Expanded(
+          child: _ActionButton(
+            labelKey: LocaleKeys.contractsReject,
+            icon: FontAwesomeIcons.xmark,
+            bg: AppColors.contractsReject,
+            fg: AppColors.danger,
+            onTap: (isResponding || contractId == null)
+                ? null
+                : () => cubit.rejectContract(contractId),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _viewDetailsAction(BuildContext context) {
+    return _ActionButton(
+      labelKey: LocaleKeys.contractsViewDetails,
+      icon: FontAwesomeIcons.fileInvoice,
+      bg: AppColors.slate100,
+      fg: AppColors.textDark,
+      fillWidth: true,
+      onTap: () => ContractDetailsRoute().push(context),
+    );
+  }
+
+  /// Chip colours/label per API status id.
+  ({String labelKey, Color fg, Color bg}) _statusStyle(int? status) {
+    switch (status) {
+      case ContractStatusId.active:
+        return (
+          labelKey: LocaleKeys.contractsStatusActive,
+          fg: AppColors.success,
+          bg: AppColors.contractsStatusActive,
         );
-      },
-    );
+      case ContractStatusId.rejected:
+        return (
+          labelKey: LocaleKeys.contractsStatusRejected,
+          fg: AppColors.danger,
+          bg: AppColors.contractsReject,
+        );
+      default:
+        return (
+          labelKey: LocaleKeys.contractsStatusPending,
+          fg: AppColors.warning600,
+          bg: AppColors.warningLight,
+        );
+    }
   }
 }
 
-class _HistoryContractCard extends StatelessWidget {
-  final HistoryContractModel contract;
-  const _HistoryContractCard({required this.contract});
-
-  @override
-  Widget build(BuildContext context) {
-    return _ContractCardShell(
-      header: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12.r),
-            child: CustomNetworkImage(
-              imageUrl: contract.partyLogoUrl,
-              width: 45.w,
-              height: 45.w,
-              fit: BoxFit.cover,
-            ),
-          ),
-          12.w.sizedWidth,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _TypeBadge(
-                  labelKey: LocaleKeys.contractsStatusExpired,
-                  color: AppColors.textMuted,
-                  bg: AppColors.slate100,
-                ),
-                4.h.sizedHeight,
-                Text(
-                  contract.partyName,
-                  style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.textDark,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      body: _DetailsGrid(details: contract.details),
-      footer: null,
-    );
-  }
+/// `15000` → `15,000` (kept dependency-free on purpose).
+String _formatAmount(num? amount) {
+  if (amount == null) return '0';
+  final normalized = amount % 1 == 0 ? amount.toInt().toString() : amount.toString();
+  final parts = normalized.split('.');
+  final whole = parts.first.replaceAllMapped(
+    RegExp(r'(\d)(?=(\d{3})+$)'),
+    (m) => '${m[1]},',
+  );
+  return parts.length > 1 ? '$whole.${parts[1]}' : whole;
 }
 
 // ─── SHARED WIDGETS ─────────────────────────────────────────────────────────
@@ -729,11 +847,11 @@ class _ContractCardShell extends StatelessWidget {
 }
 
 class _TypeBadge extends StatelessWidget {
-  final String labelKey;
+  final String label;
   final Color color;
   final Color bg;
 
-  const _TypeBadge({required this.labelKey, required this.color, required this.bg});
+  const _TypeBadge({required this.label, required this.color, required this.bg});
 
   @override
   Widget build(BuildContext context) {
@@ -742,7 +860,7 @@ class _TypeBadge extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 3.h),
         child: Text(
-          labelKey.tr(),
+          label,
           style: AppTextTheme.bodyXXSmall(context).copyWith(
             fontWeight: FontWeight.w700,
             color: color,
@@ -766,6 +884,7 @@ class _DetailsGrid extends StatelessWidget {
       mainAxisSpacing: 12.h,
       crossAxisSpacing: 10.w,
       childAspectRatio: 3.0,
+      padding: EdgeInsets.only(top: 12.h),
       children: details
           .map((d) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -809,10 +928,12 @@ class _ActionButton extends StatelessWidget {
   final IconData icon;
   final Color bg;
   final Color fg;
-  final VoidCallback onTap;
-  final int flex;
+
+  /// `null` disables the button (used while a response is in flight).
+  final VoidCallback? onTap;
   final bool fillWidth;
   final bool iconOnly;
+  final bool isLoading;
 
   const _ActionButton({
     this.labelKey,
@@ -820,41 +941,105 @@ class _ActionButton extends StatelessWidget {
     required this.bg,
     required this.fg,
     required this.onTap,
-    this.flex = 1,
     this.fillWidth = false,
     this.iconOnly = false,
+    this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDisabled = onTap == null;
+
     final content = GestureDetector(
       onTap: onTap,
       child: DecoratedBox(
-        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(12.r)),
+        decoration: BoxDecoration(
+          color: isDisabled ? bg.withOpacity(0.5) : bg,
+          borderRadius: BorderRadius.circular(12.r),
+        ),
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 11.h, horizontal: iconOnly ? 14.w : 0),
-          child: iconOnly
-              ? Center(child: FaIcon(icon, size: 15.sp, color: fg))
-              : Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              FaIcon(icon, size: 13.sp, color: fg),
-              8.w.sizedWidth,
-              Text(
-                labelKey!.tr(),
-                style: AppTextTheme.bodyXSmall(context).copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: fg,
-                ),
-              ),
-            ],
-          ),
+          child: isLoading
+              ? Center(
+                  child: SizedBox(
+                    width: 15.sp,
+                    height: 15.sp,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: fg),
+                  ),
+                )
+              : iconOnly
+                  ? Center(child: FaIcon(icon, size: 15.sp, color: fg))
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FaIcon(icon, size: 13.sp, color: fg),
+                        8.w.sizedWidth,
+                        Text(
+                          labelKey!.tr(),
+                          style: AppTextTheme.bodyXSmall(context).copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: fg,
+                          ),
+                        ),
+                      ],
+                    ),
         ),
       ),
     );
 
     if (fillWidth) return SizedBox(width: double.infinity, child: content);
     return content;
+  }
+}
+
+// ─── STATES ─────────────────────────────────────────────────────────────────
+class _CardsShimmer extends StatelessWidget {
+  const _CardsShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: 20.w.padAll,
+      children: [
+        for (int i = 0; i < 4; i++)
+          Padding(
+            padding: EdgeInsets.only(bottom: 15.h),
+            child: ShimmerWidget.rectangular(width: double.infinity, height: 190.h),
+          ),
+      ],
+    );
+  }
+}
+
+class _RetryState extends StatelessWidget {
+  final VoidCallback onRetry;
+  const _RetryState({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FaIcon(FontAwesomeIcons.circleExclamation, size: 46.sp, color: AppColors.slate300),
+          10.h.sizedHeight,
+          Text(
+            LocaleKeys.errorGeneric.tr(),
+            style: AppTextTheme.bodyMedium(context)
+                .copyWith(fontWeight: FontWeight.w700, color: AppColors.textMuted),
+          ),
+          6.h.sizedHeight,
+          TextButton(
+            onPressed: onRetry,
+            child: Text(
+              LocaleKeys.tryAgain.tr(),
+              style: AppTextTheme.bodySmallSemiBold(context)
+                  .copyWith(fontWeight: FontWeight.w800, color: AppColors.primary),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -867,30 +1052,35 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: 30.w.padAll,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FaIcon(icon, size: 60.sp, color: AppColors.slate200),
-            16.h.sizedHeight,
-            Text(
-              titleKey.tr(),
-              style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
-                fontWeight: FontWeight.w800,
-                color: AppColors.textDark,
-              ),
+    return ListView(
+      children: [
+        SizedBox(height: 80.h),
+        Center(
+          child: Padding(
+            padding: 30.w.padAll,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FaIcon(icon, size: 60.sp, color: AppColors.slate200),
+                16.h.sizedHeight,
+                Text(
+                  titleKey.tr(),
+                  style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textDark,
+                  ),
+                ),
+                6.h.sizedHeight,
+                Text(
+                  descKey.tr(),
+                  style: AppTextTheme.bodySmall(context).copyWith(color: AppColors.textMuted),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
-            6.h.sizedHeight,
-            Text(
-              descKey.tr(),
-              style: AppTextTheme.bodySmall(context).copyWith(color: AppColors.textMuted),
-              textAlign: TextAlign.center,
-            ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

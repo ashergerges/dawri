@@ -391,7 +391,11 @@ class _IndividualCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OnTap(
-      onTap: () => PartnerDetailsRoute().push(context),
+      onTap: () => PartnerDetailsRoute(
+        userId: participant.id ?? 0,
+        name: participant.name ?? '',
+        avatar: participant.avatar,
+      ).push(context),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -451,9 +455,14 @@ class _IndividualCard extends StatelessWidget {
                           ),
                         ),
                         10.w.sizedWidth,
-                        // TODO: navigate to create contract screen
-                        GestureDetector(
-                          onTap: () {},
+                        if((participant.isAvailable ?? false))GestureDetector(
+                          onTap: () {
+                            CreateContractRoute(
+                              userId: participant.id ?? 0,
+                              name: participant.name ?? '',
+                              avatar: participant.avatar,
+                            ).push(context);
+                          },
                           child: DecoratedBox(
                             decoration: BoxDecoration(
                               color: AppColors.primary,

@@ -79,7 +79,14 @@ class RegisterCubit extends Cubit<RegisterState> {
             dynamicStatus: const RegisterStatus.success(), coachSpecs: r.asValue!.value));
         break;
       default:
-        final r = await _repository.getPlayerPositions();
+        // Player positions are scoped to the selected sport.
+        final sportId = state.sportId;
+        if (sportId == null) {
+          emit(state.copyWith(
+              dynamicStatus: const RegisterStatus.initial(), positions: const []));
+          return;
+        }
+        final r = await _repository.getPlayerPositions(sportId: sportId);
         if (r.isError) {
           emit(state.copyWith(dynamicStatus: const RegisterStatus.error()));
           return;
@@ -95,7 +102,19 @@ class RegisterCubit extends Cubit<RegisterState> {
   void updateBirthDate(String value) =>
       emit(state.copyWith(birthDate: value, birthDateError: null));
   void selectCity(int value) => emit(state.copyWith(cityId: value, cityError: null));
-  void selectSport(int value) => emit(state.copyWith(sportId: value, sportError: null));
+  void selectSport(int value) {
+    if (state.sportId == value) {
+      emit(state.copyWith(sportError: null));
+      return;
+    }
+    emit(state.copyWith(sportId: value, sportError: null));
+
+    // Player positions depend on the sport — reload them (and drop the stale pick).
+    if (state.typeId != 2 && state.typeId != 3) {
+      emit(state.copyWith(dynamicId: null, dynamicError: null));
+      loadDynamic();
+    }
+  }
   void selectDynamic(int value) =>
       emit(state.copyWith(dynamicId: value, dynamicError: null));
 

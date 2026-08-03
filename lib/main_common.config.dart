@@ -60,6 +60,10 @@ import 'features/common/data/local/repositories/token_repository.dart' as _i723;
 import 'features/common/data/repositories/interfaces/i_main_repository.dart'
     as _i967;
 import 'features/common/data/repositories/remote/main_repository.dart' as _i210;
+import 'features/contracts/data/repositories/interfaces/i_contracts_repository.dart'
+    as _i568;
+import 'features/contracts/data/repositories/remote/contracts_repository.dart'
+    as _i144;
 import 'features/create_challenge/data/repositories/interfaces/i_challenge_repository.dart'
     as _i1022;
 import 'features/create_challenge/data/repositories/remote/challenge_repository.dart'
@@ -68,6 +72,10 @@ import 'features/create_championship/data/repositories/interfaces/i_create_champ
     as _i93;
 import 'features/create_championship/data/repositories/remote/create_championship_repository.dart'
     as _i638;
+import 'features/create_contract/data/repositories/interfaces/i_create_contract_repository.dart'
+    as _i1001;
+import 'features/create_contract/data/repositories/remote/create_contract_repository.dart'
+    as _i920;
 import 'features/create_team/data/repositories/interfaces/i_create_team_repository.dart'
     as _i369;
 import 'features/create_team/data/repositories/remote/create_team_repository.dart'
@@ -258,6 +266,11 @@ _i174.GetIt $initGetIt(
       networkService: gh<_i969.NetworkService>(),
     ),
   );
+  gh.factory<_i1001.ICreateContractRepository>(
+    () => _i920.CreateContractRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
+  );
   gh.factory<_i817.IReserveRepository>(
     () => _i124.ReserveRepository(networkService: gh<_i969.NetworkService>()),
   );
@@ -279,6 +292,9 @@ _i174.GetIt $initGetIt(
   );
   gh.factory<_i772.IAuthRepo>(
     () => _i413.AuthRepo(networkService: gh<_i969.NetworkService>()),
+  );
+  gh.factory<_i568.IContractsRepository>(
+    () => _i144.ContractsRepository(networkService: gh<_i969.NetworkService>()),
   );
   gh.singleton<_i402.NotificationService>(
     () => _i402.NotificationService(

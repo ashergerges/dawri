@@ -11,7 +11,7 @@ abstract class IRegisterRepository {
 
   Future<Result<List<CityModel>>> getCities();
 
-  Future<Result<List<PlayerPositionModel>>> getPlayerPositions();
+  Future<Result<List<PlayerPositionModel>>> getPlayerPositions({required int sportId});
 
   Future<Result<List<RefereeRoleModel>>> getRefereeRoles();
 

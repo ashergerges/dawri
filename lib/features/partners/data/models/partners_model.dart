@@ -63,8 +63,10 @@ class ParticipantIndividualModel {
   Map<String, dynamic> toJson() => _$ParticipantIndividualModelToJson(this);
 }
 
-// The API sometimes returns the key as `joined ` (trailing space) — fall back.
-Object? _readJoined(Map json, String key) => json['joined'] ?? json['joined '];
+// The API sends `joinedTeam`; older responses used `joined` (sometimes with a
+// trailing space) — fall back.
+Object? _readJoined(Map json, String key) =>
+    json['joinedTeam'] ?? json['joined'] ?? json['joined '];
 
 // ─── Team participant (type 5) ────────────────────────────────────────────────
 @JsonSerializable()
@@ -72,7 +74,7 @@ class ParticipantTeamModel {
   final int? id;
   final String? name;
   final String? logo;
-  @JsonKey(name: 'joined', readValue: _readJoined)
+  @JsonKey(name: 'joinedTeam', readValue: _readJoined)
   final bool? joined;
   final CityModel? city;
   final SportModel? sport;

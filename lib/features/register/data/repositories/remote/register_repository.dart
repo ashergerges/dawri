@@ -53,15 +53,19 @@ class RegisterRepository implements IRegisterRepository {
   }
 
   @override
-  Future<Result<List<PlayerPositionModel>>> getPlayerPositions() async {
-    // final response =
-    //     await networkService.getAsync(url: AppStrings.urls.playerPositionsUrl);
-    // if (response.isError) return Result.error(response.asError!.error);
-    //
-    // final list = (_list(response.asValue!.value.data['data']))
-    //     .map((e) => PlayerPositionModel.fromJson(Map<String, dynamic>.from(e)))
-    //     .toList();
-    return Result.value([]);
+  Future<Result<List<PlayerPositionModel>>> getPlayerPositions({
+    required int sportId,
+  }) async {
+    final response = await networkService.getAsync(
+      url: AppStrings.urls.playerPositionsUrl,
+      queryParameters: {'sport_id': sportId},
+    );
+    if (response.isError) return Result.error(response.asError!.error);
+
+    final list = (_list(response.asValue!.value.data['data']))
+        .map((e) => PlayerPositionModel.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
+    return Result.value(list);
   }
 
   @override

@@ -93,6 +93,44 @@ class Validator {
     return null;
   }
 
+  /// Contract amount — required, numeric, greater than zero.
+  static String? validateAmount(String? value) {
+    if (value?.trim().isEmpty ?? true) {
+      return LocaleKeys.validatorFieldIsRequired.tr();
+    }
+    final num? number = num.tryParse(value!.trim());
+    if (number == null) {
+      return LocaleKeys.validatorInvalidNumber.tr();
+    }
+    if (number <= 0) {
+      return LocaleKeys.validatorAmountPositive.tr();
+    }
+    return null;
+  }
+
+  /// Contract total hours — required, integer, greater than zero.
+  static String? validateTotalHours(String? value) {
+    if (value?.trim().isEmpty ?? true) {
+      return LocaleKeys.validatorFieldIsRequired.tr();
+    }
+    final int? number = int.tryParse(value!.trim());
+    if (number == null) {
+      return LocaleKeys.validatorInvalidNumber.tr();
+    }
+    if (number <= 0) {
+      return LocaleKeys.validatorHoursPositive.tr();
+    }
+    return null;
+  }
+
+  /// Free-text field that must not be blank (spaces only counts as blank).
+  static String? validateNotes(String? value) {
+    if (value?.trim().isEmpty ?? true) {
+      return LocaleKeys.validatorFieldIsRequired.tr();
+    }
+    return null;
+  }
+
   // ─── Additional Validators ──────────────────────────────────────────────
 
   static String? validateCountry(String? value) {

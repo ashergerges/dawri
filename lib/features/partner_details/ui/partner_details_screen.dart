@@ -18,19 +18,33 @@ import 'widgets/reel_player_page.dart';
 
 @RoutePage()
 class PartnerDetailsScreen extends StatelessWidget {
-  const PartnerDetailsScreen({super.key});
+  const PartnerDetailsScreen({
+    super.key,
+    required this.userId,
+    required this.name,
+    this.avatar,
+  });
+
+  /// Passed in from the participant card — forwarded to the contract form.
+  final int userId;
+  final String name;
+  final String? avatar;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => PartnerDetailsCubit(),
-      child: const _PartnerDetailsView(),
+      child: _PartnerDetailsView(userId: userId, name: name, avatar: avatar),
     );
   }
 }
 
 class _PartnerDetailsView extends StatelessWidget {
-  const _PartnerDetailsView();
+  const _PartnerDetailsView({required this.userId, required this.name, this.avatar});
+
+  final int userId;
+  final String name;
+  final String? avatar;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +86,12 @@ class _PartnerDetailsView extends StatelessWidget {
               ],
             ),
           ),
-          const Positioned(left: 0, right: 0, bottom: 0, child: _ActionBottomBar()),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: _ActionBottomBar(userId: userId, name: name, avatar: avatar),
+          ),
         ],
       ),
     );
@@ -558,7 +577,11 @@ class _ReviewCard extends StatelessWidget {
 
 // ─── ACTION BOTTOM BAR ──────────────────────────────────────────────────────
 class _ActionBottomBar extends StatelessWidget {
-  const _ActionBottomBar();
+  const _ActionBottomBar({required this.userId, required this.name, this.avatar});
+
+  final int userId;
+  final String name;
+  final String? avatar;
 
   @override
   Widget build(BuildContext context) {
@@ -599,7 +622,11 @@ class _ActionBottomBar extends StatelessWidget {
             Expanded(
               child: OnTap(
                 onTap: () {
-                  CreateContractRoute().push(context);
+                  CreateContractRoute(
+                    userId: userId,
+                    name: name,
+                    avatar: avatar,
+                  ).push(context);
                 },
                 child: DecoratedBox(
                   decoration: BoxDecoration(

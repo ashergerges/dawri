@@ -1,10 +1,139 @@
-// lib/features/contracts/data/contracts_model.dart
+// lib/features/contracts/data/models/contracts_model.dart
+import 'package:dawri/features/create_contract/data/models/create_contract_model.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:dawri/core/utils/constants/app_colors.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-enum ContractStatus { pending, active, expired }
+part 'contracts_model.g.dart';
 
+/// Contract status ids used by `GET api/app/contracts?status=` and
+/// `POST api/app/contracts/status`.
+class ContractStatusId {
+  ContractStatusId._();
+
+  static const int pending = 1;
+  static const int active = 2;
+  static const int rejected = 3;
+}
+
+// ─── Summary — GET api/app/contracts/summary ───────────────────────────────────
+@JsonSerializable()
+class ContractsSummaryModel {
+  final int? active;
+  final int? pending;
+
+  ContractsSummaryModel({this.active, this.pending});
+
+  factory ContractsSummaryModel.fromJson(Map<String, dynamic> json) =>
+      _$ContractsSummaryModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ContractsSummaryModelToJson(this);
+}
+
+// ─── Team (second party) ──────────────────────────────────────────────────────
+@JsonSerializable()
+class ContractTeamModel {
+  final int? id;
+  final String? name;
+  final String? image;
+
+  ContractTeamModel({this.id, this.name, this.image});
+
+  factory ContractTeamModel.fromJson(Map<String, dynamic> json) =>
+      _$ContractTeamModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ContractTeamModelToJson(this);
+}
+
+// ─── Contract — GET api/app/contracts ─────────────────────────────────────────
+@JsonSerializable()
+class ContractModel {
+  final int? id;
+  final String? contractNumber;
+  final int? status;
+  final ContractTeamModel? team;
+
+  /// Reused from `create_contract` (both carry the optional `icon` name).
+  final ContractTypeModel? contractType;
+  final SalaryTypeModel? salaryType;
+
+  final num? amount;
+  final String? startDate;
+  final String? endDate;
+  final int? totalHours;
+  final num? rating;
+  final String? notes;
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
+
+  ContractModel({
+    this.id,
+    this.contractNumber,
+    this.status,
+    this.team,
+    this.contractType,
+    this.salaryType,
+    this.amount,
+    this.startDate,
+    this.endDate,
+    this.totalHours,
+    this.rating,
+    this.notes,
+    this.createdAt,
+  });
+
+  factory ContractModel.fromJson(Map<String, dynamic> json) =>
+      _$ContractModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ContractModelToJson(this);
+}
+
+// ─── Pagination ───────────────────────────────────────────────────────────────
+/// Hand-written so it tolerates either casing the backend may use
+/// (`current_page` / `currentPage`, `has_next` / `hasNext`, …).
+class ContractsPaginationModel {
+  final int? currentPage;
+  final int? perPage;
+  final int? totalPages;
+  final int? totalItems;
+  final bool? hasNext;
+  final bool? hasPrev;
+
+  const ContractsPaginationModel({
+    this.currentPage,
+    this.perPage,
+    this.totalPages,
+    this.totalItems,
+    this.hasNext,
+    this.hasPrev,
+  });
+
+  factory ContractsPaginationModel.fromJson(Map json) =>
+      ContractsPaginationModel(
+        currentPage: _asInt(json['current_page'] ?? json['currentPage'] ?? json['page']),
+        perPage: _asInt(json['per_page'] ?? json['perPage'] ?? json['limit']),
+        totalPages: _asInt(json['total_pages'] ?? json['totalPages'] ?? json['last_page']),
+        totalItems: _asInt(json['total_items'] ?? json['totalItems'] ?? json['total']),
+        hasNext: _asBool(json['has_next'] ?? json['hasNext'] ?? json['has_more']),
+        hasPrev: _asBool(json['has_prev'] ?? json['hasPrev']),
+      );
+
+  static int? _asInt(dynamic value) =>
+      value is int ? value : int.tryParse('${value ?? ''}');
+
+  static bool? _asBool(dynamic value) {
+    if (value is bool) return value;
+    if (value is num) return value != 0;
+    if (value is String) return value == 'true' || value == '1';
+    return null;
+  }
+}
+
+/// One page of contracts: the `items` list plus its `pagination` block.
+class ContractsPageModel {
+  final List<ContractModel> items;
+  final ContractsPaginationModel? pagination;
+
+  const ContractsPageModel({required this.items, this.pagination});
+}
+
+// ─── UI value object used by the details grid on each card ─────────────────────
 class ContractDetailItem {
   final String labelKey;
   final String value;
@@ -17,144 +146,4 @@ class ContractDetailItem {
     this.icon,
     this.valueColor,
   });
-}
-
-class PendingContractModel {
-  final String id;
-  final String partyLogoUrl;
-  final String typeKey;
-  final String partyName;
-  final List<ContractDetailItem> details;
-
-  const PendingContractModel({
-    required this.id,
-    required this.partyLogoUrl,
-    required this.typeKey,
-    required this.partyName,
-    required this.details,
-  });
-}
-
-class ActiveContractModel {
-  final String id;
-  final String? partyLogoUrl;
-  final IconData? fallbackIcon;
-  final Color? fallbackIconBg;
-  final String typeKey;
-  final Color typeColor;
-  final Color typeBg;
-  final String partyName;
-  final List<ContractDetailItem> details;
-  final bool hasChat;
-
-  const ActiveContractModel({
-    required this.id,
-    this.partyLogoUrl,
-    this.fallbackIcon,
-    this.fallbackIconBg,
-    required this.typeKey,
-    required this.typeColor,
-    required this.typeBg,
-    required this.partyName,
-    required this.details,
-    this.hasChat = false,
-  });
-}
-
-class HistoryContractModel {
-  final String id;
-  final String partyLogoUrl;
-  final String partyName;
-  final List<ContractDetailItem> details;
-
-  const HistoryContractModel({
-    required this.id,
-    required this.partyLogoUrl,
-    required this.partyName,
-    required this.details,
-  });
-}
-
-class ContractsMockData {
-  static const activeCount = 2;
-  static const pendingCount = 1;
-
-  static const pendingContracts = [
-    PendingContractModel(
-      id: 'pending-1',
-      partyLogoUrl: 'https://images.unsplash.com/photo-1599474924187-334a4ae5bd3c?w=100&q=80',
-      typeKey: 'contractsTypePlayerOffer',
-      partyName: 'أكاديمية المجد الرياضية',
-      details: [
-        ContractDetailItem(
-          labelKey: 'contractsLabelSportRole',
-          value: 'كرة قدم - مهاجم',
-          icon: FontAwesomeIcons.futbol,
-        ),
-        ContractDetailItem(
-          labelKey: 'contractsLabelDuration',
-          value: 'موسم واحد (6 أشهر)',
-          icon: FontAwesomeIcons.calendar,
-        ),
-        ContractDetailItem(
-          labelKey: 'contractsLabelValue',
-          value: '2,500 رس / شهرياً',
-          icon: FontAwesomeIcons.sackDollar,
-          valueColor: AppColors.primary,
-        ),
-        ContractDetailItem(
-          labelKey: 'contractsLabelOfferDate',
-          value: 'اليوم، 10:00 ص',
-        ),
-      ],
-    ),
-  ];
-
-  static const activeContracts = [
-    ActiveContractModel(
-      id: 'active-1',
-      partyLogoUrl: 'https://i.pravatar.cc/150?img=11',
-      typeKey: 'contractsTypePersonalCoaching',
-      typeColor: AppColors.blue500,
-      typeBg: AppColors.secondary50,
-      partyName: 'الكابتن خالد الشمري',
-      hasChat: true,
-      details: [
-        ContractDetailItem(labelKey: 'contractsLabelTotalHours', value: '12 ساعة تدريبية'),
-        ContractDetailItem(labelKey: 'contractsLabelRemaining', value: '8 ساعات', valueColor: AppColors.warning600),
-        ContractDetailItem(labelKey: 'contractsLabelEndDate', value: '30 نوفمبر 2026'),
-        ContractDetailItem(labelKey: 'contractsLabelAutoRenew', value: 'معطل'),
-      ],
-    ),
-    ActiveContractModel(
-      id: 'active-2',
-      fallbackIcon: FontAwesomeIcons.trophy,
-      fallbackIconBg: AppColors.slate800,
-      typeKey: 'contractsTypeTournamentRefereeing',
-      typeColor: AppColors.warning600,
-      typeBg: AppColors.warningLight,
-      partyName: 'دوري نجوم الأحياء',
-      details: [
-        ContractDetailItem(labelKey: 'contractsLabelRequiredTasks', value: 'تحكيم 5 مباريات'),
-        ContractDetailItem(labelKey: 'contractsLabelTournamentVenue', value: 'ملاعب أرينا - الرياض'),
-      ],
-    ),
-  ];
-
-  static const historyContracts = [
-    HistoryContractModel(
-      id: 'history-1',
-      partyLogoUrl: 'https://i.pravatar.cc/150?img=55',
-      partyName: 'نادي الصقور الرياضي',
-      details: [
-        ContractDetailItem(labelKey: 'contractsLabelEndDate', value: '12 مايو 2025'),
-        ContractDetailItem(
-          labelKey: 'contractsLabelYourRating',
-          value: '5.0',
-          icon: FontAwesomeIcons.solidStar,
-          valueColor: AppColors.warning600,
-        ),
-      ],
-    ),
-  ];
 }

@@ -82,7 +82,7 @@ class Endpoints {
   String get teamJoinRequestCreateUrl => r'api/app/user/team/join-requests';
 
   //complete profile (register) — reuse participantTypesUrl / sportsUrl / citiesUrl
-  String get playerPositionsUrl => r'api/lookups/player-positions';
+  String get playerPositionsUrl => r'api/app/sports/positions';
   String get refereeRolesUrl => r'api/app/referee-roles';
   String get coachSpecializationsUrl => r'api/app/coach-specializations';
   String get completeProfileUrl => r'api/app/user/complete-profile';
@@ -124,6 +124,16 @@ class Endpoints {
   String get financialTransactionsUrl => r'api/app/user/financial-transactions';
   String get matchesTicketsUrl  => r'api/app/championship/matches/tickets';
   String get myTicketsUrl  => r'api/app/championship/matches/my-tickets';
+
+  //create contract
+  String get contractTypesUrl => r'api/app/contract-types';
+  String get salaryTypesUrl => r'api/app/salary-types';
+  String get createContractUrl => r'api/app/contracts';
+
+  //my contracts
+  String get contractsUrl => r'api/app/contracts';
+  String get contractsSummaryUrl => r'api/app/contracts/summary';
+  String get contractStatusUrl => r'api/app/contracts/status';
 
   String get challengeLevelsUrl  => r'api/app/challenge-levels';
   String get createChallengeUrl  => r'api/app/challenges';
