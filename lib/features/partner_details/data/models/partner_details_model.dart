@@ -1,83 +1,192 @@
-// lib/features/partner_details/data/partner_details_model.dart
-import 'package:dawri/gen/locale_keys.g.dart';
+// lib/features/partner_details/data/models/partner_details_model.dart
+import 'package:dawri/features/partners/data/models/partners_model.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-class StatData {
-  final String value;
-  final bool showStarIcon;
-  final String labelKey;
+part 'partner_details_model.g.dart';
 
-  const StatData({required this.value, this.showStarIcon = false, required this.labelKey});
+/// `{ label, endpoint }` block the API sends for "view all" sections.
+@JsonSerializable()
+class PartnerViewAllModel {
+  final String? label;
+  final String? endpoint;
+
+  PartnerViewAllModel({this.label, this.endpoint});
+
+  factory PartnerViewAllModel.fromJson(Map<String, dynamic> json) =>
+      _$PartnerViewAllModelFromJson(json);
+  Map<String, dynamic> toJson() => _$PartnerViewAllModelToJson(this);
 }
 
-class ReelData {
-  final String id;
-  final String thumbnailUrl;
-  final String videoUrl;
-  final String viewsLabel;
+// ─── Team (mini block inside the partner payload) ─────────────────────────────
+@JsonSerializable()
+class PartnerTeamMiniModel {
+  final int? id;
+  final String? name;
+  final num? rating;
+  final String? bio;
+  final bool? canJoin;
 
-  const ReelData({
-    required this.id,
-    required this.thumbnailUrl,
-    required this.videoUrl,
-    required this.viewsLabel,
+  PartnerTeamMiniModel({this.id, this.name, this.rating, this.bio, this.canJoin});
+
+  factory PartnerTeamMiniModel.fromJson(Map<String, dynamic> json) =>
+      _$PartnerTeamMiniModelFromJson(json);
+  Map<String, dynamic> toJson() => _$PartnerTeamMiniModelToJson(this);
+}
+
+// ─── Videos ───────────────────────────────────────────────────────────────────
+@JsonSerializable()
+class PartnerVideoModel {
+  final int? id;
+  final String? url;
+  final String? title;
+  final String? thumbnail;
+
+  /// Pre-formatted label from the API (e.g. `"1.2k"`).
+  final String? views;
+  @JsonKey(name: 'views_count')
+  final int? viewsCount;
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
+
+  PartnerVideoModel({
+    this.id,
+    this.url,
+    this.title,
+    this.thumbnail,
+    this.views,
+    this.viewsCount,
+    this.createdAt,
   });
+
+  factory PartnerVideoModel.fromJson(Map<String, dynamic> json) =>
+      _$PartnerVideoModelFromJson(json);
+  Map<String, dynamic> toJson() => _$PartnerVideoModelToJson(this);
 }
 
-class ReviewData {
-  final String reviewerImageUrl;
-  final String reviewerNameKey;
-  final int starsCount;
-  final String reviewTextKey;
+@JsonSerializable()
+class PartnerVideosModel {
+  final String? title;
+  final int? count;
+  @JsonKey(name: 'view_all')
+  final PartnerViewAllModel? viewAll;
+  final List<PartnerVideoModel>? items;
 
-  const ReviewData({
-    required this.reviewerImageUrl,
-    required this.reviewerNameKey,
-    required this.starsCount,
-    required this.reviewTextKey,
+  PartnerVideosModel({this.title, this.count, this.viewAll, this.items});
+
+  factory PartnerVideosModel.fromJson(Map<String, dynamic> json) =>
+      _$PartnerVideosModelFromJson(json);
+  Map<String, dynamic> toJson() => _$PartnerVideosModelToJson(this);
+}
+
+// ─── Reviews ──────────────────────────────────────────────────────────────────
+/// Same shape as `StadiumReviewModel` plus a `title` field, so it lives on its own.
+@JsonSerializable()
+class PartnerReviewModel {
+  final int? id;
+  @JsonKey(name: 'user_name')
+  final String? userName;
+  final String? title;
+  @JsonKey(name: 'avatar_url')
+  final String? avatarUrl;
+  final String? date;
+  final int? stars;
+  final String? comment;
+
+  PartnerReviewModel({
+    this.id,
+    this.userName,
+    this.title,
+    this.avatarUrl,
+    this.date,
+    this.stars,
+    this.comment,
   });
+
+  factory PartnerReviewModel.fromJson(Map<String, dynamic> json) =>
+      _$PartnerReviewModelFromJson(json);
+  Map<String, dynamic> toJson() => _$PartnerReviewModelToJson(this);
 }
 
-class PartnerDetailsMockData {
-  static const avatarUrl = 'https://i.pravatar.cc/150?img=33';
-  static const nameKey = LocaleKeys.partnerDetailsName;
-  static const sportTagKey = LocaleKeys.partnerDetailsSportTag;
-  static const roleKey = LocaleKeys.partnerDetailsRole;
+@JsonSerializable()
+class PartnerRatingModel {
+  final num? average;
+  final int? count;
 
-  static const stats = [
-    StatData(value: '4.8', showStarIcon: true, labelKey: LocaleKeys.partnerDetailsStatRating),
-    StatData(value: '34', labelKey: LocaleKeys.partnerDetailsStatMatches),
-    StatData(value: '18', labelKey: LocaleKeys.partnerDetailsStatGoals),
-  ];
+  PartnerRatingModel({this.average, this.count});
 
-  static const bioKey = LocaleKeys.partnerDetailsBio;
+  factory PartnerRatingModel.fromJson(Map<String, dynamic> json) =>
+      _$PartnerRatingModelFromJson(json);
+  Map<String, dynamic> toJson() => _$PartnerRatingModelToJson(this);
+}
 
-  static const reels = [
-    ReelData(
-      id: 'reel-1',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=300&q=80',
-      videoUrl: 'https://samplelib.com/mp4/sample-5s.mp4',
-      viewsLabel: '1.2k',
-    ),
-    ReelData(
-      id: 'reel-2',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=300&q=80',
-      videoUrl: 'https://samplelib.com/mp4/sample-5s.mp4',
-      viewsLabel: '854',
-    ),
-    ReelData(
-      id: 'reel-3',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=300&q=80',
-      videoUrl: 'https://placeholdervideo.dev/640x360',
-      viewsLabel: '500',
-    ),
-  ];
+@JsonSerializable()
+class PartnerReviewsModel {
+  final String? title;
+  final PartnerRatingModel? rating;
+  @JsonKey(name: 'view_all')
+  final PartnerViewAllModel? viewAll;
+  final List<PartnerReviewModel>? items;
 
-  static const reviews = [
-    ReviewData(
-      reviewerImageUrl: 'https://i.pravatar.cc/150?img=11',
-      reviewerNameKey: LocaleKeys.partnerDetailsReviewer1Name,
-      starsCount: 5,
-      reviewTextKey: LocaleKeys.partnerDetailsReview1Text,
-    ),
-  ];
+  PartnerReviewsModel({this.title, this.rating, this.viewAll, this.items});
+
+  factory PartnerReviewsModel.fromJson(Map<String, dynamic> json) =>
+      _$PartnerReviewsModelFromJson(json);
+  Map<String, dynamic> toJson() => _$PartnerReviewsModelToJson(this);
+}
+
+/// One page of reviews — `{ reviews: [...], rating: {...} }`.
+class PartnerReviewsPageModel {
+  final List<PartnerReviewModel> items;
+  final PartnerRatingModel? rating;
+
+  const PartnerReviewsPageModel({required this.items, this.rating});
+}
+
+// ─── Partner details — GET api/app/participants/details ────────────────────────
+@JsonSerializable()
+class PartnerDetailsModel {
+  final int? id;
+  final String? name;
+  final String? avatar;
+
+  /// `{id, name, icon}` blocks — reused from the partners list feature.
+  final ParticipantRefModel? role;
+  final ParticipantRefModel? position;
+  final ParticipantRefModel? sport;
+
+  final num? rating;
+  final List<ParticipantRefModel>? tags;
+  final bool? isAvailable;
+  final bool? hasContract;
+  final bool? isFav;
+  final String? bio;
+  final PartnerTeamMiniModel? team;
+  final int? goalsScored;
+  final int? matchesPlayed;
+  final PartnerVideosModel? videos;
+  final PartnerReviewsModel? reviews;
+
+  PartnerDetailsModel({
+    this.id,
+    this.name,
+    this.avatar,
+    this.role,
+    this.position,
+    this.sport,
+    this.rating,
+    this.tags,
+    this.isAvailable,
+    this.hasContract,
+    this.isFav,
+    this.bio,
+    this.team,
+    this.goalsScored,
+    this.matchesPlayed,
+    this.videos,
+    this.reviews,
+  });
+
+  factory PartnerDetailsModel.fromJson(Map<String, dynamic> json) =>
+      _$PartnerDetailsModelFromJson(json);
+  Map<String, dynamic> toJson() => _$PartnerDetailsModelToJson(this);
 }

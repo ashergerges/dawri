@@ -391,11 +391,15 @@ class _IndividualCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OnTap(
-      onTap: () => PartnerDetailsRoute(
-        userId: participant.id ?? 0,
-        name: participant.name ?? '',
-        avatar: participant.avatar,
-      ).push(context),
+      // Guard: type 5 (team) must never reach the partner-details screen.
+      onTap: () {
+        if (context.read<PartnersCubit>().state.isTeamType) return;
+        PartnerDetailsRoute(
+          userId: participant.id ?? 0,
+          name: participant.name ?? '',
+          avatar: participant.avatar,
+        ).push(context);
+      },
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -581,7 +585,12 @@ class _TeamCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
+    return OnTap(
+      // Teams (type 5) never open partner_details — they get their own screen.
+      onTap: () {
+        // TODO: navigate to team details screen (هتتعمل لاحقًا)
+      },
+      child: DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(18.r),
@@ -663,6 +672,7 @@ class _TeamCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

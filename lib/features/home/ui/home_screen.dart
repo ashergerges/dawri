@@ -187,16 +187,33 @@ class _NotificationButton extends StatelessWidget {
                 color: AppColors.white,
                 size: 20,
               ),
+              // Unread badge — fed by the notifications screen via preferences.
               Positioned(
-                top: 10,
-                right: 10,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AppColors.error,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.primary, width: 1.5),
-                  ),
-                  child: SizedBox(width: 8.w, height: 8.w),
+                top: 8,
+                right: 6,
+                child: ValueListenableBuilder<int>(
+                  valueListenable: getIt<ILocalPreference>().notificationCount,
+                  builder: (context, unreadCount, _) {
+                    if (unreadCount <= 0) return const SizedBox.shrink();
+                    return DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppColors.error,
+                        borderRadius: BorderRadius.circular(20.r),
+                        border: Border.all(color: AppColors.primary, width: 1.5),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+                        child: Text(
+                          unreadCount > 99 ? '99+' : '$unreadCount',
+                          style: AppTextTheme.bodyXXSmall(context).copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.white,
+                            fontSize: 8.sp,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],

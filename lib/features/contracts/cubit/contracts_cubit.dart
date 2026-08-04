@@ -288,22 +288,24 @@ class ContractsCubit extends Cubit<ContractsState> {
       state: ToastStates.success,
     );
 
-    // The contract just moved between lists: clear the destination tabs so they
-    // refetch on their next open, and refresh pending + summary right away.
     emit(state.copyWith(
       responseStatus: const ContractsStatus.success(),
       respondingContractId: null,
-      activeContracts: const [],
-      activePage: 1,
-      activePagination: null,
-      activeStatus: const ContractsStatus.initial(),
-      rejectedContracts: const [],
-      rejectedPage: 1,
-      rejectedPagination: null,
-      rejectedStatus: const ContractsStatus.initial(),
     ));
 
-    await Future.wait([getPending(), getSummary()]);
+    await refreshAfterStatusChange();
+  }
+
+  /// A contract moved between lists — either from here or from the details
+  /// screen. Refreshes the summary, pending, and any other tab already loaded
+  /// (untouched tabs keep their lazy load, so nothing blanks out on screen).
+  Future<void> refreshAfterStatusChange() async {
+    final requests = <Future<void>>[getSummary(), getPending()];
+
+    if (state.activeStatus is! ContractsStatusInitial) requests.add(getActive());
+    if (state.rejectedStatus is! ContractsStatusInitial) requests.add(getRejected());
+
+    await Future.wait(requests);
   }
 
   /// Prefers the pagination block; falls back to the page-size heuristic used

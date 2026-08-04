@@ -7,9 +7,14 @@ abstract class ILocalPreference {
   late final ValueNotifier<AppUser?> appUser;
   late final ValueNotifier<SettingsModel?> support;
 
+  /// Unread notifications count — drives the bell badge anywhere in the app.
+  late final ValueNotifier<int> notificationCount;
+
   void initialize();
 
   void saveAppUser(AppUser? newAppUser);
+
+  void saveNotificationCount(int count);
 
   void saveSupport(SettingsModel? support);
 

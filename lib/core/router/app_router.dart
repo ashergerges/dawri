@@ -24,6 +24,8 @@ import 'package:dawri/features/my_championships/ui/my_championships_screen.dart'
 import 'package:dawri/features/notifications/ui/notifications_screen.dart';
 import 'package:dawri/features/partner_chat/ui/partner_chat_screen.dart';
 import 'package:dawri/features/partner_details/ui/partner_details_screen.dart';
+import 'package:dawri/features/partner_details/ui/partner_reviews_screen.dart';
+import 'package:dawri/features/partner_details/ui/partner_videos_screen.dart';
 import 'package:dawri/features/partners/ui/partners_screen.dart';
 import 'package:dawri/features/product_details/ui/product_details_screen.dart';
 import 'package:dawri/features/purchase_history/ui/purchase_history_screen.dart';
@@ -35,7 +37,6 @@ import 'package:dawri/features/tickets/ui/tickets_screen.dart';
 import 'package:dawri/features/update_profile/ui/update_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
-import 'package:dawri/features/notification/ui/notification_screen.dart';
 import 'package:dawri/features/splash/ui/no_internet_splash.dart';
 import 'package:dawri/features/Tabs/ui/home_bottom_tabs_screen.dart';
 import 'package:dawri/features/splash/ui/splash_screen.dart';
@@ -68,7 +69,6 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: OfflineInternetRoute.page),
     AutoRoute(page: ServerErrorRoute.page),
     AutoRoute(page: NoInternetSplashRoute.page),
-    AutoRoute( page: NotificationRoute.page),
     AutoRoute( page: ImageViewerRoute.page),
     AutoRoute( page: CreateChampionshipRoute.page),
     AutoRoute( page: ReserveNowRoute.page),
@@ -83,6 +83,8 @@ class AppRouter extends RootStackRouter {
     AutoRoute( page: PartnersRoute.page),
     AutoRoute( page: PartnerChatRoute.page),
     AutoRoute( page: PartnerDetailsRoute.page),
+    AutoRoute( page: PartnerVideosRoute.page),
+    AutoRoute( page: PartnerReviewsRoute.page),
     AutoRoute( page: ManageTeamRoute.page),
     AutoRoute( page: InvitePlayerRoute.page),
     AutoRoute( page: PurchaseHistoryRoute.page),

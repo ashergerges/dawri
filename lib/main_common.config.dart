@@ -60,6 +60,10 @@ import 'features/common/data/local/repositories/token_repository.dart' as _i723;
 import 'features/common/data/repositories/interfaces/i_main_repository.dart'
     as _i967;
 import 'features/common/data/repositories/remote/main_repository.dart' as _i210;
+import 'features/contract_details/data/repositories/interfaces/i_contract_details_repository.dart'
+    as _i1054;
+import 'features/contract_details/data/repositories/remote/contract_details_repository.dart'
+    as _i366;
 import 'features/contracts/data/repositories/interfaces/i_contracts_repository.dart'
     as _i568;
 import 'features/contracts/data/repositories/remote/contracts_repository.dart'
@@ -94,14 +98,18 @@ import 'features/my_championships/data/repositories/interfaces/i_my_championship
     as _i735;
 import 'features/my_championships/data/repositories/remote/my_championships_repository.dart'
     as _i730;
-import 'features/notification/data/repositories/interfaces/i_notification_repository.dart'
-    as _i493;
-import 'features/notification/data/repositories/remote/notification_repository.dart'
-    as _i782;
 import 'features/notifications/data/repositories/interfaces/i_notifications_repository.dart'
     as _i97;
+import 'features/notifications/data/repositories/interfaces/i_user_notifications_repository.dart'
+    as _i1005;
 import 'features/notifications/data/repositories/remote/notifications_repository.dart'
     as _i192;
+import 'features/notifications/data/repositories/remote/user_notifications_repository.dart'
+    as _i753;
+import 'features/partner_details/data/repositories/interfaces/i_partner_details_repository.dart'
+    as _i327;
+import 'features/partner_details/data/repositories/remote/partner_details_repository.dart'
+    as _i710;
 import 'features/partners/data/repositories/interfaces/i_partners_repository.dart'
     as _i828;
 import 'features/partners/data/repositories/remote/partners_repository.dart'
@@ -192,6 +200,11 @@ _i174.GetIt $initGetIt(
   gh.factory<_i775.ICartRepository>(
     () => _i48.CartRepository(networkService: gh<_i969.NetworkService>()),
   );
+  gh.factory<_i1005.IUserNotificationsRepository>(
+    () => _i753.UserNotificationsRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
+  );
   gh.factory<_i1022.IChallengeRepository>(
     () => _i690.ChallengeRepository(networkService: gh<_i969.NetworkService>()),
   );
@@ -210,12 +223,22 @@ _i174.GetIt $initGetIt(
     () =>
         _i334.CreateTeamRepository(networkService: gh<_i969.NetworkService>()),
   );
+  gh.factory<_i327.IPartnerDetailsRepository>(
+    () => _i710.PartnerDetailsRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
+  );
   gh.factory<_i185.IHomeRepository>(
     () => _i975.HomeRepository(networkService: gh<_i969.NetworkService>()),
   );
   gh.factory<_i618.IChallengesRepository>(
     () =>
         _i730.ChallengesRepository(networkService: gh<_i969.NetworkService>()),
+  );
+  gh.factory<_i1054.IContractDetailsRepository>(
+    () => _i366.ContractDetailsRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
   );
   gh.factory<_i779.IChampionshipControlRepository>(
     () => _i22.ChampionshipControlRepository(
@@ -224,11 +247,6 @@ _i174.GetIt $initGetIt(
   );
   gh.factory<_i312.IChampProfileRepository>(
     () => _i722.ChampProfileRepository(
-      networkService: gh<_i969.NetworkService>(),
-    ),
-  );
-  gh.factory<_i493.INotificationRepository>(
-    () => _i782.NotificationRepository(
       networkService: gh<_i969.NetworkService>(),
     ),
   );

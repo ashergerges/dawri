@@ -1,106 +1,93 @@
-// lib/features/notifications/data/notifications_model.dart
+// lib/features/notifications/data/models/notifications_model.dart
+import 'package:dawri/core/utils/constants/app_colors.dart';
+import 'package:dawri/core/utils/helper/api_pagination.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:dawri/core/utils/constants/app_colors.dart';
-import 'package:dawri/gen/locale_keys.g.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-enum NotifFilter { all, team, wallet, system }
+part 'notifications_model.g.dart';
 
-enum NotifIconType { team, wallet, trophy, system }
+// ─── Notification type (filter chip) — GET api/app/notification-types ──────────
+@JsonSerializable()
+class NotificationTypeModel {
+  final int? id;
+  final String? title;
 
-enum InviteStatus { pending, accepted, rejected }
+  NotificationTypeModel({this.id, this.title});
 
-extension NotifIconStyle on NotifIconType {
-  Color get color {
-    switch (this) {
-      case NotifIconType.team:   return AppColors.info;
-      case NotifIconType.wallet: return AppColors.warning;
-      case NotifIconType.trophy: return AppColors.success;
-      case NotifIconType.system: return AppColors.textMuted;
-    }
-  }
-
-  IconData get icon {
-    switch (this) {
-      case NotifIconType.team:   return FontAwesomeIcons.userPlus;
-      case NotifIconType.wallet: return FontAwesomeIcons.wallet;
-      case NotifIconType.trophy: return FontAwesomeIcons.trophy;
-      case NotifIconType.system: return FontAwesomeIcons.bullhorn;
-    }
-  }
+  factory NotificationTypeModel.fromJson(Map<String, dynamic> json) =>
+      _$NotificationTypeModelFromJson(json);
+  Map<String, dynamic> toJson() => _$NotificationTypeModelToJson(this);
 }
 
-class FilterChipData {
-  final NotifFilter filter;
-  final String labelKey;
-  const FilterChipData({required this.filter, required this.labelKey});
+// ─── Notification — GET api/app/user/notifications ────────────────────────────
+@JsonSerializable()
+class NotificationModel {
+  final int? id;
+  final String? title;
+  final String? body;
+
+  /// Matches a [NotificationTypeModel.id].
+  final int? type;
+  @JsonKey(name: 'is_read')
+  final bool? isRead;
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
+
+  NotificationModel({
+    this.id,
+    this.title,
+    this.body,
+    this.type,
+    this.isRead,
+    this.createdAt,
+  });
+
+  bool get isUnread => isRead != true;
+
+  /// `2026-08-02 17:41:10` → `2026-08-02 17:41` (seconds add nothing here).
+  String get shortDate {
+    final value = createdAt ?? '';
+    return value.length >= 16 ? value.substring(0, 16) : value;
+  }
+
+  NotificationModel copyWith({bool? isRead}) => NotificationModel(
+        id: id,
+        title: title,
+        body: body,
+        type: type,
+        isRead: isRead ?? this.isRead,
+        createdAt: createdAt,
+      );
+
+  factory NotificationModel.fromJson(Map<String, dynamic> json) =>
+      _$NotificationModelFromJson(json);
+  Map<String, dynamic> toJson() => _$NotificationModelToJson(this);
 }
 
-class NotificationData {
-  final String id;
-  final NotifIconType iconType;
-  final NotifFilter filterType;
-  final String titleKey;
-  final String timeKey;
-  final String descKey;
-  final bool isUnread;
-  final bool hasInviteActions;
+/// One page of notifications — `{ notifications: [...], unread_count, pagination }`.
+class NotificationsPageModel {
+  final List<NotificationModel> items;
+  final int unreadCount;
+  final ApiPagination? pagination;
 
-  const NotificationData({
-    required this.id,
-    required this.iconType,
-    required this.filterType,
-    required this.titleKey,
-    required this.timeKey,
-    required this.descKey,
-    this.isUnread = false,
-    this.hasInviteActions = false,
+  const NotificationsPageModel({
+    required this.items,
+    required this.unreadCount,
+    this.pagination,
   });
 }
 
-class NotificationsMockData {
-  static const filterChips = [
-    FilterChipData(filter: NotifFilter.all,    labelKey: LocaleKeys.notifFilterAll),
-    FilterChipData(filter: NotifFilter.team,   labelKey: LocaleKeys.notifFilterTeam),
-    FilterChipData(filter: NotifFilter.wallet, labelKey: LocaleKeys.notifFilterWallet),
-    FilterChipData(filter: NotifFilter.system, labelKey: LocaleKeys.notifFilterSystem),
-  ];
+// ─── Icon / colour per notification type id ───────────────────────────────────
+/// 1 = Bookings, 2 = Finance, 3 = Team invitations & contracts, 4 = System.
+/// Add new ids here as the backend introduces them.
+const Map<int, ({IconData icon, Color color})> kNotificationTypeStyles = {
+  1: (icon: FontAwesomeIcons.calendarCheck, color: AppColors.success),
+  2: (icon: FontAwesomeIcons.wallet, color: AppColors.warning),
+  3: (icon: FontAwesomeIcons.fileSignature, color: AppColors.info),
+  4: (icon: FontAwesomeIcons.bullhorn, color: AppColors.textMuted),
+};
 
-  static const notifications = [
-    NotificationData(
-      id: 'n1',
-      iconType: NotifIconType.team,
-      filterType: NotifFilter.team,
-      titleKey: LocaleKeys.notif1Title,
-      timeKey: LocaleKeys.notifTimeNow,
-      descKey: LocaleKeys.notif1Desc,
-      isUnread: true,
-      hasInviteActions: true,
-    ),
-    NotificationData(
-      id: 'n2',
-      iconType: NotifIconType.wallet,
-      filterType: NotifFilter.wallet,
-      titleKey: LocaleKeys.notif2Title,
-      timeKey: LocaleKeys.notifTime10Min,
-      descKey: LocaleKeys.notif2Desc,
-      isUnread: true,
-    ),
-    NotificationData(
-      id: 'n3',
-      iconType: NotifIconType.trophy,
-      filterType: NotifFilter.team,
-      titleKey: LocaleKeys.notif3Title,
-      timeKey: LocaleKeys.notifTimeYesterday,
-      descKey: LocaleKeys.notif3Desc,
-    ),
-    NotificationData(
-      id: 'n4',
-      iconType: NotifIconType.system,
-      filterType: NotifFilter.system,
-      titleKey: LocaleKeys.notif4Title,
-      timeKey: LocaleKeys.notifTime28Jun,
-      descKey: LocaleKeys.notif4Desc,
-    ),
-  ];
-}
+({IconData icon, Color color}) notificationStyleFor(int? type) =>
+    kNotificationTypeStyles[type] ??
+    (icon: FontAwesomeIcons.bell, color: AppColors.textMuted);

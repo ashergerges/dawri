@@ -1,6 +1,9 @@
 // lib/features/contract_details/ui/contract_details_screen.dart
 import 'package:auto_route/auto_route.dart';
+import 'package:dawri/core/utils/common_widgets/custom_network_image.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
+import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
+import 'package:dawri/core/utils/helper/fa_icon_mapper.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -17,12 +20,14 @@ import '../data/models/contract_details_model.dart';
 
 @RoutePage()
 class ContractDetailsScreen extends StatelessWidget {
-  const ContractDetailsScreen({super.key});
+  const ContractDetailsScreen({super.key, required this.contractId});
+
+  final int contractId;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ContractDetailsCubit(),
+      create: (_) => ContractDetailsCubit(contractId)..getContractDetails(),
       child: const _ContractDetailsView(),
     );
   }
@@ -33,48 +38,56 @@ class _ContractDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ContractDetailsCubit, ContractDetailsState>(
-      listenWhen: (p, c) => c.showSuccessModal && !p.showSuccessModal,
-      listener: (context, _) {
-        final cubit = context.read<ContractDetailsCubit>();
-        showDialog(
-          context: context,
-          barrierColor: AppColors.slate900.withOpacity(0.6),
-          barrierDismissible: false,
-          builder: (_) => const _SuccessModal(),
-        ).then((_) => cubit.closeModal());
-      },
-      child: Scaffold(
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.only(bottom: 100.h),
-                child: Column(
-                  children: [
-                    const _SubHeader(),
-                    const _ContractHero(),
-                    const _DetailsSection(),
-                  ],
+    final cubit = context.read<ContractDetailsCubit>();
+
+    return BlocBuilder<ContractDetailsCubit, ContractDetailsState>(
+      builder: (context, state) {
+        final contract = state.contract;
+
+        return PopScope(
+          canPop: false,
+          // Hand the result back so the contracts list can refresh its tabs.
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop) context.router.maybePop(state.didChangeStatus);
+          },
+          child: Scaffold(
+            body: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.only(bottom: 100.h),
+                    child: Column(
+                      children: [
+                        _SubHeader(popResult: state.didChangeStatus),
+                        if (state.isFirstLoad)
+                          const _DetailsShimmer()
+                        else if (state.hasFailed)
+                          _RetryState(onRetry: cubit.getContractDetails)
+                        else if (contract != null) ...[
+                          _ContractHero(contract: contract, status: state.status),
+                          _DetailsSection(contract: contract, status: state.status),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+                // Only pending contracts can still be answered.
+                if (state.showActions)
+                  _ActionBottomBar(isResponding: state.isResponding),
+              ],
             ),
-            BlocBuilder<ContractDetailsCubit, ContractDetailsState>(
-              builder: (context, state) {
-                if (state.status != ContractStatus.pending) return const SizedBox.shrink();
-                return  _ActionBottomBar();
-              },
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
 
 // ─── SUB HEADER ─────────────────────────────────────────────────────────────
 class _SubHeader extends StatelessWidget {
-  const _SubHeader();
+  const _SubHeader({required this.popResult});
+
+  final bool popResult;
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +106,7 @@ class _SubHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
-            onTap: () => context.router.maybePop(),
+            onTap: () => context.router.maybePop(popResult),
             child: CircleAvatar(radius: 20.r, backgroundColor: AppColors.slate100,
                 child: FaIcon(FontAwesomeIcons.arrowRight, size: 16.sp, color: AppColors.textDark)),
           ),
@@ -101,8 +114,9 @@ class _SubHeader extends StatelessWidget {
               style: AppTextTheme.headingSmall(context).copyWith(fontWeight: FontWeight.w900, color: AppColors.textDark)),
           GestureDetector(
             onTap: () {},
-            child: CircleAvatar(radius: 20.r, backgroundColor: AppColors.slate100,
-                child: FaIcon(FontAwesomeIcons.download, size: 15.sp, color: AppColors.textDark)),
+            child: CircleAvatar(radius: 20.r,)
+                // backgroundColor: AppColors.slate100,
+                // child: FaIcon(FontAwesomeIcons.download, size: 15.sp, color: AppColors.textDark)),
           ),
         ],
       ),
@@ -112,7 +126,10 @@ class _SubHeader extends StatelessWidget {
 
 // ─── CONTRACT HERO ───────────────────────────────────────────────────────────
 class _ContractHero extends StatelessWidget {
-  const _ContractHero();
+  const _ContractHero({required this.contract, required this.status});
+
+  final ContractDetailsModel contract;
+  final ContractStatus status;
 
   @override
   Widget build(BuildContext context) {
@@ -149,11 +166,9 @@ class _ContractHero extends StatelessWidget {
               child: Column(
                 children: [
                   // status badge top-right
-                  BlocBuilder<ContractDetailsCubit, ContractDetailsState>(
-                    builder: (context, state) => Align(
-                      alignment: AlignmentDirectional.topStart,
-                      child: _StatusBadge(status: state.status),
-                    ),
+                  Align(
+                    alignment: AlignmentDirectional.topStart,
+                    child: _StatusBadge(status: status),
                   ),
                   15.h.sizedHeight,
                   // parties
@@ -161,23 +176,23 @@ class _ContractHero extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       _PartyWidget(
-                        imageUrl: ContractDetailsMockData.party1ImageUrl,
-                        labelKey: ContractDetailsMockData.party1LabelKey,
-                        nameKey: ContractDetailsMockData.party1NameKey,
-                        isCircle: ContractDetailsMockData.party1IsCircle,
+                        imageUrl: contract.team?.image ?? '',
+                        labelKey: LocaleKeys.contractParty1Label,
+                        name: contract.team?.name ?? '',
+                        isCircle: false,
                       ),
                       _HandshakeIcon(),
                       _PartyWidget(
-                        imageUrl: ContractDetailsMockData.party2ImageUrl,
-                        labelKey: ContractDetailsMockData.party2LabelKey,
-                        nameKey: ContractDetailsMockData.party2NameKey,
-                        isCircle: ContractDetailsMockData.party2IsCircle,
+                        imageUrl: contract.user?.avatar ?? '',
+                        labelKey: LocaleKeys.contractParty2Label,
+                        name: contract.user?.name ?? '',
+                        isCircle: true,
                       ),
                     ],
                   ),
                   20.h.sizedHeight,
                   Text(
-                    ContractDetailsMockData.refNumber,
+                    contract.contractNumber ?? '',
                     style: AppTextTheme.bodyXSmall(context).copyWith(
                       fontWeight: FontWeight.w600,
                       color: AppColors.white.withOpacity(0.8),
@@ -228,10 +243,10 @@ class _StatusBadge extends StatelessWidget {
 class _PartyWidget extends StatelessWidget {
   final String imageUrl;
   final String labelKey;
-  final String nameKey;
+  final String name;
   final bool isCircle;
 
-  const _PartyWidget({required this.imageUrl, required this.labelKey, required this.nameKey, required this.isCircle});
+  const _PartyWidget({required this.imageUrl, required this.labelKey, required this.name, required this.isCircle});
 
   @override
   Widget build(BuildContext context) {
@@ -251,11 +266,11 @@ class _PartyWidget extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: isCircle ? BorderRadius.circular(30.r) : BorderRadius.circular(15.r),
-              child: Image.network(imageUrl, fit: BoxFit.cover),
+              child: CustomNetworkImage(imageUrl: imageUrl, fit: BoxFit.cover),
             ),
           ),
           8.h.sizedHeight,
-          Text(nameKey.tr(), style: AppTextTheme.bodyMediumMediumWeight(context).copyWith(fontWeight: FontWeight.w900, color: AppColors.white), textAlign: TextAlign.center),
+          Text(name, maxLines: 2, overflow: TextOverflow.ellipsis, style: AppTextTheme.bodyMediumMediumWeight(context).copyWith(fontWeight: FontWeight.w900, color: AppColors.white), textAlign: TextAlign.center),
         ],
       ),
     );
@@ -301,7 +316,10 @@ class _DashedLinePainter extends CustomPainter {
 
 // ─── DETAILS SECTION ─────────────────────────────────────────────────────────
 class _DetailsSection extends StatelessWidget {
-  const _DetailsSection();
+  const _DetailsSection({required this.contract, required this.status});
+
+  final ContractDetailsModel contract;
+  final ContractStatus status;
 
   @override
   Widget build(BuildContext context) {
@@ -311,16 +329,84 @@ class _DetailsSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _SectionHeader(icon: FontAwesomeIcons.fileContract, titleKey: LocaleKeys.contractSectionBasicInfo),
-          const _DetailsGrid(),
+          _DetailsGrid(boxes: _boxes(contract)),
           20.h.sizedHeight,
           _SectionHeader(icon: FontAwesomeIcons.listCheck, titleKey: LocaleKeys.contractSectionTerms),
-          const _TermsList(),
+          _TermsList(terms: contract.termsLines),
           20.h.sizedHeight,
-          const _SignaturesBox(),
+          _SignaturesBox(contract: contract, status: status),
         ],
       ),
     );
   }
+
+  List<DetailBoxData> _boxes(ContractDetailsModel contract) => [
+        DetailBoxData(
+          icon: (contract.contractType?.icon).toFaIcon(fallback: FontAwesomeIcons.tag),
+          iconColor: AppColors.primaryLight,
+          labelKey: LocaleKeys.contractTypeLabel,
+          value: contract.contractType?.name ?? '-',
+          isFullWidth: true,
+        ),
+        DetailBoxData(
+          icon: FontAwesomeIcons.calendarCheck,
+          iconColor: AppColors.textMuted,
+          labelKey: LocaleKeys.contractStartLabel,
+          value: contract.startDate ?? '-',
+        ),
+        DetailBoxData(
+          icon: FontAwesomeIcons.calendarXmark,
+          iconColor: AppColors.textMuted,
+          labelKey: LocaleKeys.contractEndLabel,
+          value: contract.endDate ?? '-',
+        ),
+        DetailBoxData(
+          icon: FontAwesomeIcons.streetView,
+          iconColor: AppColors.textMuted,
+          labelKey: LocaleKeys.contractPositionLabel,
+          value: contract.position?.name ?? '-',
+        ),
+        DetailBoxData(
+          // "fa-coins" → FontAwesomeIcons.coins (shared mapper, safe fallback).
+          icon: (contract.salaryType?.icon).toFaIcon(fallback: FontAwesomeIcons.coins),
+          iconColor: AppColors.textMuted,
+          labelKey: LocaleKeys.contractsLabelSalaryType,
+          value: contract.salaryType?.name ?? '-',
+        ),
+        DetailBoxData(
+          icon: FontAwesomeIcons.clock,
+          iconColor: AppColors.textMuted,
+          labelKey: LocaleKeys.contractsLabelTotalHours,
+          value: '${contract.totalHours ?? 0}',
+        ),
+        if (contract.rating != null)
+          DetailBoxData(
+            icon: FontAwesomeIcons.solidStar,
+            iconColor: AppColors.warning600,
+            labelKey: LocaleKeys.contractsLabelYourRating,
+            value: '${contract.rating}',
+          ),
+        DetailBoxData(
+          icon: FontAwesomeIcons.sackDollar,
+          iconColor: AppColors.primary,
+          labelKey: LocaleKeys.contractsLabelValue,
+          value: '${_formatAmount(contract.amount)} ${LocaleKeys.createContractCurrency.tr()}',
+          isHighlighted: true,
+          isFullWidth: true,
+        ),
+      ];
+}
+
+/// `15000` → `15,000` (kept dependency-free on purpose).
+String _formatAmount(num? amount) {
+  if (amount == null) return '0';
+  final normalized = amount % 1 == 0 ? amount.toInt().toString() : amount.toString();
+  final parts = normalized.split('.');
+  final whole = parts.first.replaceAllMapped(
+    RegExp(r'(\d)(?=(\d{3})+$)'),
+    (m) => '${m[1]},',
+  );
+  return parts.length > 1 ? '$whole.${parts[1]}' : whole;
 }
 
 class _SectionHeader extends StatelessWidget {
@@ -345,12 +431,14 @@ class _SectionHeader extends StatelessWidget {
 
 // ─── DETAILS GRID ─────────────────────────────────────────────────────────────
 class _DetailsGrid extends StatelessWidget {
-  const _DetailsGrid();
+  const _DetailsGrid({required this.boxes});
+
+  final List<DetailBoxData> boxes;
 
   @override
   Widget build(BuildContext context) {
-    final fullWidthBoxes = ContractDetailsMockData.detailBoxes.where((d) => d.isFullWidth).toList();
-    final halfWidthBoxes = ContractDetailsMockData.detailBoxes.where((d) => !d.isFullWidth).toList();
+    final fullWidthBoxes = boxes.where((d) => d.isFullWidth).toList();
+    final halfWidthBoxes = boxes.where((d) => !d.isFullWidth).toList();
 
     return Column(
       children: [
@@ -395,14 +483,23 @@ class _DetailBox extends StatelessWidget {
             ? Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(data.labelKey.tr(), style: AppTextTheme.bodyXSmall(context).copyWith(fontWeight: FontWeight.w700, color: AppColors.textMuted)),
-                4.h.sizedHeight,
-                Text(data.valueKey.tr(), style: AppTextTheme.bodyMediumMediumWeight(context).copyWith(fontWeight: FontWeight.w900, color: AppColors.textDark)),
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(data.labelKey.tr(), style: AppTextTheme.bodyXSmall(context).copyWith(fontWeight: FontWeight.w700, color: AppColors.textMuted)),
+                  4.h.sizedHeight,
+                  Text(
+                    data.value,
+                    style: AppTextTheme.bodyMediumMediumWeight(context).copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: isHighlightedBox ? AppColors.primary : AppColors.textDark,
+                    ),
+                  ),
+                ],
+              ),
             ),
+            10.w.sizedWidth,
             FaIcon(data.icon, size: 20.sp, color: data.iconColor),
           ],
         )
@@ -414,7 +511,9 @@ class _DetailBox extends StatelessWidget {
             Text(data.labelKey.tr(), style: AppTextTheme.bodyXXSmall(context).copyWith(fontWeight: FontWeight.w700, color: AppColors.textMuted)),
             4.h.sizedHeight,
             Text(
-              data.valueKey.tr(),
+              data.value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: data.isHighlighted
                   ? AppTextTheme.bodyLargeSemiBold(context).copyWith(fontWeight: FontWeight.w900, color: AppColors.primary)
                   : AppTextTheme.bodySmallMediumWeight(context).copyWith(fontWeight: FontWeight.w900, color: AppColors.textDark),
@@ -428,7 +527,9 @@ class _DetailBox extends StatelessWidget {
 
 // ─── TERMS LIST ──────────────────────────────────────────────────────────────
 class _TermsList extends StatelessWidget {
-  const _TermsList();
+  const _TermsList({required this.terms});
+
+  final List<String> terms;
 
   @override
   Widget build(BuildContext context) {
@@ -440,45 +541,53 @@ class _TermsList extends StatelessWidget {
       ),
       child: Padding(
         padding: 15.w.padAll,
-        child: Column(
-          children: ContractDetailsMockData.terms
-              .map((termKey) => Padding(
-            padding: EdgeInsets.only(bottom: ContractDetailsMockData.terms.last == termKey ? 0 : 12.h),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DecoratedBox(
-                      decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), shape: BoxShape.circle),
-                      child: SizedBox(
-                        width: 22.w,
-                        height: 22.w,
-                        child: Center(child: FaIcon(FontAwesomeIcons.check, size: 10.sp, color: AppColors.primary)),
-                      ),
-                    ),
-                    10.w.sizedWidth,
-                    Expanded(
-                      child: Text(
-                        termKey.tr(),
-                        style: AppTextTheme.bodyXSmall(context).copyWith(fontWeight: FontWeight.w600, color: AppColors.textMuted, height: 1.6),
-                      ),
-                    ),
-                  ],
-                ),
-                4.verticalSpace,
-                ContractDetailsMockData.terms.last == termKey ?0.verticalSpace:DottedLine(
-                  dashLength: 5,
-                  dashGapLength: 4,
-                  lineThickness: 1,
-                  dashColor: AppColors.slate200,
-                ),
-              ],
-            ),
-          ))
-              .toList(),
-        ),
+        child: terms.isEmpty
+            ? Text(
+                LocaleKeys.contractTermsEmpty.tr(),
+                style: AppTextTheme.bodyXSmall(context)
+                    .copyWith(fontWeight: FontWeight.w600, color: AppColors.textMuted),
+              )
+            : Column(
+                children: terms
+                    .map((term) => Padding(
+                          padding: EdgeInsets.only(bottom: terms.last == term ? 0 : 12.h),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  DecoratedBox(
+                                    decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), shape: BoxShape.circle),
+                                    child: SizedBox(
+                                      width: 22.w,
+                                      height: 22.w,
+                                      child: Center(child: FaIcon(FontAwesomeIcons.check, size: 10.sp, color: AppColors.primary)),
+                                    ),
+                                  ),
+                                  10.w.sizedWidth,
+                                  Expanded(
+                                    child: Text(
+                                      term,
+                                      style: AppTextTheme.bodyXSmall(context).copyWith(fontWeight: FontWeight.w600, color: AppColors.textMuted, height: 1.6),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              4.verticalSpace,
+                              terms.last == term
+                                  ? 0.verticalSpace
+                                  : DottedLine(
+                                      dashLength: 5,
+                                      dashGapLength: 4,
+                                      lineThickness: 1,
+                                      dashColor: AppColors.slate200,
+                                    ),
+                            ],
+                          ),
+                        ))
+                    .toList(),
+              ),
       ),
     );
   }
@@ -486,28 +595,39 @@ class _TermsList extends StatelessWidget {
 
 // ─── SIGNATURES BOX ──────────────────────────────────────────────────────────
 class _SignaturesBox extends StatelessWidget {
-  const _SignaturesBox();
+  const _SignaturesBox({required this.contract, required this.status});
+
+  final ContractDetailsModel contract;
+  final ContractStatus status;
 
   @override
   Widget build(BuildContext context) {
+    final acceptedAt = contract.acceptedAt;
+
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.slate100,
-        // border: Border.all(color: AppColors.slate200),
         borderRadius: BorderRadius.circular(16.r),
       ),
       child: IntrinsicHeight(
         child: Row(
           children: [
-            Expanded(child: _SignatureCol(signerKey: ContractDetailsMockData.party1SignerKey, isSigned: true, signedAtKey: ContractDetailsMockData.party1SignedAtKey)),
-            Container(margin:15.padVertical,width: 0.5, color: AppColors.slate200),
+            // Team side — created_at is always present.
             Expanded(
-              child: BlocBuilder<ContractDetailsCubit, ContractDetailsState>(
-                builder: (context, state) => _SignatureCol(
-                  signerKey: ContractDetailsMockData.party2SignerKey,
-                  isSigned: state.status == ContractStatus.signed,
-                  isRejected: state.status == ContractStatus.rejected,
-                ),
+              child: _SignatureCol(
+                signerKey: LocaleKeys.contractSigner1Role,
+                isSigned: true,
+                signedAt: contract.createdAt,
+              ),
+            ),
+            Container(margin: 15.padVertical, width: 0.5, color: AppColors.slate200),
+            // Player side — accepted_at is null while pending / when rejected.
+            Expanded(
+              child: _SignatureCol(
+                signerKey: LocaleKeys.contractSigner2Role,
+                isSigned: acceptedAt != null && acceptedAt.isNotEmpty,
+                isRejected: status == ContractStatus.rejected,
+                signedAt: acceptedAt,
               ),
             ),
           ],
@@ -521,9 +641,9 @@ class _SignatureCol extends StatelessWidget {
   final String signerKey;
   final bool isSigned;
   final bool isRejected;
-  final String? signedAtKey;
+  final String? signedAt;
 
-  const _SignatureCol({required this.signerKey, required this.isSigned, this.isRejected = false, this.signedAtKey});
+  const _SignatureCol({required this.signerKey, required this.isSigned, this.isRejected = false, this.signedAt});
 
   @override
   Widget build(BuildContext context) {
@@ -538,9 +658,13 @@ class _SignatureCol extends StatelessWidget {
               FaIcon(FontAwesomeIcons.signature, size: 18.sp, color: AppColors.success),
               4.h.sizedHeight,
               Text(LocaleKeys.contractSigSigned.tr(), style: AppTextTheme.bodyXSmall(context).copyWith(fontWeight: FontWeight.w800, color: AppColors.success)),
-              if (signedAtKey != null) ...[
+              if ((signedAt ?? '').isNotEmpty) ...[
                 2.h.sizedHeight,
-                Text(signedAtKey!.tr(), style: AppTextTheme.bodyXXSmall(context).copyWith(fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+                Text(
+                  signedAt!,
+                  textAlign: TextAlign.center,
+                  style: AppTextTheme.bodyXXSmall(context).copyWith(fontWeight: FontWeight.w600, color: AppColors.textMuted),
+                ),
               ],
             ])
           else if (isRejected)
@@ -563,10 +687,14 @@ class _SignatureCol extends StatelessWidget {
 
 // ─── ACTION BOTTOM BAR ───────────────────────────────────────────────────────
 class _ActionBottomBar extends StatelessWidget {
-  const _ActionBottomBar();
+  const _ActionBottomBar({required this.isResponding});
+
+  final bool isResponding;
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<ContractDetailsCubit>();
+
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -574,132 +702,160 @@ class _ActionBottomBar extends StatelessWidget {
       ),
       child: Padding(
         padding: EdgeInsets.fromLTRB(20.w, 15.h, 20.w, 25.h),
-        child: BlocBuilder<ContractDetailsCubit, ContractDetailsState>(
-          builder: (context, state) {
-            return Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (dialogCtx) => AlertDialog(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-                          title: Text(LocaleKeys.contractRejectConfirmTitle.tr(), style: AppTextTheme.bodyLargeSemiBold(context).copyWith(fontWeight: FontWeight.w900)),
-                          content: Text(LocaleKeys.contractRejectConfirmDesc.tr(), style: AppTextTheme.bodySmall(context).copyWith(color: AppColors.textMuted)),
-                          actions: [
-                            OnTap(onTap: () => Navigator.pop(dialogCtx), child: Text(LocaleKeys.contractRejectCancel.tr())),
-                            OnTap(
-                              onTap: () {
-                                Navigator.pop(dialogCtx);
-                                context.read<ContractDetailsCubit>().rejectContract();
-                              },
-                              child: Text(LocaleKeys.contractRejectConfirm.tr(), style: TextStyle(color: AppColors.error)),
-                            ),
-                          ],
+        child: Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: isResponding
+                    ? null
+                    : () {
+                        showDialog(
+                          context: context,
+                          builder: (dialogCtx) => AlertDialog(
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+                            title: Text(LocaleKeys.contractRejectConfirmTitle.tr(), style: AppTextTheme.bodyLargeSemiBold(context).copyWith(fontWeight: FontWeight.w900)),
+                            content: Text(LocaleKeys.contractRejectConfirmDesc.tr(), style: AppTextTheme.bodySmall(context).copyWith(color: AppColors.textMuted)),
+                            actions: [
+                              OnTap(onTap: () => Navigator.pop(dialogCtx), child: Text(LocaleKeys.contractRejectCancel.tr())),
+                              OnTap(
+                                onTap: () {
+                                  Navigator.pop(dialogCtx);
+                                  cubit.rejectContract();
+                                },
+                                child: Text(LocaleKeys.contractRejectConfirm.tr(), style: TextStyle(color: AppColors.error)),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.slate100,
+                    border: Border.all(color: AppColors.error50),
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 14.h),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          LocaleKeys.contractBtnReject.tr(),
+                          style: AppTextTheme.bodyMediumMediumWeight(context).copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: isResponding ? AppColors.error.withOpacity(0.5) : AppColors.error,
+                          ),
                         ),
-                      );
-                    },
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: AppColors.slate100,
-                        border: Border.all(color: AppColors.error50),
-                        borderRadius: BorderRadius.circular(16.r),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(LocaleKeys.contractBtnReject.tr(), style: AppTextTheme.bodyMediumMediumWeight(context).copyWith(fontWeight: FontWeight.w800, color: AppColors.error)),
-                            8.w.sizedWidth,
-                            FaIcon(FontAwesomeIcons.xmark, size: 14.sp, color: AppColors.error),
-                          ],
+                        8.w.sizedWidth,
+                        FaIcon(
+                          FontAwesomeIcons.xmark,
+                          size: 14.sp,
+                          color: isResponding ? AppColors.error.withOpacity(0.5) : AppColors.error,
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ),
-                12.w.sizedWidth,
-                Expanded(
-                  child: GestureDetector(
-                    onTap: state.isSigning ? null : () => context.read<ContractDetailsCubit>().signContract(),
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(16.r),
-                        boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.25), blurRadius: 20, offset: const Offset(0, 8))],
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
-                        child: Center(
-                          child: state.isSigning
-                              ? Row(mainAxisSize: MainAxisSize.min, children: [
-                            SizedBox(width: 15.sp, height: 15.sp, child: const CircularProgressIndicator(strokeWidth: 2, color: AppColors.white)),
-                            8.w.sizedWidth,
-                            Text(LocaleKeys.contractBtnSigning.tr(), style: AppTextTheme.bodyMediumMediumWeight(context).copyWith(fontWeight: FontWeight.w800, color: AppColors.white)),
-                          ])
-                              : Row(mainAxisSize: MainAxisSize.min, children: [
-                            Text(LocaleKeys.contractBtnSign.tr(), style: AppTextTheme.bodyMediumMediumWeight(context).copyWith(fontWeight: FontWeight.w800, color: AppColors.white)),
-                            8.w.sizedWidth,
-                            FaIcon(FontAwesomeIcons.fileSignature, size: 14.sp, color: AppColors.white),
-                          ]),
-                        ),
-                      ),
+              ),
+            ),
+            12.w.sizedWidth,
+            Expanded(
+              child: GestureDetector(
+                onTap: isResponding ? null : () => cubit.acceptContract(),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: isResponding ? AppColors.slate400 : AppColors.primary,
+                    borderRadius: BorderRadius.circular(16.r),
+                    boxShadow: isResponding
+                        ? null
+                        : [BoxShadow(color: AppColors.primary.withOpacity(0.25), blurRadius: 20, offset: const Offset(0, 8))],
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 14.h),
+                    child: Center(
+                      child: isResponding
+                          ? Row(mainAxisSize: MainAxisSize.min, children: [
+                        SizedBox(width: 15.sp, height: 15.sp, child: const CircularProgressIndicator(strokeWidth: 2, color: AppColors.white)),
+                        8.w.sizedWidth,
+                        Text(LocaleKeys.contractBtnSigning.tr(), style: AppTextTheme.bodyMediumMediumWeight(context).copyWith(fontWeight: FontWeight.w800, color: AppColors.white)),
+                      ])
+                          : Row(mainAxisSize: MainAxisSize.min, children: [
+                        Text(LocaleKeys.contractBtnSign.tr(), style: AppTextTheme.bodyMediumMediumWeight(context).copyWith(fontWeight: FontWeight.w800, color: AppColors.white)),
+                        8.w.sizedWidth,
+                        FaIcon(FontAwesomeIcons.fileSignature, size: 14.sp, color: AppColors.white),
+                      ]),
                     ),
                   ),
                 ),
-              ],
-            );
-          },
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-// ─── SUCCESS MODAL ───────────────────────────────────────────────────────────
-class _SuccessModal extends StatelessWidget {
-  const _SuccessModal();
+// ─── STATES ──────────────────────────────────────────────────────────────────
+class _DetailsShimmer extends StatelessWidget {
+  const _DetailsShimmer();
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: AppColors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.r)),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 35.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DecoratedBox(
-              decoration: BoxDecoration(color: AppColors.success.withOpacity(0.1), shape: BoxShape.circle),
-              child: SizedBox(
-                width: 70.w,
-                height: 70.w,
-                child: Center(child: FaIcon(FontAwesomeIcons.fileCircleCheck, size: 30.sp, color: AppColors.success)),
-              ),
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 20.h),
+      child: Column(
+        children: [
+          ShimmerWidget.rectangular(width: double.infinity, height: 210.h),
+          20.h.sizedHeight,
+          ShimmerWidget.rectangular(width: double.infinity, height: 80.h),
+          12.h.sizedHeight,
+          Row(
+            children: [
+              Expanded(child: ShimmerWidget.rectangular(width: double.infinity, height: 90.h)),
+              12.w.sizedWidth,
+              Expanded(child: ShimmerWidget.rectangular(width: double.infinity, height: 90.h)),
+            ],
+          ),
+          20.h.sizedHeight,
+          ShimmerWidget.rectangular(width: double.infinity, height: 120.h),
+          20.h.sizedHeight,
+          ShimmerWidget.rectangular(width: double.infinity, height: 100.h),
+        ],
+      ),
+    );
+  }
+}
+
+class _RetryState extends StatelessWidget {
+  const _RetryState({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 60.h),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FaIcon(FontAwesomeIcons.circleExclamation, size: 46.sp, color: AppColors.slate300),
+          10.h.sizedHeight,
+          Text(
+            LocaleKeys.errorGeneric.tr(),
+            style: AppTextTheme.bodyMedium(context)
+                .copyWith(fontWeight: FontWeight.w700, color: AppColors.textMuted),
+          ),
+          6.h.sizedHeight,
+          TextButton(
+            onPressed: onRetry,
+            child: Text(
+              LocaleKeys.tryAgain.tr(),
+              style: AppTextTheme.bodySmallSemiBold(context)
+                  .copyWith(fontWeight: FontWeight.w800, color: AppColors.primary),
             ),
-            15.h.sizedHeight,
-            Text(LocaleKeys.contractModalTitle.tr(), style: AppTextTheme.headingSmall(context).copyWith(fontWeight: FontWeight.w900, color: AppColors.textDark)),
-            10.h.sizedHeight,
-            Text(LocaleKeys.contractModalDesc.tr(), textAlign: TextAlign.center, style: AppTextTheme.bodySmall(context).copyWith(fontWeight: FontWeight.w600, color: AppColors.textMuted, height: 1.5)),
-            20.h.sizedHeight,
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: EdgeInsets.symmetric(vertical: 13.h),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-                  elevation: 0,
-                ),
-                child: Text(LocaleKeys.contractModalBtn.tr(), style: AppTextTheme.bodyMediumMediumWeight(context).copyWith(fontWeight: FontWeight.w800, color: AppColors.white)),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

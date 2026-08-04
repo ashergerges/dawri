@@ -1,4 +1,5 @@
 // lib/features/contracts/data/models/contracts_model.dart
+import 'package:dawri/core/utils/helper/api_pagination.dart';
 import 'package:dawri/features/create_contract/data/models/create_contract_model.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -85,45 +86,8 @@ class ContractModel {
 }
 
 // ─── Pagination ───────────────────────────────────────────────────────────────
-/// Hand-written so it tolerates either casing the backend may use
-/// (`current_page` / `currentPage`, `has_next` / `hasNext`, …).
-class ContractsPaginationModel {
-  final int? currentPage;
-  final int? perPage;
-  final int? totalPages;
-  final int? totalItems;
-  final bool? hasNext;
-  final bool? hasPrev;
-
-  const ContractsPaginationModel({
-    this.currentPage,
-    this.perPage,
-    this.totalPages,
-    this.totalItems,
-    this.hasNext,
-    this.hasPrev,
-  });
-
-  factory ContractsPaginationModel.fromJson(Map json) =>
-      ContractsPaginationModel(
-        currentPage: _asInt(json['current_page'] ?? json['currentPage'] ?? json['page']),
-        perPage: _asInt(json['per_page'] ?? json['perPage'] ?? json['limit']),
-        totalPages: _asInt(json['total_pages'] ?? json['totalPages'] ?? json['last_page']),
-        totalItems: _asInt(json['total_items'] ?? json['totalItems'] ?? json['total']),
-        hasNext: _asBool(json['has_next'] ?? json['hasNext'] ?? json['has_more']),
-        hasPrev: _asBool(json['has_prev'] ?? json['hasPrev']),
-      );
-
-  static int? _asInt(dynamic value) =>
-      value is int ? value : int.tryParse('${value ?? ''}');
-
-  static bool? _asBool(dynamic value) {
-    if (value is bool) return value;
-    if (value is num) return value != 0;
-    if (value is String) return value == 'true' || value == '1';
-    return null;
-  }
-}
+/// Shared tolerant pagination parser (`core/utils/helper/api_pagination.dart`).
+typedef ContractsPaginationModel = ApiPagination;
 
 /// One page of contracts: the `items` list plus its `pagination` block.
 class ContractsPageModel {

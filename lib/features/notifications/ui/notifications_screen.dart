@@ -1,5 +1,7 @@
 // lib/features/notifications/ui/notifications_screen.dart
 import 'package:auto_route/auto_route.dart';
+import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
+import 'package:dawri/core/utils/constants/pull_refresh.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +11,7 @@ import 'package:dawri/core/utils/constants/app_colors.dart';
 import 'package:dawri/core/utils/constants/app_text_them.dart';
 import 'package:dawri/core/utils/extensions/padding_extensions.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../cubit/notifications_cubit.dart';
 import '../data/models/notifications_model.dart';
@@ -20,7 +23,7 @@ class NotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => NotificationsCubit(),
+      create: (_) => NotificationsCubit()..init(),
       child: const _NotificationsView(),
     );
   }
@@ -71,18 +74,48 @@ class _SubHeader extends StatelessWidget {
               child: FaIcon(FontAwesomeIcons.arrowRight, size: 16.sp, color: AppColors.textDark),
             ),
           ),
-          Text(
-            LocaleKeys.notifTitle.tr(),
-            style: AppTextTheme.headingSmall(context).copyWith(fontWeight: FontWeight.w900, color: AppColors.textDark),
+          Row(
+            children: [
+              Text(
+                LocaleKeys.notifTitle.tr(),
+                style: AppTextTheme.headingSmall(context).copyWith(fontWeight: FontWeight.w900, color: AppColors.textDark),
+              ),
+              BlocBuilder<NotificationsCubit, NotificationsState>(
+                buildWhen: (p, c) => p.unreadCount != c.unreadCount,
+                builder: (context, state) {
+                  if (state.unreadCount == 0) return const SizedBox.shrink();
+                  return Padding(
+                    padding: EdgeInsets.only(right: 8.w, left: 8.w),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppColors.error,
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
+                        child: Text(
+                          '${state.unreadCount}',
+                          style: AppTextTheme.bodyXXSmall(context)
+                              .copyWith(fontWeight: FontWeight.w800, color: AppColors.white),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
+          // Mark-all-as-read — disabled (grey/success) when nothing is unread.
           BlocBuilder<NotificationsCubit, NotificationsState>(
+            buildWhen: (p, c) =>
+                p.unreadCount != c.unreadCount || p.isMarkingAllRead != c.isMarkingAllRead,
             builder: (context, state) {
               return GestureDetector(
-                onTap: () => context.read<NotificationsCubit>().markAllRead(),
+                onTap: () => context.read<NotificationsCubit>().markAllAsRead(),
                 child: CircleAvatar(
                   radius: 20.r,
                   backgroundColor: AppColors.slate100,
-                  child: state.isMarkingRead
+                  child: state.isMarkingAllRead
                       ? SizedBox(
                     width: 14.sp,
                     height: 14.sp,
@@ -91,7 +124,7 @@ class _SubHeader extends StatelessWidget {
                       : FaIcon(
                     FontAwesomeIcons.checkDouble,
                     size: 15.sp,
-                    color: state.unreadIds.isEmpty ? AppColors.success : AppColors.textDark,
+                    color: state.unreadCount == 0 ? AppColors.success : AppColors.textDark,
                   ),
                 ),
               );
@@ -110,19 +143,42 @@ class _FilterChipsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<NotificationsCubit, NotificationsState>(
+      buildWhen: (p, c) =>
+          p.types != c.types ||
+          p.typesStatus != c.typesStatus ||
+          p.selectedTypeId != c.selectedTypeId,
       builder: (context, state) {
+        if (state.types.isEmpty && state.isLoadingTypes) {
+          return SizedBox(
+            height: 52.h,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.fromLTRB(20.w, 15.h, 20.w, 5.h),
+              itemCount: 4,
+              separatorBuilder: (_, __) => 10.w.sizedWidth,
+              itemBuilder: (_, __) => ShimmerWidget.rectangular(width: 90.w, height: 32.h),
+            ),
+          );
+        }
+
+        // "All" (null id) followed by every type coming from the API.
+        final chips = <({int? id, String label})>[
+          (id: null, label: LocaleKeys.notifFilterAll.tr()),
+          ...state.types.map((t) => (id: t.id, label: t.title ?? '')),
+        ];
+
         return SizedBox(
           height: 52.h,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.fromLTRB(20.w, 15.h, 20.w, 5.h),
-            itemCount: NotificationsMockData.filterChips.length,
+            itemCount: chips.length,
             separatorBuilder: (_, __) => 10.w.sizedWidth,
             itemBuilder: (context, index) {
-              final chip = NotificationsMockData.filterChips[index];
-              final isActive = state.selectedFilter == chip.filter;
+              final chip = chips[index];
+              final isActive = state.selectedTypeId == chip.id;
               return GestureDetector(
-                onTap: () => context.read<NotificationsCubit>().selectFilter(chip.filter),
+                onTap: () => context.read<NotificationsCubit>().selectType(chip.id),
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: isActive ? AppColors.primary : AppColors.white,
@@ -134,11 +190,13 @@ class _FilterChipsRow extends StatelessWidget {
                   ),
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 8.h),
-                    child: Text(
-                      chip.labelKey.tr(),
-                      style: AppTextTheme.bodyXSmall(context).copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: isActive ? AppColors.white : AppColors.textMuted,
+                    child: Center(
+                      child: Text(
+                        chip.label,
+                        style: AppTextTheme.bodyXSmall(context).copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: isActive ? AppColors.white : AppColors.textMuted,
+                        ),
                       ),
                     ),
                   ),
@@ -158,23 +216,35 @@ class _NotificationsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<NotificationsCubit>();
+
     return BlocBuilder<NotificationsCubit, NotificationsState>(
       builder: (context, state) {
-        final filtered = NotificationsMockData.notifications.where((n) {
-          if (state.selectedFilter == NotifFilter.all) return true;
-          return n.filterType == state.selectedFilter;
-        }).toList();
+        if (state.isFirstLoad) return const _ListShimmer();
+        if (state.hasFailed) return _RetryState(onRetry: cubit.getNotifications);
 
-        if (filtered.isEmpty) return const _EmptyState();
-
-        return ListView.separated(
-          padding: EdgeInsets.fromLTRB(20.w, 15.h, 20.w, 20.h),
-          itemCount: filtered.length,
-          separatorBuilder: (_, __) => 12.h.sizedHeight,
-          itemBuilder: (context, index) {
-            final n = filtered[index];
-            return _NotificationCard(notification: n);
-          },
+        return SmartRefresher(
+          controller: cubit.refreshController,
+          enablePullUp: true,
+          enablePullDown: true,
+          onRefresh: () => cubit.getNotifications(),
+          onLoading: () => cubit.loadMoreNotifications(),
+          header: PullRefresh.pullRefresh,
+          footer: const ClassicFooter(
+            loadStyle: LoadStyle.ShowAlways,
+            completeDuration: Duration(milliseconds: 500),
+          ),
+          child: state.notifications.isEmpty
+              ? const _EmptyState()
+              : ListView.separated(
+                  padding: EdgeInsets.fromLTRB(20.w, 15.h, 20.w, 20.h),
+                  itemCount: state.notifications.length,
+                  separatorBuilder: (_, __) => 12.h.sizedHeight,
+                  itemBuilder: (context, index) {
+                    final notification = state.notifications[index];
+                    return _NotificationCard(notification: notification);
+                  },
+                ),
         );
       },
     );
@@ -183,189 +253,244 @@ class _NotificationsList extends StatelessWidget {
 
 // ─── NOTIFICATION CARD ───────────────────────────────────────────────────────
 class _NotificationCard extends StatelessWidget {
-  final NotificationData notification;
+  final NotificationModel notification;
   const _NotificationCard({required this.notification});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NotificationsCubit, NotificationsState>(
-      builder: (context, state) {
-        final isUnread = state.unreadIds.contains(notification.id);
-        final inviteStatus = state.inviteStatuses[notification.id];
+    final cubit = context.read<NotificationsCubit>();
+    final isUnread = notification.isUnread;
+    final style = notificationStyleFor(notification.type);
 
-        return GestureDetector(
-          onTap: () => context.read<NotificationsCubit>().markRead(notification.id),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            decoration: BoxDecoration(
-              color: isUnread ? AppColors.slate50 : AppColors.white,
-              borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(
-                color: isUnread ? AppColors.primaryLight.withOpacity(0.3) : AppColors.slate200,
-              ),
-              boxShadow: [BoxShadow(color: AppColors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
+    // Swipe-to-delete (no slidable package in the project — Dismissible does it).
+    return Dismissible(
+      key: ValueKey('notification_${notification.id}'),
+      direction: DismissDirection.horizontal,
+      confirmDismiss: (_) => _confirmDelete(context),
+      onDismissed: (_) => cubit.deleteNotification(notification),
+      background: _DeleteBackground(alignment: AlignmentDirectional.centerStart),
+      secondaryBackground: _DeleteBackground(alignment: AlignmentDirectional.centerEnd),
+      child: GestureDetector(
+        onTap: () {
+          // Already read → no request, only navigation.
+          cubit.markAsRead(notification);
+          // TODO: navigate based on notification type/target
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          decoration: BoxDecoration(
+            color: isUnread ? AppColors.slate50 : AppColors.white,
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(
+              color: isUnread ? AppColors.primaryLight.withOpacity(0.3) : AppColors.slate200,
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16.r),
-              child: IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Unread indicator bar (right side in RTL)
-                    if (isUnread)
-                      Container(width: 4.w, color: AppColors.primaryLight),
-                    Expanded(
-                      child: Padding(
-                        padding: 16.w.padAll,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _NotifIconBox(iconType: notification.iconType),
-                            15.w.sizedWidth,
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        notification.titleKey.tr(),
-                                        style: AppTextTheme.bodyMediumMediumWeight(context).copyWith(
-                                          fontWeight: FontWeight.w900,
-                                          color: AppColors.textDark,
-                                        ),
+            boxShadow: [BoxShadow(color: AppColors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16.r),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Unread indicator bar (right side in RTL)
+                  if (isUnread)
+                    Container(width: 4.w, color: AppColors.primaryLight),
+                  Expanded(
+                    child: Padding(
+                      padding: 16.w.padAll,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _NotifIconBox(icon: style.icon, color: style.color),
+                          15.w.sizedWidth,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          Flexible(
+                                            child: Text(
+                                              notification.title ?? '',
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: AppTextTheme.bodyMediumMediumWeight(context).copyWith(
+                                                fontWeight: FontWeight.w900,
+                                                color: AppColors.textDark,
+                                              ),
+                                            ),
+                                          ),
+                                          if (isUnread) ...[
+                                            6.w.sizedWidth,
+                                            Padding(
+                                              padding: EdgeInsets.only(top: 2.h),
+                                              child: DecoratedBox(
+                                                decoration: const BoxDecoration(
+                                                  color: AppColors.error,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: SizedBox(width: 7.w, height: 7.w),
+                                              ),
+                                            ),
+                                          ],
+                                        ],
                                       ),
-                                      Text(
-                                        notification.timeKey.tr(),
-                                        style: AppTextTheme.bodyXXSmall(context).copyWith(
-                                          fontWeight: FontWeight.w700,
-                                          color: AppColors.textMuted,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  4.h.sizedHeight,
-                                  Text(
-                                    notification.descKey.tr(),
-                                    style: AppTextTheme.bodyXSmall(context).copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.textMuted,
-                                      height: 1.5,
                                     ),
-                                  ),
-                                  // Invite actions
-                                  if (notification.hasInviteActions) ...[
-                                    12.h.sizedHeight,
-                                    if (inviteStatus == null)
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: GestureDetector(
-                                              onTap: () => context.read<NotificationsCubit>().rejectInvite(notification.id),
-                                              child: DecoratedBox(
-                                                decoration: BoxDecoration(
-                                                  color: AppColors.slate100,
-                                                  border: Border.all(color: AppColors.slate200),
-                                                  borderRadius: BorderRadius.circular(10.r),
-                                                ),
-                                                child: Padding(
-                                                  padding: EdgeInsets.symmetric(vertical: 8.h),
-                                                  child: Center(
-                                                    child: Text(
-                                                      LocaleKeys.notifInviteReject.tr(),
-                                                      style: AppTextTheme.bodyXSmall(context).copyWith(
-                                                        fontWeight: FontWeight.w800,
-                                                        color: AppColors.error,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          10.w.sizedWidth,
-                                          Expanded(
-                                            child: GestureDetector(
-                                              onTap: () => context.read<NotificationsCubit>().acceptInvite(notification.id),
-                                              child: DecoratedBox(
-                                                decoration: BoxDecoration(
-                                                  color: AppColors.primary,
-                                                  borderRadius: BorderRadius.circular(10.r),
-                                                ),
-                                                child: Padding(
-                                                  padding: EdgeInsets.symmetric(vertical: 8.h),
-                                                  child: Center(
-                                                    child: Text(
-                                                      LocaleKeys.notifInviteAccept.tr(),
-                                                      style: AppTextTheme.bodyXSmall(context).copyWith(
-                                                        fontWeight: FontWeight.w800,
-                                                        color: AppColors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    else
-                                      Row(
-                                        children: [
-                                          FaIcon(
-                                            inviteStatus == InviteStatus.accepted
-                                                ? FontAwesomeIcons.circleCheck
-                                                : FontAwesomeIcons.circleXmark,
-                                            size: 14.sp,
-                                            color: inviteStatus == InviteStatus.accepted ? AppColors.success : AppColors.textMuted,
-                                          ),
-                                          6.w.sizedWidth,
-                                          Text(
-                                            inviteStatus == InviteStatus.accepted
-                                                ? LocaleKeys.notifInviteAccepted.tr()
-                                                : LocaleKeys.notifInviteRejected.tr(),
-                                            style: AppTextTheme.bodyXSmall(context).copyWith(
-                                              fontWeight: FontWeight.w800,
-                                              color: inviteStatus == InviteStatus.accepted ? AppColors.success : AppColors.textMuted,
-                                            ),
-                                          ),
-                                        ],
+                                    8.w.sizedWidth,
+                                    Text(
+                                      notification.shortDate,
+                                      style: AppTextTheme.bodyXXSmall(context).copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.textMuted,
                                       ),
+                                    ),
                                   ],
-                                ],
-                              ),
+                                ),
+                                4.h.sizedHeight,
+                                Text(
+                                  notification.body ?? '',
+                                  style: AppTextTheme.bodyXSmall(context).copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textMuted,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
+  }
+
+  Future<bool> _confirmDelete(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        title: Text(
+          LocaleKeys.notifDeleteConfirmTitle.tr(),
+          style: AppTextTheme.bodyLargeSemiBold(dialogCtx).copyWith(fontWeight: FontWeight.w900),
+        ),
+        content: Text(
+          LocaleKeys.notifDeleteConfirmDesc.tr(),
+          style: AppTextTheme.bodySmall(dialogCtx).copyWith(color: AppColors.textMuted),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx, false),
+            child: Text(LocaleKeys.cancel.tr()),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx, true),
+            child: Text(LocaleKeys.delete.tr(), style: const TextStyle(color: AppColors.error)),
+          ),
+        ],
+      ),
+    );
+    return confirmed ?? false;
   }
 }
 
-class _NotifIconBox extends StatelessWidget {
-  final NotifIconType iconType;
-  const _NotifIconBox({required this.iconType});
+class _DeleteBackground extends StatelessWidget {
+  const _DeleteBackground({required this.alignment});
+
+  final AlignmentGeometry alignment;
 
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: iconType.color.withOpacity(0.1),
+        color: AppColors.error.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Align(
+        alignment: alignment,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          child: FaIcon(FontAwesomeIcons.trashCan, size: 18.sp, color: AppColors.error),
+        ),
+      ),
+    );
+  }
+}
+
+class _NotifIconBox extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  const _NotifIconBox({required this.icon, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
         shape: BoxShape.circle,
       ),
       child: SizedBox(
         width: 48.w,
         height: 48.w,
-        child: Center(child: FaIcon(iconType.icon, size: 19.sp, color: iconType.color)),
+        child: Center(child: FaIcon(icon, size: 19.sp, color: color)),
+      ),
+    );
+  }
+}
+
+// ─── STATES ──────────────────────────────────────────────────────────────────
+class _ListShimmer extends StatelessWidget {
+  const _ListShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      padding: EdgeInsets.fromLTRB(20.w, 15.h, 20.w, 20.h),
+      itemCount: 6,
+      separatorBuilder: (_, __) => 12.h.sizedHeight,
+      itemBuilder: (_, __) => ShimmerWidget.rectangular(width: double.infinity, height: 95.h),
+    );
+  }
+}
+
+class _RetryState extends StatelessWidget {
+  const _RetryState({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FaIcon(FontAwesomeIcons.circleExclamation, size: 46.sp, color: AppColors.slate300),
+          10.h.sizedHeight,
+          Text(
+            LocaleKeys.errorGeneric.tr(),
+            style: AppTextTheme.bodyMedium(context)
+                .copyWith(fontWeight: FontWeight.w700, color: AppColors.textMuted),
+          ),
+          6.h.sizedHeight,
+          TextButton(
+            onPressed: onRetry,
+            child: Text(
+              LocaleKeys.tryAgain.tr(),
+              style: AppTextTheme.bodySmallSemiBold(context)
+                  .copyWith(fontWeight: FontWeight.w800, color: AppColors.primary),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -377,17 +502,21 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 60.h, horizontal: 20.w),
-      child: Column(
-        children: [
-          FaIcon(FontAwesomeIcons.bellSlash, size: 64.sp, color: AppColors.slate300),
-          15.h.sizedHeight,
-          Text(LocaleKeys.notifEmptyTitle.tr(), style: AppTextTheme.headingSmall(context).copyWith(fontWeight: FontWeight.w900, color: AppColors.textDark)),
-          5.h.sizedHeight,
-          Text(LocaleKeys.notifEmptyDesc.tr(), textAlign: TextAlign.center, style: AppTextTheme.bodySmall(context).copyWith(fontWeight: FontWeight.w600, color: AppColors.textMuted)),
-        ],
-      ),
+    return ListView(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 60.h, horizontal: 20.w),
+          child: Column(
+            children: [
+              FaIcon(FontAwesomeIcons.bellSlash, size: 64.sp, color: AppColors.slate300),
+              15.h.sizedHeight,
+              Text(LocaleKeys.notifEmptyTitle.tr(), style: AppTextTheme.headingSmall(context).copyWith(fontWeight: FontWeight.w900, color: AppColors.textDark)),
+              5.h.sizedHeight,
+              Text(LocaleKeys.notifEmptyDesc.tr(), textAlign: TextAlign.center, style: AppTextTheme.bodySmall(context).copyWith(fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

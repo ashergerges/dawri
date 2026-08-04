@@ -751,13 +751,20 @@ class _ContractCard extends StatelessWidget {
   }
 
   Widget _viewDetailsAction(BuildContext context) {
+    final cubit = context.read<ContractsCubit>();
+
     return _ActionButton(
       labelKey: LocaleKeys.contractsViewDetails,
       icon: FontAwesomeIcons.fileInvoice,
       bg: AppColors.slate100,
       fg: AppColors.textDark,
       fillWidth: true,
-      onTap: () => ContractDetailsRoute().push(context),
+      onTap: () async {
+        // The details screen pops `true` when it accepted / rejected there.
+        final changed = await ContractDetailsRoute(contractId: contract.id ?? 0)
+            .push<bool>(context);
+        if (changed == true) cubit.refreshAfterStatusChange();
+      },
     );
   }
 
@@ -932,7 +939,6 @@ class _ActionButton extends StatelessWidget {
   /// `null` disables the button (used while a response is in flight).
   final VoidCallback? onTap;
   final bool fillWidth;
-  final bool iconOnly;
   final bool isLoading;
 
   const _ActionButton({
@@ -942,7 +948,6 @@ class _ActionButton extends StatelessWidget {
     required this.fg,
     required this.onTap,
     this.fillWidth = false,
-    this.iconOnly = false,
     this.isLoading = false,
   });
 
@@ -958,7 +963,7 @@ class _ActionButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 11.h, horizontal: iconOnly ? 14.w : 0),
+          padding: EdgeInsets.symmetric(vertical: 11.h),
           child: isLoading
               ? Center(
                   child: SizedBox(
@@ -967,9 +972,7 @@ class _ActionButton extends StatelessWidget {
                     child: CircularProgressIndicator(strokeWidth: 2, color: fg),
                   ),
                 )
-              : iconOnly
-                  ? Center(child: FaIcon(icon, size: 15.sp, color: fg))
-                  : Row(
+              : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         FaIcon(icon, size: 13.sp, color: fg),

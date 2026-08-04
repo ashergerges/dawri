@@ -340,18 +340,49 @@ class ChargeWalletRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [ContractDetailsScreen]
-class ContractDetailsRoute extends PageRouteInfo<void> {
-  const ContractDetailsRoute({List<PageRouteInfo>? children})
-    : super(ContractDetailsRoute.name, initialChildren: children);
+class ContractDetailsRoute extends PageRouteInfo<ContractDetailsRouteArgs> {
+  ContractDetailsRoute({
+    Key? key,
+    required int contractId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         ContractDetailsRoute.name,
+         args: ContractDetailsRouteArgs(key: key, contractId: contractId),
+         initialChildren: children,
+       );
 
   static const String name = 'ContractDetailsRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const ContractDetailsScreen();
+      final args = data.argsAs<ContractDetailsRouteArgs>();
+      return ContractDetailsScreen(key: args.key, contractId: args.contractId);
     },
   );
+}
+
+class ContractDetailsRouteArgs {
+  const ContractDetailsRouteArgs({this.key, required this.contractId});
+
+  final Key? key;
+
+  final int contractId;
+
+  @override
+  String toString() {
+    return 'ContractDetailsRouteArgs{key: $key, contractId: $contractId}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ContractDetailsRouteArgs) return false;
+    return key == other.key && contractId == other.contractId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ contractId.hashCode;
 }
 
 /// generated route for
@@ -764,22 +795,6 @@ class NotFoundRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [NotificationScreen]
-class NotificationRoute extends PageRouteInfo<void> {
-  const NotificationRoute({List<PageRouteInfo>? children})
-    : super(NotificationRoute.name, initialChildren: children);
-
-  static const String name = 'NotificationRoute';
-
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const NotificationScreen();
-    },
-  );
-}
-
-/// generated route for
 /// [NotificationsScreen]
 class NotificationsRoute extends PageRouteInfo<void> {
   const NotificationsRoute({List<PageRouteInfo>? children})
@@ -931,6 +946,130 @@ class PartnerDetailsRouteArgs {
   @override
   int get hashCode =>
       key.hashCode ^ userId.hashCode ^ name.hashCode ^ avatar.hashCode;
+}
+
+/// generated route for
+/// [PartnerReviewsScreen]
+class PartnerReviewsRoute extends PageRouteInfo<PartnerReviewsRouteArgs> {
+  PartnerReviewsRoute({
+    Key? key,
+    required int partnerId,
+    String? title,
+    List<PageRouteInfo>? children,
+  }) : super(
+         PartnerReviewsRoute.name,
+         args: PartnerReviewsRouteArgs(
+           key: key,
+           partnerId: partnerId,
+           title: title,
+         ),
+         initialChildren: children,
+       );
+
+  static const String name = 'PartnerReviewsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<PartnerReviewsRouteArgs>();
+      return PartnerReviewsScreen(
+        key: args.key,
+        partnerId: args.partnerId,
+        title: args.title,
+      );
+    },
+  );
+}
+
+class PartnerReviewsRouteArgs {
+  const PartnerReviewsRouteArgs({
+    this.key,
+    required this.partnerId,
+    this.title,
+  });
+
+  final Key? key;
+
+  final int partnerId;
+
+  final String? title;
+
+  @override
+  String toString() {
+    return 'PartnerReviewsRouteArgs{key: $key, partnerId: $partnerId, title: $title}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! PartnerReviewsRouteArgs) return false;
+    return key == other.key &&
+        partnerId == other.partnerId &&
+        title == other.title;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ partnerId.hashCode ^ title.hashCode;
+}
+
+/// generated route for
+/// [PartnerVideosScreen]
+class PartnerVideosRoute extends PageRouteInfo<PartnerVideosRouteArgs> {
+  PartnerVideosRoute({
+    Key? key,
+    required int partnerId,
+    String? title,
+    List<PageRouteInfo>? children,
+  }) : super(
+         PartnerVideosRoute.name,
+         args: PartnerVideosRouteArgs(
+           key: key,
+           partnerId: partnerId,
+           title: title,
+         ),
+         initialChildren: children,
+       );
+
+  static const String name = 'PartnerVideosRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<PartnerVideosRouteArgs>();
+      return PartnerVideosScreen(
+        key: args.key,
+        partnerId: args.partnerId,
+        title: args.title,
+      );
+    },
+  );
+}
+
+class PartnerVideosRouteArgs {
+  const PartnerVideosRouteArgs({this.key, required this.partnerId, this.title});
+
+  final Key? key;
+
+  final int partnerId;
+
+  final String? title;
+
+  @override
+  String toString() {
+    return 'PartnerVideosRouteArgs{key: $key, partnerId: $partnerId, title: $title}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! PartnerVideosRouteArgs) return false;
+    return key == other.key &&
+        partnerId == other.partnerId &&
+        title == other.title;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ partnerId.hashCode ^ title.hashCode;
 }
 
 /// generated route for

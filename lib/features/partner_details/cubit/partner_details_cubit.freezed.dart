@@ -14,7 +14,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PartnerDetailsState {
 
- bool get isLiked;
+ PartnerDetailsModel? get partner; PartnerDetailsStatus get detailsStatus;/// Kept apart from [partner] so the heart flips instantly (optimistic).
+ bool get isFavorite;
 /// Create a copy of PartnerDetailsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +26,16 @@ $PartnerDetailsStateCopyWith<PartnerDetailsState> get copyWith => _$PartnerDetai
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerDetailsState&&(identical(other.isLiked, isLiked) || other.isLiked == isLiked));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerDetailsState&&(identical(other.partner, partner) || other.partner == partner)&&(identical(other.detailsStatus, detailsStatus) || other.detailsStatus == detailsStatus)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isLiked);
+int get hashCode => Object.hash(runtimeType,partner,detailsStatus,isFavorite);
 
 @override
 String toString() {
-  return 'PartnerDetailsState(isLiked: $isLiked)';
+  return 'PartnerDetailsState(partner: $partner, detailsStatus: $detailsStatus, isFavorite: $isFavorite)';
 }
 
 
@@ -45,11 +46,11 @@ abstract mixin class $PartnerDetailsStateCopyWith<$Res>  {
   factory $PartnerDetailsStateCopyWith(PartnerDetailsState value, $Res Function(PartnerDetailsState) _then) = _$PartnerDetailsStateCopyWithImpl;
 @useResult
 $Res call({
- bool isLiked
+ PartnerDetailsModel? partner, PartnerDetailsStatus detailsStatus, bool isFavorite
 });
 
 
-
+$PartnerDetailsStatusCopyWith<$Res> get detailsStatus;
 
 }
 /// @nodoc
@@ -62,13 +63,24 @@ class _$PartnerDetailsStateCopyWithImpl<$Res>
 
 /// Create a copy of PartnerDetailsState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? isLiked = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? partner = freezed,Object? detailsStatus = null,Object? isFavorite = null,}) {
   return _then(_self.copyWith(
-isLiked: null == isLiked ? _self.isLiked : isLiked // ignore: cast_nullable_to_non_nullable
+partner: freezed == partner ? _self.partner : partner // ignore: cast_nullable_to_non_nullable
+as PartnerDetailsModel?,detailsStatus: null == detailsStatus ? _self.detailsStatus : detailsStatus // ignore: cast_nullable_to_non_nullable
+as PartnerDetailsStatus,isFavorite: null == isFavorite ? _self.isFavorite : isFavorite // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
-
+/// Create a copy of PartnerDetailsState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PartnerDetailsStatusCopyWith<$Res> get detailsStatus {
+  
+  return $PartnerDetailsStatusCopyWith<$Res>(_self.detailsStatus, (value) {
+    return _then(_self.copyWith(detailsStatus: value));
+  });
+}
 }
 
 
@@ -150,10 +162,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isLiked)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( PartnerDetailsModel? partner,  PartnerDetailsStatus detailsStatus,  bool isFavorite)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PartnerDetailsState() when $default != null:
-return $default(_that.isLiked);case _:
+return $default(_that.partner,_that.detailsStatus,_that.isFavorite);case _:
   return orElse();
 
 }
@@ -171,10 +183,10 @@ return $default(_that.isLiked);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isLiked)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( PartnerDetailsModel? partner,  PartnerDetailsStatus detailsStatus,  bool isFavorite)  $default,) {final _that = this;
 switch (_that) {
 case _PartnerDetailsState():
-return $default(_that.isLiked);case _:
+return $default(_that.partner,_that.detailsStatus,_that.isFavorite);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -191,10 +203,10 @@ return $default(_that.isLiked);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isLiked)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( PartnerDetailsModel? partner,  PartnerDetailsStatus detailsStatus,  bool isFavorite)?  $default,) {final _that = this;
 switch (_that) {
 case _PartnerDetailsState() when $default != null:
-return $default(_that.isLiked);case _:
+return $default(_that.partner,_that.detailsStatus,_that.isFavorite);case _:
   return null;
 
 }
@@ -205,11 +217,14 @@ return $default(_that.isLiked);case _:
 /// @nodoc
 
 
-class _PartnerDetailsState implements PartnerDetailsState {
-  const _PartnerDetailsState({this.isLiked = false});
+class _PartnerDetailsState extends PartnerDetailsState {
+  const _PartnerDetailsState({this.partner, this.detailsStatus = const PartnerDetailsStatus.initial(), this.isFavorite = false}): super._();
   
 
-@override@JsonKey() final  bool isLiked;
+@override final  PartnerDetailsModel? partner;
+@override@JsonKey() final  PartnerDetailsStatus detailsStatus;
+/// Kept apart from [partner] so the heart flips instantly (optimistic).
+@override@JsonKey() final  bool isFavorite;
 
 /// Create a copy of PartnerDetailsState
 /// with the given fields replaced by the non-null parameter values.
@@ -221,16 +236,16 @@ _$PartnerDetailsStateCopyWith<_PartnerDetailsState> get copyWith => __$PartnerDe
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PartnerDetailsState&&(identical(other.isLiked, isLiked) || other.isLiked == isLiked));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PartnerDetailsState&&(identical(other.partner, partner) || other.partner == partner)&&(identical(other.detailsStatus, detailsStatus) || other.detailsStatus == detailsStatus)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isLiked);
+int get hashCode => Object.hash(runtimeType,partner,detailsStatus,isFavorite);
 
 @override
 String toString() {
-  return 'PartnerDetailsState(isLiked: $isLiked)';
+  return 'PartnerDetailsState(partner: $partner, detailsStatus: $detailsStatus, isFavorite: $isFavorite)';
 }
 
 
@@ -241,11 +256,11 @@ abstract mixin class _$PartnerDetailsStateCopyWith<$Res> implements $PartnerDeta
   factory _$PartnerDetailsStateCopyWith(_PartnerDetailsState value, $Res Function(_PartnerDetailsState) _then) = __$PartnerDetailsStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool isLiked
+ PartnerDetailsModel? partner, PartnerDetailsStatus detailsStatus, bool isFavorite
 });
 
 
-
+@override $PartnerDetailsStatusCopyWith<$Res> get detailsStatus;
 
 }
 /// @nodoc
@@ -258,14 +273,331 @@ class __$PartnerDetailsStateCopyWithImpl<$Res>
 
 /// Create a copy of PartnerDetailsState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? isLiked = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? partner = freezed,Object? detailsStatus = null,Object? isFavorite = null,}) {
   return _then(_PartnerDetailsState(
-isLiked: null == isLiked ? _self.isLiked : isLiked // ignore: cast_nullable_to_non_nullable
+partner: freezed == partner ? _self.partner : partner // ignore: cast_nullable_to_non_nullable
+as PartnerDetailsModel?,detailsStatus: null == detailsStatus ? _self.detailsStatus : detailsStatus // ignore: cast_nullable_to_non_nullable
+as PartnerDetailsStatus,isFavorite: null == isFavorite ? _self.isFavorite : isFavorite // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
 
+/// Create a copy of PartnerDetailsState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PartnerDetailsStatusCopyWith<$Res> get detailsStatus {
+  
+  return $PartnerDetailsStatusCopyWith<$Res>(_self.detailsStatus, (value) {
+    return _then(_self.copyWith(detailsStatus: value));
+  });
+}
+}
+
+/// @nodoc
+mixin _$PartnerDetailsStatus {
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerDetailsStatus);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'PartnerDetailsStatus()';
+}
+
 
 }
+
+/// @nodoc
+class $PartnerDetailsStatusCopyWith<$Res>  {
+$PartnerDetailsStatusCopyWith(PartnerDetailsStatus _, $Res Function(PartnerDetailsStatus) __);
+}
+
+
+/// Adds pattern-matching-related methods to [PartnerDetailsStatus].
+extension PartnerDetailsStatusPatterns on PartnerDetailsStatus {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( PartnerDetailsStatusInitial value)?  initial,TResult Function( PartnerDetailsStatusLoading value)?  loading,TResult Function( PartnerDetailsStatusError value)?  error,TResult Function( PartnerDetailsStatusSuccess value)?  success,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case PartnerDetailsStatusInitial() when initial != null:
+return initial(_that);case PartnerDetailsStatusLoading() when loading != null:
+return loading(_that);case PartnerDetailsStatusError() when error != null:
+return error(_that);case PartnerDetailsStatusSuccess() when success != null:
+return success(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( PartnerDetailsStatusInitial value)  initial,required TResult Function( PartnerDetailsStatusLoading value)  loading,required TResult Function( PartnerDetailsStatusError value)  error,required TResult Function( PartnerDetailsStatusSuccess value)  success,}){
+final _that = this;
+switch (_that) {
+case PartnerDetailsStatusInitial():
+return initial(_that);case PartnerDetailsStatusLoading():
+return loading(_that);case PartnerDetailsStatusError():
+return error(_that);case PartnerDetailsStatusSuccess():
+return success(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( PartnerDetailsStatusInitial value)?  initial,TResult? Function( PartnerDetailsStatusLoading value)?  loading,TResult? Function( PartnerDetailsStatusError value)?  error,TResult? Function( PartnerDetailsStatusSuccess value)?  success,}){
+final _that = this;
+switch (_that) {
+case PartnerDetailsStatusInitial() when initial != null:
+return initial(_that);case PartnerDetailsStatusLoading() when loading != null:
+return loading(_that);case PartnerDetailsStatusError() when error != null:
+return error(_that);case PartnerDetailsStatusSuccess() when success != null:
+return success(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function()?  error,TResult Function()?  success,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case PartnerDetailsStatusInitial() when initial != null:
+return initial();case PartnerDetailsStatusLoading() when loading != null:
+return loading();case PartnerDetailsStatusError() when error != null:
+return error();case PartnerDetailsStatusSuccess() when success != null:
+return success();case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function()  error,required TResult Function()  success,}) {final _that = this;
+switch (_that) {
+case PartnerDetailsStatusInitial():
+return initial();case PartnerDetailsStatusLoading():
+return loading();case PartnerDetailsStatusError():
+return error();case PartnerDetailsStatusSuccess():
+return success();case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function()?  error,TResult? Function()?  success,}) {final _that = this;
+switch (_that) {
+case PartnerDetailsStatusInitial() when initial != null:
+return initial();case PartnerDetailsStatusLoading() when loading != null:
+return loading();case PartnerDetailsStatusError() when error != null:
+return error();case PartnerDetailsStatusSuccess() when success != null:
+return success();case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class PartnerDetailsStatusInitial implements PartnerDetailsStatus {
+  const PartnerDetailsStatusInitial();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerDetailsStatusInitial);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'PartnerDetailsStatus.initial()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class PartnerDetailsStatusLoading implements PartnerDetailsStatus {
+  const PartnerDetailsStatusLoading();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerDetailsStatusLoading);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'PartnerDetailsStatus.loading()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class PartnerDetailsStatusError implements PartnerDetailsStatus {
+  const PartnerDetailsStatusError();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerDetailsStatusError);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'PartnerDetailsStatus.error()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class PartnerDetailsStatusSuccess implements PartnerDetailsStatus {
+  const PartnerDetailsStatusSuccess();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerDetailsStatusSuccess);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'PartnerDetailsStatus.success()';
+}
+
+
+}
+
+
+
 
 // dart format on

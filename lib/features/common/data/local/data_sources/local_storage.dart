@@ -18,7 +18,11 @@ class LocalPreferenceImpl extends ILocalPreference {
 
   @override
   Future<void> initialize() async {
+    // Assigned before the first await so listeners can attach immediately.
+    notificationCount = ValueNotifier<int>(0);
     sharedPreferences = await SharedPreferences.getInstance();
+    notificationCount.value =
+        sharedPreferences?.getInt(AppStrings.prefKeys.notificationCountKey) ?? 0;
     appUser = ValueNotifier<AppUser?>(
       (sharedPreferences?.getString(AppStrings.prefKeys.appUserKey) != null)
           ? AppUser.fromJson(
@@ -61,6 +65,12 @@ class LocalPreferenceImpl extends ILocalPreference {
     log("appUser:: ${sharedPreferences?.getString(AppStrings.prefKeys.supportKey)}");
 
     support.value = supportData;
+  }
+
+  @override
+  void saveNotificationCount(int count) {
+    sharedPreferences?.setInt(AppStrings.prefKeys.notificationCountKey, count);
+    notificationCount.value = count;
   }
 
   @override

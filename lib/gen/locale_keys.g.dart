@@ -547,6 +547,9 @@ abstract class  LocaleKeys {
   static const partnerDetailsReviewer1Name = 'partnerDetailsReviewer1Name';
   static const partnerDetailsReview1Text = 'partnerDetailsReview1Text';
   static const partnerDetailsContractOffer = 'partnerDetailsContractOffer';
+  static const partnerVideoOpenExternally = 'partnerVideoOpenExternally';
+  static const partnerDetailsNoVideos = 'partnerDetailsNoVideos';
+  static const partnerDetailsNoReviews = 'partnerDetailsNoReviews';
   static const manageTeamName = 'manageTeamName';
   static const manageTeamSport = 'manageTeamSport';
   static const manageTeamStatPlayers = 'manageTeamStatPlayers';
@@ -800,6 +803,8 @@ abstract class  LocaleKeys {
   static const notifInviteReject = 'notifInviteReject';
   static const notifInviteAccepted = 'notifInviteAccepted';
   static const notifInviteRejected = 'notifInviteRejected';
+  static const notifDeleteConfirmTitle = 'notifDeleteConfirmTitle';
+  static const notifDeleteConfirmDesc = 'notifDeleteConfirmDesc';
   static const notifEmptyTitle = 'notifEmptyTitle';
   static const notifEmptyDesc = 'notifEmptyDesc';
   static const contractTitle = 'contractTitle';
@@ -825,6 +830,7 @@ abstract class  LocaleKeys {
   static const contractTerm1 = 'contractTerm1';
   static const contractTerm2 = 'contractTerm2';
   static const contractTerm3 = 'contractTerm3';
+  static const contractTermsEmpty = 'contractTermsEmpty';
   static const contractSigner1Role = 'contractSigner1Role';
   static const contractSigner1Time = 'contractSigner1Time';
   static const contractSigner2Role = 'contractSigner2Role';

@@ -1,16 +1,126 @@
-// lib/features/contract_details/data/contract_details_model.dart
+// lib/features/contract_details/data/models/contract_details_model.dart
+import 'package:dawri/features/contracts/data/models/contracts_model.dart';
+import 'package:dawri/features/create_contract/data/models/create_contract_model.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:dawri/core/utils/constants/app_colors.dart';
-import 'package:dawri/gen/locale_keys.g.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'contract_details_model.g.dart';
+
+/// UI-facing status of the contract (derived from the API's int `status`).
 enum ContractStatus { pending, signed, rejected }
 
+/// Maps the API ids (see [ContractStatusId]) onto [ContractStatus].
+ContractStatus contractStatusFromId(int? id) {
+  switch (id) {
+    case ContractStatusId.active:
+      return ContractStatus.signed;
+    case ContractStatusId.rejected:
+      return ContractStatus.rejected;
+    default:
+      return ContractStatus.pending;
+  }
+}
+
+// ─── Player (second party) ────────────────────────────────────────────────────
+@JsonSerializable()
+class ContractUserModel {
+  final int? id;
+  final String? name;
+  final String? avatar;
+
+  ContractUserModel({this.id, this.name, this.avatar});
+
+  factory ContractUserModel.fromJson(Map<String, dynamic> json) =>
+      _$ContractUserModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ContractUserModelToJson(this);
+}
+
+// ─── Position agreed on this contract ─────────────────────────────────────────
+/// Deliberately separate from the participant position in `partner_details` —
+/// this is the position fixed at contract-creation time.
+@JsonSerializable()
+class ContractDetailsPositionModel {
+  final int? id;
+  final String? name;
+
+  ContractDetailsPositionModel({this.id, this.name});
+
+  factory ContractDetailsPositionModel.fromJson(Map<String, dynamic> json) =>
+      _$ContractDetailsPositionModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ContractDetailsPositionModelToJson(this);
+}
+
+// ─── Contract details — GET api/app/contracts/details ─────────────────────────
+@JsonSerializable()
+class ContractDetailsModel {
+  final int? id;
+  final String? contractNumber;
+  final int? status;
+
+  /// Reused from the contracts list / create-contract features.
+  final ContractTeamModel? team;
+  final ContractTypeModel? contractType;
+  final SalaryTypeModel? salaryType;
+
+  final ContractUserModel? user;
+  final ContractDetailsPositionModel? position;
+
+  final num? amount;
+  final String? startDate;
+  final String? endDate;
+  final int? totalHours;
+  final num? rating;
+  final String? terms;
+
+  /// When the player accepted — `null` while the contract is still pending.
+  @JsonKey(name: 'accepted_at')
+  final String? acceptedAt;
+
+  /// When the team created / signed the contract (always present).
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
+
+  ContractDetailsModel({
+    this.id,
+    this.contractNumber,
+    this.status,
+    this.team,
+    this.contractType,
+    this.salaryType,
+    this.user,
+    this.position,
+    this.amount,
+    this.startDate,
+    this.endDate,
+    this.totalHours,
+    this.rating,
+    this.terms,
+    this.acceptedAt,
+    this.createdAt,
+  });
+
+  ContractStatus get statusEnum => contractStatusFromId(status);
+
+  bool get isPending => status == ContractStatusId.pending;
+
+  /// Terms arrive as one free-text blob — split on line breaks for the list.
+  List<String> get termsLines => (terms ?? '')
+      .split(RegExp(r'[\r\n]+'))
+      .map((e) => e.trim())
+      .where((e) => e.isNotEmpty)
+      .toList();
+
+  factory ContractDetailsModel.fromJson(Map<String, dynamic> json) =>
+      _$ContractDetailsModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ContractDetailsModelToJson(this);
+}
+
+// ─── UI value object for the details grid ─────────────────────────────────────
 class DetailBoxData {
   final IconData icon;
   final Color iconColor;
   final String labelKey;
-  final String valueKey;
+  final String value;
   final bool isHighlighted;
   final bool isFullWidth;
 
@@ -18,68 +128,8 @@ class DetailBoxData {
     required this.icon,
     required this.iconColor,
     required this.labelKey,
-    required this.valueKey,
+    required this.value,
     this.isHighlighted = false,
     this.isFullWidth = false,
   });
-}
-
-class ContractDetailsMockData {
-  static const refNumber = '#CONT-2026-8942';
-
-  static const party1ImageUrl = 'https://images.unsplash.com/photo-1599474924187-334a4ae5bd3c?w=150&q=80';
-  static const party1LabelKey = LocaleKeys.contractParty1Label;
-  static const party1NameKey = LocaleKeys.contractParty1Name;
-  static const party1IsCircle = false;
-
-  static const party2ImageUrl = 'https://i.pravatar.cc/150?img=11';
-  static const party2LabelKey = LocaleKeys.contractParty2Label;
-  static const party2NameKey = LocaleKeys.contractParty2Name;
-  static const party2IsCircle = true;
-
-  static const detailBoxes = [
-    DetailBoxData(
-      icon: FontAwesomeIcons.tag,
-      iconColor: AppColors.primaryLight,
-      labelKey: LocaleKeys.contractTypeLabel,
-      valueKey: LocaleKeys.contractTypeValue,
-      isFullWidth: true,
-    ),
-    DetailBoxData(
-      icon: FontAwesomeIcons.calendarCheck,
-      iconColor: AppColors.textMuted,
-      labelKey: LocaleKeys.contractStartLabel,
-      valueKey: LocaleKeys.contractStartValue,
-    ),
-    DetailBoxData(
-      icon: FontAwesomeIcons.calendarXmark,
-      iconColor: AppColors.textMuted,
-      labelKey: LocaleKeys.contractEndLabel,
-      valueKey: LocaleKeys.contractEndValue,
-    ),
-    DetailBoxData(
-      icon: FontAwesomeIcons.streetView,
-      iconColor: AppColors.textMuted,
-      labelKey: LocaleKeys.contractPositionLabel,
-      valueKey: LocaleKeys.contractPositionValue,
-    ),
-    DetailBoxData(
-      icon: FontAwesomeIcons.sackDollar,
-      iconColor: AppColors.primary,
-      labelKey: LocaleKeys.contractBonusLabel,
-      valueKey: LocaleKeys.contractBonusValue,
-      isHighlighted: true,
-    ),
-  ];
-
-  static const terms = [
-    LocaleKeys.contractTerm1,
-    LocaleKeys.contractTerm2,
-    LocaleKeys.contractTerm3,
-  ];
-
-  static const party1SignerKey = LocaleKeys.contractSigner1Role;
-  static const party1SignedAtKey = LocaleKeys.contractSigner1Time;
-
-  static const party2SignerKey = LocaleKeys.contractSigner2Role;
 }

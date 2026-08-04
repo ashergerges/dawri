@@ -39,6 +39,9 @@ class Endpoints {
 
   //notification
   String get notificationUrl => r'api/app/notifications/all';
+  String get notificationTypesUrl => r'api/app/notification-types';
+  String get userNotificationsUrl => r'api/app/user/notifications';
+  String get markAllNotificationsReadUrl => r'api/app/user/notifications/read-all';
 
   // create invitation
   String get createInvitationUrl => r'api/app/invitation/create';
@@ -79,6 +82,10 @@ class Endpoints {
 
   //participants (partners)
   String get participantsUrl => r'api/app/participants';
+  String get participantDetailsUrl => r'api/app/participants/details';
+  String get participantFavoriteUrl => r'api/app/participants/favorite';
+  String get participantVideosUrl => r'api/app/participants/videos';
+  String get participantReviewsUrl => r'api/app/participants/reviews';
   String get teamJoinRequestCreateUrl => r'api/app/user/team/join-requests';
 
   //complete profile (register) — reuse participantTypesUrl / sportsUrl / citiesUrl
@@ -133,6 +140,7 @@ class Endpoints {
   //my contracts
   String get contractsUrl => r'api/app/contracts';
   String get contractsSummaryUrl => r'api/app/contracts/summary';
+  String get contractDetailsUrl => r'api/app/contracts/details';
   String get contractStatusUrl => r'api/app/contracts/status';
 
   String get challengeLevelsUrl  => r'api/app/challenge-levels';
