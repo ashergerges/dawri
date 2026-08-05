@@ -1,4 +1,3 @@
-import 'package:dawri/features/create_championship/data/models/championship_option_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'app_user.g.dart';
@@ -95,11 +94,34 @@ class Profile {
   @JsonKey(name: 'birth_date')
   final String? birthDate;
 
+  final String? email;
+  final String? bio;
+
   @JsonKey(name: 'city_id')
   final int? cityId;
 
+  @JsonKey(name: 'city_name')
+  final String? cityName;
+
   final String? avatar;
-  final SportModel? type;
+
+  /// Participant type — `{id, name, icon}` (1 Player / 2 Referee / 3 Coach …).
+  @JsonKey(name: 'type_id')
+  final int? typeId;
+  final ProfileRefModel? type;
+
+  @JsonKey(name: 'sport_id')
+  final int? sportId;
+
+  @JsonKey(name: 'sport_name')
+  final String? sportName;
+
+  @JsonKey(name: 'sport_position_id')
+  final int? sportPositionId;
+
+  @JsonKey(name: 'sport_position_name')
+  final String? sportPositionName;
+
   final String? title;
   final String? license;
 
@@ -118,9 +140,17 @@ class Profile {
     required this.id,
     this.fullName,
     this.birthDate,
+    this.email,
+    this.bio,
     this.cityId,
+    this.cityName,
     this.avatar,
+    this.typeId,
     this.type,
+    this.sportId,
+    this.sportName,
+    this.sportPositionId,
+    this.sportPositionName,
     this.title,
     this.license,
     this.isAvailableForContract,
@@ -129,8 +159,73 @@ class Profile {
     this.updatedAt,
   });
 
+  /// Participant type id — the payload sends it both flat and nested.
+  int? get participantTypeId => typeId ?? type?.id;
+
+  Profile copyWith({
+    int? id,
+    String? fullName,
+    String? birthDate,
+    String? email,
+    String? bio,
+    int? cityId,
+    String? cityName,
+    String? avatar,
+    int? typeId,
+    ProfileRefModel? type,
+    int? sportId,
+    String? sportName,
+    int? sportPositionId,
+    String? sportPositionName,
+    String? title,
+    String? license,
+    bool? isAvailableForContract,
+    num? rating,
+    String? createdAt,
+    String? updatedAt,
+  }) {
+    return Profile(
+      id: id ?? this.id,
+      fullName: fullName ?? this.fullName,
+      birthDate: birthDate ?? this.birthDate,
+      email: email ?? this.email,
+      bio: bio ?? this.bio,
+      cityId: cityId ?? this.cityId,
+      cityName: cityName ?? this.cityName,
+      avatar: avatar ?? this.avatar,
+      typeId: typeId ?? this.typeId,
+      type: type ?? this.type,
+      sportId: sportId ?? this.sportId,
+      sportName: sportName ?? this.sportName,
+      sportPositionId: sportPositionId ?? this.sportPositionId,
+      sportPositionName: sportPositionName ?? this.sportPositionName,
+      title: title ?? this.title,
+      license: license ?? this.license,
+      isAvailableForContract:
+          isAvailableForContract ?? this.isAvailableForContract,
+      rating: rating ?? this.rating,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
   factory Profile.fromJson(Map<String, dynamic> json) =>
       _$ProfileFromJson(json);
 
   Map<String, dynamic> toJson() => _$ProfileToJson(this);
+}
+
+/// `{id, name, icon}` reference block used by `profile.type`.
+@JsonSerializable()
+class ProfileRefModel {
+  final int? id;
+  final String? name;
+  final String? icon;
+
+  const ProfileRefModel({this.id, this.name, this.icon});
+
+  factory ProfileRefModel.fromJson(Map<String, dynamic> json) =>
+      _$ProfileRefModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ProfileRefModelToJson(this);
 }

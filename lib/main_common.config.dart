@@ -53,6 +53,10 @@ import 'features/championships/data/repositories/interfaces/i_championships_repo
     as _i651;
 import 'features/championships/data/repositories/remote/championships_repository.dart'
     as _i419;
+import 'features/charge_wallet/data/repositories/interfaces/i_charge_wallet_repository.dart'
+    as _i1068;
+import 'features/charge_wallet/data/repositories/remote/charge_wallet_repository.dart'
+    as _i895;
 import 'features/common/data/local/data_sources/local_storage.dart' as _i656;
 import 'features/common/data/local/repositories/token_local_repository.dart'
     as _i784;
@@ -146,10 +150,18 @@ import 'features/stadiums/data/repositories/remote/stadiums_repository.dart'
 import 'features/store/data/repository/interface/i_store_repository.dart'
     as _i255;
 import 'features/store/data/repository/remote/store_repository.dart' as _i77;
+import 'features/team_profile/data/repositories/interfaces/i_team_profile_repository.dart'
+    as _i55;
+import 'features/team_profile/data/repositories/remote/team_profile_repository.dart'
+    as _i378;
 import 'features/tickets/data/repository/interface/i_tickets_repository.dart'
     as _i773;
 import 'features/tickets/data/repository/remote/tickets_repository.dart'
     as _i305;
+import 'features/update_profile/data/repositories/interfaces/i_update_profile_repository.dart'
+    as _i289;
+import 'features/update_profile/data/repositories/remote/update_profile_repository.dart'
+    as _i609;
 
 // initializes the registration of main-scope dependencies inside of GetIt
 _i174.GetIt $initGetIt(
@@ -263,6 +275,16 @@ _i174.GetIt $initGetIt(
       networkService: gh<_i969.NetworkService>(),
     ),
   );
+  gh.factory<_i289.IUpdateProfileRepository>(
+    () => _i609.UpdateProfileRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
+  );
+  gh.factory<_i1068.IChargeWalletRepository>(
+    () => _i895.ChargeWalletRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
+  );
   gh.factory<_i93.ICreateChampionshipRepository>(
     () => _i638.CreateChampionshipRepository(
       networkService: gh<_i969.NetworkService>(),
@@ -302,6 +324,10 @@ _i174.GetIt $initGetIt(
   );
   gh.factory<_i720.IRegisterRepository>(
     () => _i423.RegisterRepository(networkService: gh<_i969.NetworkService>()),
+  );
+  gh.factory<_i55.ITeamProfileRepository>(
+    () =>
+        _i378.TeamProfileRepository(networkService: gh<_i969.NetworkService>()),
   );
   gh.factory<_i1053.IStadiumProfileRepository>(
     () => _i44.StadiumProfileRepository(

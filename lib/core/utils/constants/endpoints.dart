@@ -36,6 +36,7 @@ class Endpoints {
   //profile
   String get updateProfileImageUrl => r'api/app/update-profile-image';
   String get updateProfileUrl => r'api/app/update-profile';
+  String get updateUserProfileUrl => r'api/app/user/update-profile';
 
   //notification
   String get notificationUrl => r'api/app/notifications/all';
@@ -78,6 +79,7 @@ class Endpoints {
   String get championshipRegisterOneUrl => r'api/app/championships/register-one';
 
   String get teamsUrl => r'api/app/teams';
+  String get teamDetailsUrl => r'api/app/teams/details';
   String get championshipRegisterTeamUrl => r'api/app/championships/register-team';
 
   //participants (partners)
@@ -129,6 +131,9 @@ class Endpoints {
 
 
   String get financialTransactionsUrl => r'api/app/user/financial-transactions';
+
+  //wallet
+  String get walletTopUpUrl => r'api/app/user/wallet/top-up';
   String get matchesTicketsUrl  => r'api/app/championship/matches/tickets';
   String get myTicketsUrl  => r'api/app/championship/matches/my-tickets';
 

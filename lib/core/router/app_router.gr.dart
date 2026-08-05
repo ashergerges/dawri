@@ -324,18 +324,54 @@ class ChampionshipRegisterRouteArgs {
 
 /// generated route for
 /// [ChargeWalletScreen]
-class ChargeWalletRoute extends PageRouteInfo<void> {
-  const ChargeWalletRoute({List<PageRouteInfo>? children})
-    : super(ChargeWalletRoute.name, initialChildren: children);
+class ChargeWalletRoute extends PageRouteInfo<ChargeWalletRouteArgs> {
+  ChargeWalletRoute({
+    Key? key,
+    double currentBalance = 0,
+    List<PageRouteInfo>? children,
+  }) : super(
+         ChargeWalletRoute.name,
+         args: ChargeWalletRouteArgs(key: key, currentBalance: currentBalance),
+         initialChildren: children,
+       );
 
   static const String name = 'ChargeWalletRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const ChargeWalletScreen();
+      final args = data.argsAs<ChargeWalletRouteArgs>(
+        orElse: () => const ChargeWalletRouteArgs(),
+      );
+      return ChargeWalletScreen(
+        key: args.key,
+        currentBalance: args.currentBalance,
+      );
     },
   );
+}
+
+class ChargeWalletRouteArgs {
+  const ChargeWalletRouteArgs({this.key, this.currentBalance = 0});
+
+  final Key? key;
+
+  final double currentBalance;
+
+  @override
+  String toString() {
+    return 'ChargeWalletRouteArgs{key: $key, currentBalance: $currentBalance}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ChargeWalletRouteArgs) return false;
+    return key == other.key && currentBalance == other.currentBalance;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ currentBalance.hashCode;
 }
 
 /// generated route for
@@ -1354,6 +1390,53 @@ class StadiumProfileRouteArgs {
 
   @override
   int get hashCode => key.hashCode ^ stadiumId.hashCode;
+}
+
+/// generated route for
+/// [TeamProfileScreen]
+class TeamProfileRoute extends PageRouteInfo<TeamProfileRouteArgs> {
+  TeamProfileRoute({
+    Key? key,
+    required int teamId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         TeamProfileRoute.name,
+         args: TeamProfileRouteArgs(key: key, teamId: teamId),
+         initialChildren: children,
+       );
+
+  static const String name = 'TeamProfileRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<TeamProfileRouteArgs>();
+      return TeamProfileScreen(key: args.key, teamId: args.teamId);
+    },
+  );
+}
+
+class TeamProfileRouteArgs {
+  const TeamProfileRouteArgs({this.key, required this.teamId});
+
+  final Key? key;
+
+  final int teamId;
+
+  @override
+  String toString() {
+    return 'TeamProfileRouteArgs{key: $key, teamId: $teamId}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! TeamProfileRouteArgs) return false;
+    return key == other.key && teamId == other.teamId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ teamId.hashCode;
 }
 
 /// generated route for

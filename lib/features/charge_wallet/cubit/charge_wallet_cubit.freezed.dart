@@ -14,7 +14,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ChargeWalletState {
 
- double get selectedAmount; double? get selectedChip; String get customInput; PaymentMethod get selectedMethod; bool get isPaying; bool get showSuccessModal;
+/// Live wallet balance — seeded from the account screen, updated on top-up.
+ double get balance; double get selectedAmount; double? get selectedChip; String get customInput; PaymentMethod get selectedMethod; bool get isPaying;/// Amount of the last successful top-up — what the success modal shows.
+ double get chargedAmount; bool get showSuccessModal;
 /// Create a copy of ChargeWalletState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +27,16 @@ $ChargeWalletStateCopyWith<ChargeWalletState> get copyWith => _$ChargeWalletStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChargeWalletState&&(identical(other.selectedAmount, selectedAmount) || other.selectedAmount == selectedAmount)&&(identical(other.selectedChip, selectedChip) || other.selectedChip == selectedChip)&&(identical(other.customInput, customInput) || other.customInput == customInput)&&(identical(other.selectedMethod, selectedMethod) || other.selectedMethod == selectedMethod)&&(identical(other.isPaying, isPaying) || other.isPaying == isPaying)&&(identical(other.showSuccessModal, showSuccessModal) || other.showSuccessModal == showSuccessModal));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChargeWalletState&&(identical(other.balance, balance) || other.balance == balance)&&(identical(other.selectedAmount, selectedAmount) || other.selectedAmount == selectedAmount)&&(identical(other.selectedChip, selectedChip) || other.selectedChip == selectedChip)&&(identical(other.customInput, customInput) || other.customInput == customInput)&&(identical(other.selectedMethod, selectedMethod) || other.selectedMethod == selectedMethod)&&(identical(other.isPaying, isPaying) || other.isPaying == isPaying)&&(identical(other.chargedAmount, chargedAmount) || other.chargedAmount == chargedAmount)&&(identical(other.showSuccessModal, showSuccessModal) || other.showSuccessModal == showSuccessModal));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,selectedAmount,selectedChip,customInput,selectedMethod,isPaying,showSuccessModal);
+int get hashCode => Object.hash(runtimeType,balance,selectedAmount,selectedChip,customInput,selectedMethod,isPaying,chargedAmount,showSuccessModal);
 
 @override
 String toString() {
-  return 'ChargeWalletState(selectedAmount: $selectedAmount, selectedChip: $selectedChip, customInput: $customInput, selectedMethod: $selectedMethod, isPaying: $isPaying, showSuccessModal: $showSuccessModal)';
+  return 'ChargeWalletState(balance: $balance, selectedAmount: $selectedAmount, selectedChip: $selectedChip, customInput: $customInput, selectedMethod: $selectedMethod, isPaying: $isPaying, chargedAmount: $chargedAmount, showSuccessModal: $showSuccessModal)';
 }
 
 
@@ -45,7 +47,7 @@ abstract mixin class $ChargeWalletStateCopyWith<$Res>  {
   factory $ChargeWalletStateCopyWith(ChargeWalletState value, $Res Function(ChargeWalletState) _then) = _$ChargeWalletStateCopyWithImpl;
 @useResult
 $Res call({
- double selectedAmount, double? selectedChip, String customInput, PaymentMethod selectedMethod, bool isPaying, bool showSuccessModal
+ double balance, double selectedAmount, double? selectedChip, String customInput, PaymentMethod selectedMethod, bool isPaying, double chargedAmount, bool showSuccessModal
 });
 
 
@@ -62,14 +64,16 @@ class _$ChargeWalletStateCopyWithImpl<$Res>
 
 /// Create a copy of ChargeWalletState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? selectedAmount = null,Object? selectedChip = freezed,Object? customInput = null,Object? selectedMethod = null,Object? isPaying = null,Object? showSuccessModal = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? balance = null,Object? selectedAmount = null,Object? selectedChip = freezed,Object? customInput = null,Object? selectedMethod = null,Object? isPaying = null,Object? chargedAmount = null,Object? showSuccessModal = null,}) {
   return _then(_self.copyWith(
-selectedAmount: null == selectedAmount ? _self.selectedAmount : selectedAmount // ignore: cast_nullable_to_non_nullable
+balance: null == balance ? _self.balance : balance // ignore: cast_nullable_to_non_nullable
+as double,selectedAmount: null == selectedAmount ? _self.selectedAmount : selectedAmount // ignore: cast_nullable_to_non_nullable
 as double,selectedChip: freezed == selectedChip ? _self.selectedChip : selectedChip // ignore: cast_nullable_to_non_nullable
 as double?,customInput: null == customInput ? _self.customInput : customInput // ignore: cast_nullable_to_non_nullable
 as String,selectedMethod: null == selectedMethod ? _self.selectedMethod : selectedMethod // ignore: cast_nullable_to_non_nullable
 as PaymentMethod,isPaying: null == isPaying ? _self.isPaying : isPaying // ignore: cast_nullable_to_non_nullable
-as bool,showSuccessModal: null == showSuccessModal ? _self.showSuccessModal : showSuccessModal // ignore: cast_nullable_to_non_nullable
+as bool,chargedAmount: null == chargedAmount ? _self.chargedAmount : chargedAmount // ignore: cast_nullable_to_non_nullable
+as double,showSuccessModal: null == showSuccessModal ? _self.showSuccessModal : showSuccessModal // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -155,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double selectedAmount,  double? selectedChip,  String customInput,  PaymentMethod selectedMethod,  bool isPaying,  bool showSuccessModal)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double balance,  double selectedAmount,  double? selectedChip,  String customInput,  PaymentMethod selectedMethod,  bool isPaying,  double chargedAmount,  bool showSuccessModal)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ChargeWalletState() when $default != null:
-return $default(_that.selectedAmount,_that.selectedChip,_that.customInput,_that.selectedMethod,_that.isPaying,_that.showSuccessModal);case _:
+return $default(_that.balance,_that.selectedAmount,_that.selectedChip,_that.customInput,_that.selectedMethod,_that.isPaying,_that.chargedAmount,_that.showSuccessModal);case _:
   return orElse();
 
 }
@@ -176,10 +180,10 @@ return $default(_that.selectedAmount,_that.selectedChip,_that.customInput,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double selectedAmount,  double? selectedChip,  String customInput,  PaymentMethod selectedMethod,  bool isPaying,  bool showSuccessModal)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double balance,  double selectedAmount,  double? selectedChip,  String customInput,  PaymentMethod selectedMethod,  bool isPaying,  double chargedAmount,  bool showSuccessModal)  $default,) {final _that = this;
 switch (_that) {
 case _ChargeWalletState():
-return $default(_that.selectedAmount,_that.selectedChip,_that.customInput,_that.selectedMethod,_that.isPaying,_that.showSuccessModal);case _:
+return $default(_that.balance,_that.selectedAmount,_that.selectedChip,_that.customInput,_that.selectedMethod,_that.isPaying,_that.chargedAmount,_that.showSuccessModal);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +200,10 @@ return $default(_that.selectedAmount,_that.selectedChip,_that.customInput,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double selectedAmount,  double? selectedChip,  String customInput,  PaymentMethod selectedMethod,  bool isPaying,  bool showSuccessModal)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double balance,  double selectedAmount,  double? selectedChip,  String customInput,  PaymentMethod selectedMethod,  bool isPaying,  double chargedAmount,  bool showSuccessModal)?  $default,) {final _that = this;
 switch (_that) {
 case _ChargeWalletState() when $default != null:
-return $default(_that.selectedAmount,_that.selectedChip,_that.customInput,_that.selectedMethod,_that.isPaying,_that.showSuccessModal);case _:
+return $default(_that.balance,_that.selectedAmount,_that.selectedChip,_that.customInput,_that.selectedMethod,_that.isPaying,_that.chargedAmount,_that.showSuccessModal);case _:
   return null;
 
 }
@@ -211,14 +215,18 @@ return $default(_that.selectedAmount,_that.selectedChip,_that.customInput,_that.
 
 
 class _ChargeWalletState implements ChargeWalletState {
-  const _ChargeWalletState({this.selectedAmount = 0.0, this.selectedChip, this.customInput = '', this.selectedMethod = PaymentMethod.applePay, this.isPaying = false, this.showSuccessModal = false});
+  const _ChargeWalletState({this.balance = 0.0, this.selectedAmount = 0.0, this.selectedChip, this.customInput = '', this.selectedMethod = PaymentMethod.applePay, this.isPaying = false, this.chargedAmount = 0.0, this.showSuccessModal = false});
   
 
+/// Live wallet balance — seeded from the account screen, updated on top-up.
+@override@JsonKey() final  double balance;
 @override@JsonKey() final  double selectedAmount;
 @override final  double? selectedChip;
 @override@JsonKey() final  String customInput;
 @override@JsonKey() final  PaymentMethod selectedMethod;
 @override@JsonKey() final  bool isPaying;
+/// Amount of the last successful top-up — what the success modal shows.
+@override@JsonKey() final  double chargedAmount;
 @override@JsonKey() final  bool showSuccessModal;
 
 /// Create a copy of ChargeWalletState
@@ -231,16 +239,16 @@ _$ChargeWalletStateCopyWith<_ChargeWalletState> get copyWith => __$ChargeWalletS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChargeWalletState&&(identical(other.selectedAmount, selectedAmount) || other.selectedAmount == selectedAmount)&&(identical(other.selectedChip, selectedChip) || other.selectedChip == selectedChip)&&(identical(other.customInput, customInput) || other.customInput == customInput)&&(identical(other.selectedMethod, selectedMethod) || other.selectedMethod == selectedMethod)&&(identical(other.isPaying, isPaying) || other.isPaying == isPaying)&&(identical(other.showSuccessModal, showSuccessModal) || other.showSuccessModal == showSuccessModal));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChargeWalletState&&(identical(other.balance, balance) || other.balance == balance)&&(identical(other.selectedAmount, selectedAmount) || other.selectedAmount == selectedAmount)&&(identical(other.selectedChip, selectedChip) || other.selectedChip == selectedChip)&&(identical(other.customInput, customInput) || other.customInput == customInput)&&(identical(other.selectedMethod, selectedMethod) || other.selectedMethod == selectedMethod)&&(identical(other.isPaying, isPaying) || other.isPaying == isPaying)&&(identical(other.chargedAmount, chargedAmount) || other.chargedAmount == chargedAmount)&&(identical(other.showSuccessModal, showSuccessModal) || other.showSuccessModal == showSuccessModal));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,selectedAmount,selectedChip,customInput,selectedMethod,isPaying,showSuccessModal);
+int get hashCode => Object.hash(runtimeType,balance,selectedAmount,selectedChip,customInput,selectedMethod,isPaying,chargedAmount,showSuccessModal);
 
 @override
 String toString() {
-  return 'ChargeWalletState(selectedAmount: $selectedAmount, selectedChip: $selectedChip, customInput: $customInput, selectedMethod: $selectedMethod, isPaying: $isPaying, showSuccessModal: $showSuccessModal)';
+  return 'ChargeWalletState(balance: $balance, selectedAmount: $selectedAmount, selectedChip: $selectedChip, customInput: $customInput, selectedMethod: $selectedMethod, isPaying: $isPaying, chargedAmount: $chargedAmount, showSuccessModal: $showSuccessModal)';
 }
 
 
@@ -251,7 +259,7 @@ abstract mixin class _$ChargeWalletStateCopyWith<$Res> implements $ChargeWalletS
   factory _$ChargeWalletStateCopyWith(_ChargeWalletState value, $Res Function(_ChargeWalletState) _then) = __$ChargeWalletStateCopyWithImpl;
 @override @useResult
 $Res call({
- double selectedAmount, double? selectedChip, String customInput, PaymentMethod selectedMethod, bool isPaying, bool showSuccessModal
+ double balance, double selectedAmount, double? selectedChip, String customInput, PaymentMethod selectedMethod, bool isPaying, double chargedAmount, bool showSuccessModal
 });
 
 
@@ -268,14 +276,16 @@ class __$ChargeWalletStateCopyWithImpl<$Res>
 
 /// Create a copy of ChargeWalletState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? selectedAmount = null,Object? selectedChip = freezed,Object? customInput = null,Object? selectedMethod = null,Object? isPaying = null,Object? showSuccessModal = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? balance = null,Object? selectedAmount = null,Object? selectedChip = freezed,Object? customInput = null,Object? selectedMethod = null,Object? isPaying = null,Object? chargedAmount = null,Object? showSuccessModal = null,}) {
   return _then(_ChargeWalletState(
-selectedAmount: null == selectedAmount ? _self.selectedAmount : selectedAmount // ignore: cast_nullable_to_non_nullable
+balance: null == balance ? _self.balance : balance // ignore: cast_nullable_to_non_nullable
+as double,selectedAmount: null == selectedAmount ? _self.selectedAmount : selectedAmount // ignore: cast_nullable_to_non_nullable
 as double,selectedChip: freezed == selectedChip ? _self.selectedChip : selectedChip // ignore: cast_nullable_to_non_nullable
 as double?,customInput: null == customInput ? _self.customInput : customInput // ignore: cast_nullable_to_non_nullable
 as String,selectedMethod: null == selectedMethod ? _self.selectedMethod : selectedMethod // ignore: cast_nullable_to_non_nullable
 as PaymentMethod,isPaying: null == isPaying ? _self.isPaying : isPaying // ignore: cast_nullable_to_non_nullable
-as bool,showSuccessModal: null == showSuccessModal ? _self.showSuccessModal : showSuccessModal // ignore: cast_nullable_to_non_nullable
+as bool,chargedAmount: null == chargedAmount ? _self.chargedAmount : chargedAmount // ignore: cast_nullable_to_non_nullable
+as double,showSuccessModal: null == showSuccessModal ? _self.showSuccessModal : showSuccessModal // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

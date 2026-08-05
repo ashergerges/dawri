@@ -33,6 +33,7 @@ import 'package:dawri/features/register/ui/register_screen.dart';
 import 'package:dawri/features/reserve/ui/reserve_now_screen.dart';
 import 'package:dawri/features/search/ui/search_screen.dart';
 import 'package:dawri/features/stadium_profile/ui/stadium_profile_screen.dart';
+import 'package:dawri/features/team_profile/ui/team_profile_screen.dart';
 import 'package:dawri/features/tickets/ui/tickets_screen.dart';
 import 'package:dawri/features/update_profile/ui/update_profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -105,6 +106,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute( page: CreateTeamRoute.page),
     AutoRoute( page: EmptyMyTeamRoute.page),
     AutoRoute( page: RegisterRoute.page),
+    AutoRoute( page: TeamProfileRoute.page),
     AutoRoute(path: '*', page: NotFoundRoute.page), // this must be last route
 
   ];

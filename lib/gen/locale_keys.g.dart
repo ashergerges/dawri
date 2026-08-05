@@ -713,6 +713,10 @@ abstract class  LocaleKeys {
   static const updateProfileOk = 'updateProfileOk';
   static const updateProfileErrorImageTooLarge = 'updateProfileErrorImageTooLarge';
   static const updateProfileErrorPickFailed = 'updateProfileErrorPickFailed';
+  static const updateProfileEmailOptional = 'updateProfileEmailOptional';
+  static const updateProfileBirthDate = 'updateProfileBirthDate';
+  static const updateProfileDeleteAccount = 'updateProfileDeleteAccount';
+  static const updateProfileDeleteAccountUnavailable = 'updateProfileDeleteAccountUnavailable';
   static const stadiumProfileName = 'stadiumProfileName';
   static const stadiumProfileLocation = 'stadiumProfileLocation';
   static const stadiumProfileDescription = 'stadiumProfileDescription';
@@ -1088,5 +1092,14 @@ abstract class  LocaleKeys {
   static const registerParticipantRoleLabel = 'registerParticipantRoleLabel';
   static const registerParticipantSuccessTitle = 'registerParticipantSuccessTitle';
   static const registerParticipantSuccessDesc = 'registerParticipantSuccessDesc';
+  static const teamNotFound = 'teamNotFound';
+  static const joinTeam = 'joinTeam';
+  static const alreadyJoined = 'alreadyJoined';
+  static const players = 'players';
+  static const rating = 'rating';
+  static const roster = 'roster';
+  static const teamProfileRequestSent = 'teamProfileRequestSent';
+  static const teamProfileHaveOtherTeam = 'teamProfileHaveOtherTeam';
+  static const teamProfileNoMembers = 'teamProfileNoMembers';
 
 }

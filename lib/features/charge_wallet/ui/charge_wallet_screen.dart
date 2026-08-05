@@ -1,6 +1,5 @@
 // lib/features/charge_wallet/ui/charge_wallet_screen.dart
 import 'package:auto_route/auto_route.dart';
-import 'package:dawri/core/utils/common_widgets/on_tap.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,12 +16,15 @@ import '../data/models/charge_wallet_model.dart';
 
 @RoutePage()
 class ChargeWalletScreen extends StatelessWidget {
-  const ChargeWalletScreen({super.key});
+  /// Current wallet balance, handed over by the account screen.
+  final double currentBalance;
+
+  const ChargeWalletScreen({super.key, this.currentBalance = 0});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ChargeWalletCubit(),
+      create: (_) => ChargeWalletCubit(currentBalance: currentBalance),
       child: const _ChargeWalletView(),
     );
   }
@@ -41,7 +43,7 @@ class _ChargeWalletView extends StatelessWidget {
           context: context,
           barrierColor: AppColors.slate900.withOpacity(0.6),
           barrierDismissible: false,
-          builder: (_) => _SuccessModal(amount: state.selectedAmount),
+          builder: (_) => _SuccessModal(amount: state.chargedAmount),
         ).then((_) => cubit.closeModal());
       },
       child: Scaffold(
@@ -92,11 +94,8 @@ class _SubHeader extends StatelessWidget {
           ),
           Text(LocaleKeys.walletTitle.tr(),
               style: AppTextTheme.headingSmall(context).copyWith(fontWeight: FontWeight.w900, color: AppColors.textDark)),
-          OnTap(
-            onTap: () {},
-            child: CircleAvatar(radius: 20.r, backgroundColor: AppColors.slate100,
-                child: FaIcon(FontAwesomeIcons.clockRotateLeft, size: 15.sp, color: AppColors.textDark)),
-          ),
+          // Balances the back button so the title stays centred.
+          SizedBox(width: 40.w, height: 40.w),
         ],
       ),
     );
@@ -136,12 +135,15 @@ class _WalletCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
                     children: [
-                      Text(
-                        ChargeWalletMockData.currentBalance.toStringAsFixed(2),
-                        style: AppTextTheme.headingMedium(context).copyWith(
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.white,
-                          fontSize: 32.sp,
+                      BlocBuilder<ChargeWalletCubit, ChargeWalletState>(
+                        buildWhen: (p, c) => p.balance != c.balance,
+                        builder: (context, state) => Text(
+                          state.balance.toStringAsFixed(2),
+                          style: AppTextTheme.headingMedium(context).copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.white,
+                            fontSize: 32.sp,
+                          ),
                         ),
                       ),
                       5.w.sizedWidth,

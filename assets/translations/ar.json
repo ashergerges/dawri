@@ -716,6 +716,10 @@
   "updateProfileOk": "حسناً",
   "updateProfileErrorImageTooLarge": "حجم الصورة يتجاوز الحد المسموح (5 ميجا)",
   "updateProfileErrorPickFailed": "حدث خطأ أثناء اختيار الصورة",
+  "updateProfileEmailOptional": "البريد الإلكتروني (اختياري)",
+  "updateProfileBirthDate": "تاريخ الميلاد",
+  "updateProfileDeleteAccount": "تعطيل أو حذف الحساب",
+  "updateProfileDeleteAccountUnavailable": "حذف الحساب غير متاح في التطبيق حاليًا. يرجى التواصل مع الدعم.",
   "stadiumProfileName": "ملعب أرينا الرياض",
   "stadiumProfileLocation": "الرياض، حي الملقا (يبعد 4.2 كم)",
   "stadiumProfileDescription": "يعتبر ملعب أرينا من أفضل الملاعب المجهزة بأحدث الأرضيات الصناعية المعتمدة من الفيفا. يوفر بيئة مثالية للبطولات والتمارين الليلة بفضل الإضاءة الاحترافية.",
@@ -1090,7 +1094,14 @@
   "registerSuccessAction": "ابدأ التصفح",
   "registerParticipantRoleLabel": "صفتك في التطبيق",
   "registerParticipantSuccessTitle": "أهلاً بك في دوري!",
-  "registerParticipantSuccessDesc": "تم تسجيل حسابك بنجاح. يمكنك الآن استكشاف البطولات والتحديات المتاحة في منطقتك والانضمام إلى الفرق."
-
-
+  "registerParticipantSuccessDesc": "تم تسجيل حسابك بنجاح. يمكنك الآن استكشاف البطولات والتحديات المتاحة في منطقتك والانضمام إلى الفرق.",
+  "teamNotFound": "لم يتم العثور على الفريق",
+  "joinTeam": "انضمام للفريق",
+  "alreadyJoined": "أنت عضو في هذا الفريق",
+  "players": "لاعبين",
+  "rating": "التقييم",
+  "roster": "التشكيلة",
+  "teamProfileRequestSent": "تم إرسال طلب الانضمام",
+  "teamProfileHaveOtherTeam": "أنت بالفعل ضمن فريق",
+  "teamProfileNoMembers": "لا يوجد لاعبون في هذا الفريق بعد"
 }

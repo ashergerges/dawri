@@ -587,8 +587,12 @@ class _TeamCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return OnTap(
       // Teams (type 5) never open partner_details — they get their own screen.
-      onTap: () {
-        // TODO: navigate to team details screen (هتتعمل لاحقًا)
+      onTap: () async {
+        final cubit = context.read<PartnersCubit>();
+        final joined =
+            await TeamProfileRoute(teamId: team.id ?? 0).push<bool>(context);
+        // The profile screen reports back a join request made while it was open.
+        if (joined == true) cubit.markTeamJoined(team.id ?? 0);
       },
       child: DecoratedBox(
       decoration: BoxDecoration(

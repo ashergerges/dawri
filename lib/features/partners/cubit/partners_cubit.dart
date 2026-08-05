@@ -195,6 +195,16 @@ class PartnersCubit extends Cubit<PartnersState> {
     );
   }
 
+  /// Reflects a join request made on the team profile screen without refetching.
+  void markTeamJoined(int teamId) {
+    if (isClosed) return;
+    emit(state.copyWith(
+      teams: state.teams
+          .map((t) => t.id == teamId ? t.copyWith(joined: true) : t)
+          .toList(),
+    ));
+  }
+
   @override
   Future<void> close() {
     _debounce?.cancel();

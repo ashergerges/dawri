@@ -18,10 +18,10 @@ import 'package:dawri/core/utils/constants/app_text_them.dart';
 import 'package:dawri/core/utils/extensions/padding_extensions.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
 
+import 'package:dawri/features/common/data/local/models/app_user.dart';
+
 import '../cubit/account_cubit.dart';
 import '../data/models/account_model.dart';
-import 'package:dawri/core/interfaces/i_local_preference.dart';
-import 'package:dawri/main_common.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -63,35 +63,6 @@ class _AccountView extends StatelessWidget {
   }
 }
 
-// ─── TRANSPARENT TOP BAR ────────────────────────────────────────────────────
-
-class _GlassIconButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _GlassIconButton({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.white.withOpacity(0.2),
-          shape: BoxShape.circle,
-        ),
-        child: SizedBox(
-          width: 40.w,
-          height: 40.w,
-          child: Center(
-            child: FaIcon(icon, size: 17.sp, color: AppColors.white),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 // ─── PROFILE HEADER ─────────────────────────────────────────────────────────
 class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader();
@@ -100,7 +71,7 @@ class _ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(20.w, 40.h, 20.w, 50.h),
+      padding: EdgeInsets.fromLTRB(20.w, 60.h, 20.w, 50.h),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
@@ -122,46 +93,43 @@ class _ProfileHeader extends StatelessWidget {
       child: Column(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _GlassIconButton(icon: FontAwesomeIcons.bell, onTap: () {}),
-              _GlassIconButton(icon: FontAwesomeIcons.qrcode, onTap: () {}),
-            ],
-          ),
-          10.verticalSpace,
-          Row(
-            children: [
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  CustomNetworkImage(
-                    imageUrl: getIt<ILocalPreference>().appUser.value?.profile?.avatar??"",
-                    width: 75.w,
-                    height: 75.w,
-                    fit: BoxFit.cover,
-                    withBorder: true,
-                    radius: 20,
-                    borderColor: AppColors.bookTotal.withOpacity(0.3),
-                  ),
-                  Positioned(
-                    bottom: -5,
-                    right: -5,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryLight,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.primary, width: 2),
-                      ),
-                      child: SizedBox(
-                        width: 28.w,
-                        height: 28.w,
-                        child: Center(
-                          child: FaIcon(FontAwesomeIcons.camera, size: 12.sp, color: AppColors.white),
+              OnTap(
+                onTap: (){
+                  UpdateProfileRoute().push(context);
+                },
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    CustomNetworkImage(
+                      imageUrl: getIt<ILocalPreference>().appUser.value?.profile?.avatar??"",
+                      width: 75.w,
+                      height: 75.w,
+                      fit: BoxFit.cover,
+                      withBorder: true,
+                      radius: 20,
+                      borderColor: AppColors.bookTotal.withOpacity(0.3),
+                    ),
+                    Positioned(
+                      bottom: -5,
+                      right: -5,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.primary, width: 2),
+                        ),
+                        child: SizedBox(
+                          width: 28.w,
+                          height: 28.w,
+                          child: Center(
+                            child: FaIcon(FontAwesomeIcons.camera, size: 12.sp, color: AppColors.white),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               15.w.sizedWidth,
               Expanded(
@@ -223,9 +191,11 @@ class _WalletCard extends StatelessWidget {
             ),
           ],
         ),
-        child: BlocBuilder<AccountCubit, AccountState>(
-          buildWhen: (p, c) => p.walletBalance != c.walletBalance,
-          builder: (context, state) {
+        // Listens to the cached user so a top-up is reflected on return.
+        child: ValueListenableBuilder<AppUser?>(
+          valueListenable: getIt<ILocalPreference>().appUser,
+          builder: (context, user, _) {
+            final balance = double.tryParse(user?.balance ?? '') ?? 0;
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -245,8 +215,7 @@ class _WalletCard extends StatelessWidget {
                       textBaseline: TextBaseline.alphabetic,
                       children: [
                         Text(
-                          getIt<ILocalPreference>().appUser.value?.balance??'',
-                          // state.walletBalance.toStringAsFixed(2),
+                          balance.toStringAsFixed(2),
                           style: AppTextTheme.headingSmall(context).copyWith(
                             fontWeight: FontWeight.w900,
                             color: AppColors.textDark,
@@ -266,7 +235,7 @@ class _WalletCard extends StatelessWidget {
                 ),
                 OnTap(
                   onTap: () {
-                    ChargeWalletRoute().push(context);
+                    ChargeWalletRoute(currentBalance: balance).push(context);
                   },
                   child: DecoratedBox(
                     decoration: BoxDecoration(

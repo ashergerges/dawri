@@ -1,11 +1,11 @@
-// lib/features/update_profile/data/update_profile_model.dart
-class UpdateProfileMockData {
-  static const currentName = 'فهد الدوسري';
-  static const currentPhone = '+966 501 234 567';
-  static const currentEmail = 'fahad@example.com';
-  static const currentAvatarUrl = 'https://i.pravatar.cc/150?img=33';
-  static const memberSinceYear = '2024';
+// lib/features/update_profile/data/models/update_profile_model.dart
+class UpdateProfileConstants {
+  const UpdateProfileConstants._();
 
   /// Max profile photo size allowed, in bytes (5 MB).
   static const int maxAvatarSizeBytes = 5 * 1024 * 1024;
+
+  // Participant types that change which "role" list the dropdown shows.
+  static const int refereeTypeId = 2;
+  static const int coachTypeId = 3;
 }

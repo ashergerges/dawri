@@ -715,6 +715,10 @@
   "updateProfileOk": "OK",
   "updateProfileErrorImageTooLarge": "Image size exceeds the allowed limit (5 MB)",
   "updateProfileErrorPickFailed": "An error occurred while picking the image",
+  "updateProfileEmailOptional": "Email Address (optional)",
+  "updateProfileBirthDate": "Date of Birth",
+  "updateProfileDeleteAccount": "Disable or delete account",
+  "updateProfileDeleteAccountUnavailable": "Account deletion isn't available in the app yet. Please contact support.",
   "stadiumProfileName": "Arena Riyadh Stadium",
   "stadiumProfileLocation": "Riyadh, Al Malqa (4.2 km away)",
   "stadiumProfileDescription": "Arena Stadium is one of the best stadiums equipped with the latest FIFA-approved artificial turf. It provides an ideal environment for tournaments and night training thanks to professional lighting.",
@@ -1089,6 +1093,14 @@
   "registerSuccessAction": "Start Exploring",
   "registerParticipantRoleLabel": "Your Role",
   "registerParticipantSuccessTitle": "Welcome to Dawri!",
-  "registerParticipantSuccessDesc": "Your account has been created successfully. You can now explore tournaments and challenges in your area and join teams."
-
+  "registerParticipantSuccessDesc": "Your account has been created successfully. You can now explore tournaments and challenges in your area and join teams.",
+  "teamNotFound": "Team not found",
+  "joinTeam": "Join Team",
+  "alreadyJoined": "You are already a member of this team",
+  "players": "Players",
+  "rating": "Rating",
+  "roster": "Roster",
+  "teamProfileRequestSent": "Join request sent",
+  "teamProfileHaveOtherTeam": "You already belong to a team",
+  "teamProfileNoMembers": "No players in this team yet"
 }
