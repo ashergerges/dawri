@@ -1,12 +1,9 @@
 // lib/features/home/ui/home_screen.dart
-import 'dart:developer';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/interfaces/i_local_preference.dart';
 import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
 import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
-import 'package:dawri/features/home/data/models/service_model.dart';
 import 'package:dawri/main_common.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -97,66 +94,61 @@ class _HomeHeader extends StatelessWidget {
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 25.h),
-            child: BlocBuilder<HomeCubit, HomeState>(
-              builder: (context, state) {
-                return Column(
-                  children: [
-                    30.verticalSpace,
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(16.r),
-                              child: CustomNetworkImage(
-                                imageUrl: (getIt<ILocalPreference>().appUser.value?.profile?.avatar)??"",
-                                width: 52.w,
-                                height: 52.w,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            12.w.sizedWidth,
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  LocaleKeys.homeGreeting.tr(
-                                    namedArgs: {'name':  (getIt<ILocalPreference>().appUser.value?.profile?.fullName)??""},
-                                  ),
-                                  style:
-                                      AppTextTheme.bodyXSmallMediumWeight(
-                                        context,
-                                      ).copyWith(
-                                        color: AppColors.white.withOpacity(0.9),
-                                      ),
-                                ),
-                                // Text(
-                                //   HomeMockData.userName,
-                                //   style: AppTextTheme.headingSmall(context)
-                                //       .copyWith(
-                                //         fontWeight: FontWeight.w900,
-                                //         color: AppColors.white,
-                                //         letterSpacing: 0.5,
-                                //       ),
-                                // ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        _NotificationButton(),
-                      ],
-                    ),
-                    20.h.sizedHeight,
-                    const _SearchBox(),
-                  ],
-                );
-              },
-            ),
+            child: const _HeaderContent(),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _HeaderContent extends StatelessWidget {
+  const _HeaderContent();
+
+  @override
+  Widget build(BuildContext context) {
+    final profile = getIt<ILocalPreference>().appUser.value?.profile;
+
+    return Column(
+      children: [
+        30.verticalSpace,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16.r),
+                    child: CustomNetworkImage(
+                      imageUrl: profile?.avatar ?? '',
+                      width: 52.w,
+                      height: 52.w,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  12.w.sizedWidth,
+                  Expanded(
+                    child: Text(
+                      LocaleKeys.homeGreeting.tr(
+                        namedArgs: {'name': profile?.fullName ?? ''},
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextTheme.bodyXSmallMediumWeight(context)
+                          .copyWith(color: AppColors.white.withOpacity(0.9)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            12.w.sizedWidth,
+            const _NotificationButton(),
+          ],
+        ),
+        20.h.sizedHeight,
+        const _SearchBox(),
+      ],
     );
   }
 }
@@ -278,79 +270,63 @@ class _SearchBox extends StatelessWidget {
 class _ServicesSection extends StatelessWidget {
   const _ServicesSection();
 
+  /// Labels stay as keys here — translating at class-init would freeze them to
+  /// whichever locale happened to be active first.
   static final List<_ServiceItem> _services = [
     _ServiceItem(
-      onTap: () {
-        getIt<AppRouter>().replaceAll([
-          HomeBottomTabsRoute(index: 2),
-        ], updateExistingRoutes: false);
-      },
+      onTap: () => _openTab(2),
       icon: FontAwesomeIcons.mapLocationDot,
       color: AppColors.success,
-      label: 'حجز ملاعب',
+      labelKey: LocaleKeys.homeServiceReserve,
     ),
     _ServiceItem(
-      onTap: () {
-        getIt<AppRouter>().push(PartnersRoute());
-      },
+      onTap: () => getIt<AppRouter>().push(PartnersRoute()),
       icon: FontAwesomeIcons.users,
       color: AppColors.info,
-      label: 'المشاركين',
+      labelKey: LocaleKeys.homeServicePartners,
     ),
     _ServiceItem(
-      onTap: () {
-        getIt<AppRouter>().replaceAll([
-          HomeBottomTabsRoute(index: 1),
-        ], updateExistingRoutes: false);
-      },
+      onTap: () => _openTab(1),
       icon: FontAwesomeIcons.trophy,
       color: AppColors.warning,
-      label: 'البطولات',
+      labelKey: LocaleKeys.homeServiceChampionships,
     ),
     _ServiceItem(
-      onTap: () {
-        getIt<AppRouter>().push(ChallengesRoute());
-      },
+      onTap: () => getIt<AppRouter>().push(ChallengesRoute()),
       icon: FontAwesomeIcons.fire,
       color: AppColors.error,
-      label: 'التحديات',
+      labelKey: LocaleKeys.homeServiceChallenges,
     ),
     _ServiceItem(
-      onTap: () {
-        getIt<AppRouter>().push(ContractsRoute());
-      },
+      onTap: () => getIt<AppRouter>().push(ContractsRoute()),
       icon: FontAwesomeIcons.fileContract,
       color: AppColors.purple,
-      label: 'العقود',
+      labelKey: LocaleKeys.homeServiceContracts,
     ),
     _ServiceItem(
-      onTap: () {
-        getIt<AppRouter>().replaceAll([
-          HomeBottomTabsRoute(index: 3),
-        ], updateExistingRoutes: false);
-      },
+      onTap: () => _openTab(3),
       icon: FontAwesomeIcons.shop,
       color: AppColors.pink,
-      label: 'المتجر',
+      labelKey: LocaleKeys.homeServiceShop,
     ),
     _ServiceItem(
-      onTap: () {
-        getIt<AppRouter>().push(TicketsRoute());
-      },
+      onTap: () => getIt<AppRouter>().push(TicketsRoute()),
       icon: FontAwesomeIcons.ticket,
       color: AppColors.teal,
-      label: 'التذاكر',
+      labelKey: LocaleKeys.homeServiceTickets,
     ),
     _ServiceItem(
-      onTap: () {
-        getIt<AppRouter>().push(BookingHistoryRoute());
-
-      },
-      icon: FontAwesomeIcons.ellipsis,
-      color: AppColors.textMuted,
-      label: LocaleKeys.bookingHistoryTitle.tr(),
+      onTap: () => getIt<AppRouter>().push(const BookingHistoryRoute()),
+      icon: FontAwesomeIcons.calendarCheck,
+      color: AppColors.secondary,
+      labelKey: LocaleKeys.bookingHistoryTitle,
     ),
   ];
+
+  static void _openTab(int index) => getIt<AppRouter>().replaceAll(
+        [HomeBottomTabsRoute(index: index)],
+        updateExistingRoutes: false,
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -358,14 +334,9 @@ class _ServicesSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.only(
-            right: 20.w,
-            left: 20.w,
-            top: 28.h,
-            bottom: 15.h,
-          ),
+          padding: EdgeInsets.fromLTRB(20.w, 28.h, 20.w, 15.h),
           child: Text(
-            'اكتشف دوري',
+            LocaleKeys.homeDiscoverTitle.tr(),
             style: AppTextTheme.headingSmall(
               context,
             ).copyWith(fontWeight: FontWeight.w900, color: AppColors.textDark),
@@ -382,14 +353,17 @@ class _ServicesSection extends StatelessWidget {
             crossAxisSpacing: 10.w,
             childAspectRatio: 0.85,
           ),
-          itemBuilder: (_, i) => OnTap(
-            onTap: _services[i].onTap,
-            child: _ServiceCell(
-              icon: _services[i].icon,
-              color: _services[i].color,
-              label: _services[i].label,
-            ),
-          ),
+          itemBuilder: (_, i) {
+            final service = _services[i];
+            return OnTap(
+              onTap: service.onTap,
+              child: _ServiceCell(
+                icon: service.icon,
+                color: service.color,
+                label: service.labelKey.tr(),
+              ),
+            );
+          },
         ),
       ],
     );
@@ -399,14 +373,14 @@ class _ServicesSection extends StatelessWidget {
 class _ServiceItem {
   final IconData icon;
   final Color color;
-  final String label;
-  final Function() onTap;
+  final String labelKey;
+  final VoidCallback onTap;
 
   const _ServiceItem({
     required this.onTap,
     required this.icon,
     required this.color,
-    required this.label,
+    required this.labelKey,
   });
 }
 
@@ -461,6 +435,63 @@ class _ServiceCell extends StatelessWidget {
   }
 }
 
+// ─── SECTION HEADER ────────────────────────────────────────────────────────
+/// Title + "view all"-style chip, shared by the products and tickets sections.
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final String actionLabel;
+  final VoidCallback onAction;
+
+  const _SectionHeader({
+    required this.title,
+    required this.actionLabel,
+    required this.onAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20.w, 28.h, 20.w, 15.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextTheme.headingSmall(context).copyWith(
+                fontWeight: FontWeight.w900,
+                color: AppColors.textDark,
+              ),
+            ),
+          ),
+          8.w.sizedWidth,
+          OnTap(
+            onTap: onAction,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.secondary50,
+                borderRadius: BorderRadius.circular(20.r),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                child: Text(
+                  actionLabel,
+                  style: AppTextTheme.bodyXSmall(context).copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.secondary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ─── PRODUCTS ──────────────────────────────────────────────────────────────
 class _ProductsSection extends StatelessWidget {
   const _ProductsSection();
@@ -473,43 +504,12 @@ class _ProductsSection extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: EdgeInsets.only(right: 20.w, left: 20.w, top: 28.h, bottom: 15.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'أفضل المنتجات',
-                    style: AppTextTheme.headingSmall(context).copyWith(
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.textDark,
-                    ),
-                  ),
-                  OnTap(
-                    onTap: () {
-                      context.router.replaceAll(
-                        [HomeBottomTabsRoute(index: 3)],
-                        updateExistingRoutes: false,
-                      );
-                    },
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: AppColors.secondary50,
-                        borderRadius: BorderRadius.circular(20.r),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-                        child: Text(
-                          'عرض المتجر',
-                          style: AppTextTheme.bodyXSmall(context).copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.secondary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+            _SectionHeader(
+              title: LocaleKeys.homeBestProductsTitle.tr(),
+              actionLabel: LocaleKeys.homeViewShop.tr(),
+              onAction: () => context.router.replaceAll(
+                [HomeBottomTabsRoute(index: 3)],
+                updateExistingRoutes: false,
               ),
             ),
             SizedBox(
@@ -519,24 +519,31 @@ class _ProductsSection extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 padding: 20.w.padHorizontal,
                 itemCount: 3,
-                separatorBuilder: (_, __) => 15.w.sizedWidth,
-                itemBuilder: (_, __) => const _ProductCardShimmer(),
+                separatorBuilder: (_, _) => 15.w.sizedWidth,
+                itemBuilder: (_, _) => const _ProductCardShimmer(),
               )
                   : ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: 20.w.padHorizontal,
                 itemCount: state.products.length,
-                separatorBuilder: (_, __) => 15.w.sizedWidth,
-                itemBuilder: (_, i) => _ProductCard(
-                  productId: state.products[i].id??0,
-                  onTapAddedToCart: (){
-                    log("HIII");
-                    context.read<HomeCubit>().addedToCart(id:(state.products[i].variants?.first.id)??0);
-                  },
-                  imageUrl: state.products[i].image??"",
-                  title: state.products[i].name??"",
-                  price: '${state.products[i].price} ${LocaleKeys.walletSar.tr()}',
-                ),
+                separatorBuilder: (_, _) => 15.w.sizedWidth,
+                itemBuilder: (_, i) {
+                  final product = state.products[i];
+                  final variants = product.variants;
+                  // `.first` blew up on products that ship without variants.
+                  final variantId = (variants != null && variants.isNotEmpty)
+                      ? variants.first.id ?? 0
+                      : 0;
+
+                  return _ProductCard(
+                    productId: product.id ?? 0,
+                    onTapAddedToCart: () =>
+                        context.read<HomeCubit>().addedToCart(id: variantId),
+                    imageUrl: product.image ?? '',
+                    title: product.name ?? '',
+                    price: '${product.price} ${LocaleKeys.walletSar.tr()}',
+                  );
+                },
               ),
             ),
           ],
@@ -700,39 +707,10 @@ class _TicketsSection extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: EdgeInsets.only(right: 20.w, left: 20.w, top: 28.h, bottom: 15.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'تذاكر المباريات',
-                    style: AppTextTheme.headingSmall(context).copyWith(
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.textDark,
-                    ),
-                  ),
-                  OnTap(
-                    onTap: () => TicketsRoute().push(context),
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: AppColors.secondary50,
-                        borderRadius: BorderRadius.circular(20.r),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-                        child: Text(
-                          'عرض الكل',
-                          style: AppTextTheme.bodyXSmall(context).copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.secondary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            _SectionHeader(
+              title: LocaleKeys.homeMatchTicketsTitle.tr(),
+              actionLabel: LocaleKeys.viewAll.tr(),
+              onAction: () => TicketsRoute().push(context),
             ),
             if (state.status == HomeStateStatus.loading())
               ListView.separated(
@@ -740,8 +718,8 @@ class _TicketsSection extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 padding: 20.w.padHorizontal,
                 itemCount: 2,
-                separatorBuilder: (_, __) => 15.h.sizedHeight,
-                itemBuilder: (_, __) => const _TicketCardShimmer(),
+                separatorBuilder: (_, _) => 15.h.sizedHeight,
+                itemBuilder: (_, _) => const _TicketCardShimmer(),
               )
             else
               ListView.separated(
@@ -749,7 +727,7 @@ class _TicketsSection extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 padding: 20.w.padHorizontal,
                 itemCount: state.tickets.length,
-                separatorBuilder: (_, __) => 15.h.sizedHeight,
+                separatorBuilder: (_, _) => 15.h.sizedHeight,
                 itemBuilder: (_, i) => _TicketCard(
                   teams: state.tickets[i].title??"",
                   date: '${state.tickets[i].dateText}، ${state.tickets[i].time}',
