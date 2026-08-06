@@ -1101,5 +1101,24 @@ abstract class  LocaleKeys {
   static const teamProfileRequestSent = 'teamProfileRequestSent';
   static const teamProfileHaveOtherTeam = 'teamProfileHaveOtherTeam';
   static const teamProfileNoMembers = 'teamProfileNoMembers';
+  static const bookingHistoryTitle = 'bookingHistoryTitle';
+  static const upcoming = 'upcoming';
+  static const past = 'past';
+  static const noUpcomingBookings = 'noUpcomingBookings';
+  static const noPastBookings = 'noPastBookings';
+  static const cancelBooking = 'cancelBooking';
+  static const cancelConfirmationTitle = 'cancelConfirmationTitle';
+  static const cancelConfirmationMessage = 'cancelConfirmationMessage';
+  static const cancelError24h = 'cancelError24h';
+  static const cancelSuccess = 'cancelSuccess';
+  static const cancelPolicyTitle = 'cancelPolicyTitle';
+  static const cancelPolicyMessage = 'cancelPolicyMessage';
+  static const policyUnderstand = 'policyUnderstand';
+  static const bookingStatusConfirmed = 'bookingStatusConfirmed';
+  static const bookingCancelConfirm = 'bookingCancelConfirm';
+  static const duration = 'duration';
+  static const type = 'type';
+  static const price = 'price';
+  static const status = 'status';
 
 }

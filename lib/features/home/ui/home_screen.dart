@@ -343,13 +343,12 @@ class _ServicesSection extends StatelessWidget {
     ),
     _ServiceItem(
       onTap: () {
-        getIt<AppRouter>().replaceAll([
-          HomeBottomTabsRoute(index: 4),
-        ], updateExistingRoutes: false);
+        getIt<AppRouter>().push(BookingHistoryRoute());
+
       },
       icon: FontAwesomeIcons.ellipsis,
       color: AppColors.textMuted,
-      label: 'المزيد',
+      label: LocaleKeys.bookingHistoryTitle.tr(),
     ),
   ];
 

@@ -1103,5 +1103,25 @@
   "roster": "التشكيلة",
   "teamProfileRequestSent": "تم إرسال طلب الانضمام",
   "teamProfileHaveOtherTeam": "أنت بالفعل ضمن فريق",
-  "teamProfileNoMembers": "لا يوجد لاعبون في هذا الفريق بعد"
+  "teamProfileNoMembers": "لا يوجد لاعبون في هذا الفريق بعد",
+  "bookingHistoryTitle": "سجل الحجوزات",
+  "upcoming": "القادمة",
+  "past": "المنتهية",
+  "noUpcomingBookings": "لا توجد حجوزات قادمة",
+  "noPastBookings": "لا توجد حجوزات منتهية",
+  "cancelBooking": "إلغاء الحجز",
+  "cancelConfirmationTitle": "تأكيد الإلغاء",
+  "cancelConfirmationMessage": "هل أنت متأكد من إلغاء حجز {stadium} في {date} الساعة {time}؟",
+  "cancelError24h": "لا يمكن الإلغاء قبل أقل من 24 ساعة من موعد الحجز.",
+  "cancelSuccess": "تم إلغاء الحجز بنجاح.",
+  "cancelPolicyTitle": "سياسة الإلغاء",
+  "cancelPolicyMessage": "يمكنك إلغاء أي حجز قبل 24 ساعة من موعد الحجز.\nفي حال كان الوقت المتبقي أقل من 24 ساعة، لن تتمكن من الإلغاء.",
+  "policyUnderstand": "فهمت",
+  "bookingStatusConfirmed": "مؤكد",
+  "bookingCancelConfirm": "تأكيد الإلغاء",
+  "duration": "المدة",
+  "type": "النوع",
+  "price": "السعر",
+  "status": "الحالة"
+
 }

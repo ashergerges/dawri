@@ -26,6 +26,10 @@ import 'core/services/network/token_service.dart' as _i797;
 import 'core/services/notification/notifications_service.dart' as _i402;
 import 'core/services/upgrader/upgrader_service.dart' as _i289;
 import 'core/utils/helper/error_handler.dart' as _i785;
+import 'features/booking_history/data/repositories/interfaces/i_booking_history_repository.dart'
+    as _i667;
+import 'features/booking_history/data/repositories/remote/booking_history_repository.dart'
+    as _i433;
 import 'features/cart/data/repositories/interfaces/i_cart_repository.dart'
     as _i775;
 import 'features/cart/data/repositories/remote/cart_repository.dart' as _i48;
@@ -259,6 +263,11 @@ _i174.GetIt $initGetIt(
   );
   gh.factory<_i312.IChampProfileRepository>(
     () => _i722.ChampProfileRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
+  );
+  gh.factory<_i667.IBookingHistoryRepository>(
+    () => _i433.BookingHistoryRepository(
       networkService: gh<_i969.NetworkService>(),
     ),
   );

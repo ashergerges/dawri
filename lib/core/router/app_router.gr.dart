@@ -11,6 +11,22 @@
 part of 'app_router.dart';
 
 /// generated route for
+/// [BookingHistoryScreen]
+class BookingHistoryRoute extends PageRouteInfo<void> {
+  const BookingHistoryRoute({List<PageRouteInfo>? children})
+    : super(BookingHistoryRoute.name, initialChildren: children);
+
+  static const String name = 'BookingHistoryRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const BookingHistoryScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [CartScreen]
 class CartRoute extends PageRouteInfo<void> {
   const CartRoute({List<PageRouteInfo>? children})

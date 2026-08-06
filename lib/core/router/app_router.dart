@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/services/ui/offline_internet_screen.dart';
 import 'package:dawri/core/services/ui/server_error_screen.dart';
 import 'package:dawri/features/account/ui/language_screen.dart';
+import 'package:dawri/features/booking_history/ui/booking_history_screen.dart';
 import 'package:dawri/features/cart/ui/cart_screen.dart';
 import 'package:dawri/features/challenges/ui/challenges_screen.dart';
 import 'package:dawri/features/champ_profile/ui/champ_profile_screen.dart';
@@ -107,6 +108,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute( page: EmptyMyTeamRoute.page),
     AutoRoute( page: RegisterRoute.page),
     AutoRoute( page: TeamProfileRoute.page),
+    AutoRoute( page: BookingHistoryRoute.page),
     AutoRoute(path: '*', page: NotFoundRoute.page), // this must be last route
 
   ];

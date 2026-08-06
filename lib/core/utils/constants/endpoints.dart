@@ -28,6 +28,11 @@ class Endpoints {
 
   //my booking
   String get myBookingUrl => r'api/app/booking/my-bookings';
+
+  //booking history (status: 1 = upcoming, 2 = past)
+  String get myBookingsUrl => r'api/app/my-bookings';
+  String get myBookingsCancelUrl => r'api/app/bookings/cancel';
+
   String get bookingDetailsUrl => r'api/app/booking/details';
   String get reviewAddUrl => r'api/app/review/add';
   String get cancelBookUrl => r'api/app/booking/cancel';
