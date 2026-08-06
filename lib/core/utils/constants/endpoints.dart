@@ -42,6 +42,7 @@ class Endpoints {
   String get updateProfileImageUrl => r'api/app/update-profile-image';
   String get updateProfileUrl => r'api/app/update-profile';
   String get updateUserProfileUrl => r'api/app/user/update-profile';
+  String get deactivateAccountUrl => r'api/app/user/account/deactivate';
 
   //notification
   String get notificationUrl => r'api/app/notifications/all';

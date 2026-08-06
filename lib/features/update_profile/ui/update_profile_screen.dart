@@ -3,12 +3,17 @@ import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/router/app_router.dart';
+import 'package:dawri/core/services/dialogs/message_service.dart';
+import 'package:dawri/core/utils/common_widgets/app_button.dart';
 import 'package:dawri/core/utils/common_widgets/custom_network_image.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
 import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
 import 'package:dawri/core/utils/constants/app_colors.dart';
 import 'package:dawri/core/utils/constants/app_text_them.dart';
 import 'package:dawri/core/utils/extensions/padding_extensions.dart';
+import 'package:dawri/features/partner_details/ui/widgets/partner_video_card.dart';
+import 'package:dawri/features/partner_details/ui/widgets/reel_player_page.dart';
+import 'package:dawri/features/update_profile/data/models/update_profile_model.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
 import 'package:dawri/main_common.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -427,6 +432,8 @@ class _FormFields extends StatelessWidget {
               onChanged: cubit.updateBio,
             ),
           ),
+          22.h.sizedHeight,
+          const _VideosSection(),
           6.h.sizedHeight,
           const _DeleteAccountButton(),
         ],
@@ -488,6 +495,10 @@ class _LabeledInput extends StatefulWidget {
   final Widget? trailing;
   final ValueChanged<String>? onChanged;
 
+  /// Supplied when the caller owns the text (e.g. the add-video form);
+  /// otherwise the field manages its own controller from [initialValue].
+  final TextEditingController? controller;
+
   const _LabeledInput({
     required this.label,
     required this.icon,
@@ -499,6 +510,7 @@ class _LabeledInput extends StatefulWidget {
     this.errorText,
     this.trailing,
     this.onChanged,
+    this.controller,
   });
 
   @override
@@ -506,14 +518,18 @@ class _LabeledInput extends StatefulWidget {
 }
 
 class _LabeledInputState extends State<_LabeledInput> {
-  late final TextEditingController _controller;
+  TextEditingController? _ownController;
   final FocusNode _focusNode = FocusNode();
   bool _isFocused = false;
+
+  TextEditingController get _controller => widget.controller ?? _ownController!;
 
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.initialValue);
+    if (widget.controller == null) {
+      _ownController = TextEditingController(text: widget.initialValue);
+    }
     _focusNode.addListener(() => setState(() => _isFocused = _focusNode.hasFocus));
   }
 
@@ -521,8 +537,9 @@ class _LabeledInputState extends State<_LabeledInput> {
   void didUpdateWidget(covariant _LabeledInput oldWidget) {
     super.didUpdateWidget(oldWidget);
     // The value arrives asynchronously (profile fetch) — adopt it unless the
-    // user is mid-edit.
-    if (widget.initialValue != oldWidget.initialValue &&
+    // user is mid-edit. Caller-owned controllers are left alone.
+    if (widget.controller == null &&
+        widget.initialValue != oldWidget.initialValue &&
         widget.initialValue != _controller.text &&
         !_focusNode.hasFocus) {
       _controller.text = widget.initialValue;
@@ -531,7 +548,7 @@ class _LabeledInputState extends State<_LabeledInput> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    _ownController?.dispose();
     _focusNode.dispose();
     super.dispose();
   }
@@ -891,60 +908,429 @@ class _BioFieldState extends State<_BioField> {
   }
 }
 
+// ─── REELS ──────────────────────────────────────────────────────────────────
+/// Preview of the participant's reels, styled like the partner-details slider.
+/// Shows at most [UpdateProfileConstants.videosPreviewCount]; the rest sit
+/// behind "see all", which reuses the existing paginated videos screen.
+class _VideosSection extends StatelessWidget {
+  const _VideosSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<UpdateProfileCubit, UpdateProfileState>(
+      buildWhen: (p, c) =>
+          p.videos != c.videos ||
+          p.userId != c.userId ||
+          p.isAddingVideo != c.isAddingVideo,
+      builder: (context, state) {
+        final videos = state.previewVideos;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    LocaleKeys.partnerDetailsReelsTitle.tr(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textDark,
+                    ),
+                  ),
+                ),
+                if (state.hasMoreVideos && state.userId != null)
+                  OnTap(
+                    onTap: () => PartnerVideosRoute(
+                      partnerId: state.userId!,
+                      title: LocaleKeys.partnerDetailsReelsTitle.tr(),
+                    ).push(context),
+                    child: Text(
+                      LocaleKeys.partnerDetailsSeeAll.tr(),
+                      style: AppTextTheme.bodyXSmall(context).copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            12.h.sizedHeight,
+            if (videos.isEmpty)
+              _VideosEmptyState(onAdd: () => _openAddVideoSheet(context))
+            else ...[
+              SizedBox(
+                height: 150.h,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: videos.length,
+                  separatorBuilder: (_, _) => 12.w.sizedWidth,
+                  itemBuilder: (context, index) => SizedBox(
+                    width: 120.w,
+                    child: PartnerVideoCard(
+                      video: videos[index],
+                      showTitle: true,
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ReelPlayerPage(
+                            reels: videos,
+                            initialIndex: index,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              12.h.sizedHeight,
+              _AddVideoButton(onTap: () => _openAddVideoSheet(context)),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  void _openAddVideoSheet(BuildContext context) {
+    final cubit = context.read<UpdateProfileCubit>();
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+      ),
+      builder: (_) => BlocProvider.value(
+        value: cubit,
+        child: const _AddVideoSheet(),
+      ),
+    );
+  }
+}
+
+class _VideosEmptyState extends StatelessWidget {
+  final VoidCallback onAdd;
+  const _VideosEmptyState({required this.onAdd});
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: AppColors.slate200, width: 1.5),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
+        child: Column(
+          children: [
+            FaIcon(
+              FontAwesomeIcons.video,
+              size: 34.sp,
+              color: AppColors.slate300,
+            ),
+            10.h.sizedHeight,
+            Text(
+              LocaleKeys.partnerDetailsNoVideos.tr(),
+              textAlign: TextAlign.center,
+              style: AppTextTheme.bodySmall(context).copyWith(
+                fontWeight: FontWeight.w700,
+                color: AppColors.textMuted,
+              ),
+            ),
+            14.h.sizedHeight,
+            _AddVideoButton(onTap: onAdd),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AddVideoButton extends StatelessWidget {
+  final VoidCallback onTap;
+  const _AddVideoButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return OnTap(
+      onTap: onTap,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.primary.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(color: AppColors.primary, width: 1.5),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 18.w),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FaIcon(FontAwesomeIcons.plus, size: 13.sp, color: AppColors.primary),
+              8.w.sizedWidth,
+              Text(
+                LocaleKeys.updateProfileVideosAdd.tr(),
+                style: AppTextTheme.bodySmall(context).copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Title + YouTube link form. The link is validated locally before the request
+/// so an obviously wrong URL never reaches the API.
+class _AddVideoSheet extends StatefulWidget {
+  const _AddVideoSheet();
+
+  @override
+  State<_AddVideoSheet> createState() => _AddVideoSheetState();
+}
+
+class _AddVideoSheetState extends State<_AddVideoSheet> {
+  final _titleController = TextEditingController();
+  final _urlController = TextEditingController();
+  String? _titleError;
+  String? _urlError;
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _urlController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final title = _titleController.text.trim();
+    final url = _urlController.text.trim();
+
+    setState(() {
+      _titleError = title.isEmpty ? LocaleKeys.fieldIsRequired.tr() : null;
+      _urlError = url.isEmpty
+          ? LocaleKeys.fieldIsRequired.tr()
+          : (UpdateProfileConstants.isYoutubeUrl(url)
+              ? null
+              : LocaleKeys.updateProfileVideoUrlInvalid.tr());
+    });
+    if (_titleError != null || _urlError != null) return;
+
+    final added = await context
+        .read<UpdateProfileCubit>()
+        .addVideo(title: title, url: url);
+
+    if (added && mounted) Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      // Lifts the sheet above the keyboard.
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.viewInsetsOf(context).bottom,
+      ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(20.w, 18.h, 20.w, 24.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 42.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: AppColors.slate200,
+                  borderRadius: BorderRadius.circular(4.r),
+                ),
+              ),
+            ),
+            18.h.sizedHeight,
+            Text(
+              LocaleKeys.updateProfileVideosAdd.tr(),
+              style: AppTextTheme.bodyLargeSemiBold(context).copyWith(
+                fontWeight: FontWeight.w900,
+                color: AppColors.textDark,
+              ),
+            ),
+            18.h.sizedHeight,
+            _LabeledInput(
+              label: LocaleKeys.updateProfileVideoTitleLabel.tr(),
+              icon: FontAwesomeIcons.heading,
+              initialValue: '',
+              controller: _titleController,
+              hint: LocaleKeys.updateProfileVideoTitleHint.tr(),
+              errorText: _titleError,
+              onChanged: (_) {
+                if (_titleError != null) setState(() => _titleError = null);
+              },
+            ),
+            16.h.sizedHeight,
+            _LabeledInput(
+              label: LocaleKeys.updateProfileVideoUrlLabel.tr(),
+              icon: FontAwesomeIcons.youtube,
+              initialValue: '',
+              controller: _urlController,
+              hint: LocaleKeys.updateProfileVideoUrlHint.tr(),
+              isLtr: true,
+              keyboardType: TextInputType.url,
+              errorText: _urlError,
+              onChanged: (_) {
+                if (_urlError != null) setState(() => _urlError = null);
+              },
+            ),
+            22.h.sizedHeight,
+            BlocBuilder<UpdateProfileCubit, UpdateProfileState>(
+              buildWhen: (p, c) => p.isAddingVideo != c.isAddingVideo,
+              builder: (context, state) {
+                return SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: state.isAddingVideo ? null : _submit,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.white,
+                      disabledBackgroundColor: AppColors.slate300,
+                      padding: EdgeInsets.symmetric(vertical: 15.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14.r),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: state.isAddingVideo
+                        ? SizedBox(
+                            width: 20.w,
+                            height: 20.w,
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: AppColors.white,
+                            ),
+                          )
+                        : Text(
+                            LocaleKeys.updateProfileVideosAdd.tr(),
+                            style: AppTextTheme.bodyMediumSemiBold(context)
+                                .copyWith(color: AppColors.white,fontWeight: FontWeight.w900),
+                          ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 // ─── DELETE ACCOUNT ─────────────────────────────────────────────────────────
 class _DeleteAccountButton extends StatelessWidget {
   const _DeleteAccountButton();
 
   @override
   Widget build(BuildContext context) {
-    return OnTap(
-      onTap: () => showDialog(
-        context: context,
-        builder: (dialogContext) => AlertDialog(
-          backgroundColor: AppColors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-          title: Text(
-            LocaleKeys.updateProfileDeleteAccount.tr(),
-            style: AppTextTheme.bodyLargeSemiBold(context).copyWith(
-              fontWeight: FontWeight.w900,
-              color: AppColors.textDark,
-            ),
-          ),
-          content: Text(
-            LocaleKeys.updateProfileDeleteAccountUnavailable.tr(),
-            style: AppTextTheme.bodySmall(context).copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppColors.textMuted,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(
-                LocaleKeys.updateProfileOk.tr(),
-                style: AppTextTheme.bodySmallSemiBold(context).copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.primary,
+    return BlocBuilder<UpdateProfileCubit, UpdateProfileState>(
+      buildWhen: (p, c) => p.isDeactivating != c.isDeactivating,
+      builder: (context, state) {
+        final isBusy = state.isDeactivating;
+
+        return OnTap(
+          // Disabled while the request is in flight so it can't be double-sent.
+          onTap: isBusy ? null : () => _confirmDelete(context),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 15.h),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (isBusy)
+                  SizedBox(
+                    width: 15.sp,
+                    height: 15.sp,
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.danger,
+                    ),
+                  )
+                else
+                  FaIcon(
+                    FontAwesomeIcons.userXmark,
+                    size: 15.sp,
+                    color: AppColors.danger,
+                  ),
+                8.w.sizedWidth,
+                Text(
+                  LocaleKeys.updateProfileDeleteAccount.tr(),
+                  style: AppTextTheme.bodySmall(context).copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: isBusy
+                        ? AppColors.danger.withOpacity(0.5)
+                        : AppColors.danger,
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Mirrors the logout confirmation dialog used on the account screen.
+  void _confirmDelete(BuildContext context) {
+    final cubit = context.read<UpdateProfileCubit>();
+
+    MessageService.showNewCustomDialog(
+      context,
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 15.h),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        padding: 16.padAll,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            FaIcon(FontAwesomeIcons.userXmark, size: 15.sp, color: AppColors.danger),
-            8.w.sizedWidth,
+            30.verticalSpace,
             Text(
-              LocaleKeys.updateProfileDeleteAccount.tr(),
-              style: AppTextTheme.bodySmall(context).copyWith(
-                fontWeight: FontWeight.w800,
-                color: AppColors.danger,
-              ),
+              LocaleKeys.updateProfileDeleteAccountTitle.tr(),
+              textAlign: TextAlign.center,
+              style: AppTextTheme.bodyLarge(context)
+                  .copyWith(fontWeight: FontWeight.w600),
             ),
+            8.verticalSpace,
+            Text(
+              LocaleKeys.updateProfileDeleteAccountBody.tr(),
+              textAlign: TextAlign.center,
+              style: AppTextTheme.bodyXSmall(context)
+                  .copyWith(color: AppColors.neutral400),
+            ),
+            15.verticalSpace,
+            Row(
+              children: [
+                Expanded(
+                  child: AppButton(
+                    text: LocaleKeys.delete.tr(),
+                    background: AppColors.white,
+                    textColor: AppColors.error,
+                    onTap: () {
+                      getIt<AppRouter>().maybePop();
+                      cubit.deleteAccount();
+                    },
+                  ),
+                ),
+                10.horizontalSpace,
+                Expanded(
+                  child: AppButton(
+                    text: LocaleKeys.championshipControlCancel.tr(),
+                    onTap: () => getIt<AppRouter>().maybePop(),
+                  ),
+                ),
+              ],
+            ),
+            20.verticalSpace,
           ],
         ),
       ),

@@ -4,6 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/interfaces/i_local_preference.dart';
 import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/services/dialogs/message_service.dart';
+import 'package:dawri/core/services/session/session_service.dart';
 import 'package:dawri/core/utils/common_widgets/app_button.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
 import 'package:dawri/main_common.dart';
@@ -441,13 +442,7 @@ class _LogoutButton extends StatelessWidget {
                           textColor: AppColors.error,
                           onTap: () {
                             // FirebaseMessaging.instance.deleteToken();
-                            getIt<ILocalPreference>()
-                                .removeAuthPrefs()
-                                .then((onValue) {
-                              context.router.replaceAll([
-                                LoginRoute(),
-                              ], updateExistingRoutes: false);
-                            });
+                            SessionService.logout();
                           },
                         ),
                       ),

@@ -715,8 +715,16 @@ abstract class  LocaleKeys {
   static const updateProfileErrorPickFailed = 'updateProfileErrorPickFailed';
   static const updateProfileEmailOptional = 'updateProfileEmailOptional';
   static const updateProfileBirthDate = 'updateProfileBirthDate';
+  static const updateProfileVideosAdd = 'updateProfileVideosAdd';
+  static const updateProfileVideoTitleLabel = 'updateProfileVideoTitleLabel';
+  static const updateProfileVideoTitleHint = 'updateProfileVideoTitleHint';
+  static const updateProfileVideoUrlLabel = 'updateProfileVideoUrlLabel';
+  static const updateProfileVideoUrlHint = 'updateProfileVideoUrlHint';
+  static const updateProfileVideoUrlInvalid = 'updateProfileVideoUrlInvalid';
+  static const updateProfileVideoAdded = 'updateProfileVideoAdded';
   static const updateProfileDeleteAccount = 'updateProfileDeleteAccount';
-  static const updateProfileDeleteAccountUnavailable = 'updateProfileDeleteAccountUnavailable';
+  static const updateProfileDeleteAccountTitle = 'updateProfileDeleteAccountTitle';
+  static const updateProfileDeleteAccountBody = 'updateProfileDeleteAccountBody';
   static const stadiumProfileName = 'stadiumProfileName';
   static const stadiumProfileLocation = 'stadiumProfileLocation';
   static const stadiumProfileDescription = 'stadiumProfileDescription';

@@ -12,4 +12,14 @@ abstract class IUpdateProfileRepository {
     required Map<String, dynamic> fields,
     XFile? avatar,
   });
+
+  /// Deactivates the signed-in account; returns the server's message.
+  Future<Result<String>> deactivateAccount();
+
+  /// Publishes a YouTube link to the signed-in participant's reels; returns the
+  /// created video (thumbnail included).
+  Future<Result<PartnerVideoModel>> addVideo({
+    required String url,
+    required String title,
+  });
 }

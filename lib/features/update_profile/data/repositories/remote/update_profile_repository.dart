@@ -55,4 +55,34 @@ class UpdateProfileRepository implements IUpdateProfileRepository {
       return Result.error(e);
     }
   }
+
+  @override
+  Future<Result<PartnerVideoModel>> addVideo({
+    required String url,
+    required String title,
+  }) async {
+    final response = await networkService.postAsync(
+      url: AppStrings.urls.participantVideosUrl,
+      body: {'url': url, 'title': title},
+    );
+    if (response.isError) return Result.error(response.asError!.error);
+
+    try {
+      final data = response.asValue!.value.data['data'];
+      return Result.value(
+        PartnerVideoModel.fromJson(Map<String, dynamic>.from(data as Map)),
+      );
+    } catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  @override
+  Future<Result<String>> deactivateAccount() async {
+    final response = await networkService.postAsync(
+      url: AppStrings.urls.deactivateAccountUrl,
+    );
+    if (response.isError) return Result.error(response.asError!.error);
+    return Result.value(response.asValue?.value.data['message'] ?? '');
+  }
 }

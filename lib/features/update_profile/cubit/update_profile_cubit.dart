@@ -4,8 +4,10 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:dawri/core/interfaces/i_local_preference.dart';
 import 'package:dawri/core/services/dialogs/message_service.dart';
+import 'package:dawri/core/services/session/session_service.dart';
 import 'package:dawri/features/common/data/local/models/app_user.dart';
 import 'package:dawri/features/create_championship/data/models/championship_option_model.dart';
+import 'package:dawri/features/partner_details/data/models/partner_details_model.dart';
 import 'package:dawri/features/register/data/repositories/interfaces/i_register_repository.dart';
 import 'package:dawri/features/register/models/register_model.dart';
 import 'package:dawri/features/update_profile/data/models/update_profile_model.dart';
@@ -41,6 +43,7 @@ class UpdateProfileCubit extends Cubit<UpdateProfileState> {
     // The cached user carries the whole profile, so the form is fully seeded
     // before any network call.
     emit(state.copyWith(
+      userId: user?.id,
       name: profile?.fullName ?? '',
       email: profile?.email ?? '',
       phone: user?.phone ?? '',
@@ -63,7 +66,8 @@ class UpdateProfileCubit extends Cubit<UpdateProfileState> {
     // Caches written before `profile` carried sport/position fall back to the
     // participant record so the role dropdown still resolves.
     final userId = user?.id;
-    if (state.sportId == null && userId != null) {
+    if (userId != null)
+    {
       final detailsResult = await _repository.getMyProfile(userId: userId);
       if (!detailsResult.isError) {
         final details = detailsResult.asValue!.value;
@@ -72,6 +76,7 @@ class UpdateProfileCubit extends Cubit<UpdateProfileState> {
           typeId: state.typeId ?? details.role?.id,
           sportId: details.sport?.id,
           dynamicId: state.dynamicId ?? details.position?.id,
+          videos: details.videos?.items ?? const [],
         ));
       }
     }
@@ -297,4 +302,64 @@ class UpdateProfileCubit extends Cubit<UpdateProfileState> {
   }
 
   void dismissSuccess() => emit(state.copyWith(isSuccess: false));
+
+  // ─── Reels ─────────────────────────────────────────────────────────────────
+  /// Returns true when the video was published, so the sheet can close itself.
+  Future<bool> addVideo({required String title, required String url}) async {
+    if (state.isAddingVideo) return false;
+    emit(state.copyWith(addVideoStatus: const UpdateProfileStatus.loading()));
+
+    final result = await _repository.addVideo(
+      url: url.trim(),
+      title: title.trim(),
+    );
+
+    if (result.isError) {
+      emit(state.copyWith(addVideoStatus: const UpdateProfileStatus.error()));
+      MessageService.showToast(
+        msg: result.asError?.error.toString() ?? LocaleKeys.errorGeneric.tr(),
+        state: ToastStates.error,
+      );
+      return false;
+    }
+
+    // Newest first, matching the list endpoint's ordering.
+    emit(state.copyWith(
+      addVideoStatus: const UpdateProfileStatus.success(),
+      videos: [result.asValue!.value, ...state.videos],
+    ));
+    MessageService.showToast(
+      msg: LocaleKeys.updateProfileVideoAdded.tr(),
+      state: ToastStates.success,
+    );
+    return true;
+  }
+
+  // ─── Delete / deactivate account ───────────────────────────────────────────
+  /// On success this reuses [SessionService.logout] — the same clear-and-return
+  /// -to-login path the logout button takes, not a second copy of it.
+  Future<void> deleteAccount() async {
+    if (state.isDeactivating) return;
+    emit(state.copyWith(deactivateStatus: const UpdateProfileStatus.loading()));
+
+    final result = await _repository.deactivateAccount();
+
+    if (result.isError) {
+      emit(state.copyWith(deactivateStatus: const UpdateProfileStatus.error()));
+      MessageService.showToast(
+        msg: result.asError?.error.toString() ?? LocaleKeys.errorGeneric.tr(),
+        state: ToastStates.error,
+      );
+      return;
+    }
+
+    emit(state.copyWith(deactivateStatus: const UpdateProfileStatus.success()));
+
+    final message = result.asValue!.value;
+    if (message.isNotEmpty) {
+      MessageService.showToast(msg: message, state: ToastStates.success);
+    }
+
+    await SessionService.logout();
+  }
 }

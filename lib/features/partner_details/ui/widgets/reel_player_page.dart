@@ -5,15 +5,20 @@ import 'package:dawri/core/utils/common_widgets/custom_network_image.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:video_player/video_player.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:dawri/core/utils/constants/app_colors.dart';
 import '../../data/models/partner_details_model.dart';
 
 /// Instagram-style vertical reels viewer over the partner's videos.
 ///
-/// Hosts whose pages can't be played by `video_player` (YouTube, Vimeo, …) fall
-/// back to a thumbnail with an "open externally" action instead of a black screen.
+/// Three playback paths:
+///  * YouTube links play in-app through [YoutubePlayer].
+///  * Direct media files play through `video_player`.
+///  * Anything else (Vimeo, TikTok, …) falls back to "open externally" rather
+///    than showing a black screen.
 class ReelPlayerPage extends StatefulWidget {
   final List<PartnerVideoModel> reels;
   final int initialIndex;
@@ -29,16 +34,27 @@ class _ReelPlayerPageState extends State<ReelPlayerPage> {
   late int _currentIndex;
   final Map<int, VideoPlayerController> _controllers = {};
 
-  /// Embed pages / unsupported hosts — never handed to `video_player`.
+  /// Embed pages `video_player` can't decode. YouTube is absent on purpose —
+  /// it has its own in-app player below.
   static const List<String> _externalOnlyHosts = [
-    'youtube.com',
-    'youtu.be',
     'vimeo.com',
     'dailymotion.com',
     'facebook.com',
     'instagram.com',
     'tiktok.com',
   ];
+
+  /// Video id when [url] is a YouTube link (watch / youtu.be / shorts / embed),
+  /// otherwise null.
+  static String? youtubeIdOf(String? url) {
+    final trimmed = url?.trim() ?? '';
+    if (trimmed.isEmpty) return null;
+
+    final host = Uri.tryParse(trimmed)?.host.toLowerCase() ?? '';
+    if (!host.contains('youtube.com') && !host.contains('youtu.be')) return null;
+
+    return YoutubePlayer.convertUrlToId(trimmed);
+  }
 
   @override
   void initState() {
@@ -58,9 +74,12 @@ class _ReelPlayerPageState extends State<ReelPlayerPage> {
     super.dispose();
   }
 
+  /// True when `video_player` can handle the URL directly. YouTube returns
+  /// false here — [_ReelPage] renders it with the YouTube player instead.
   static bool isInlinePlayable(String? url) {
     final uri = Uri.tryParse(url?.trim() ?? '');
     if (uri == null || !uri.hasScheme) return false;
+    if (youtubeIdOf(url) != null) return false;
     final host = uri.host.toLowerCase();
     return !_externalOnlyHosts.any((blocked) => host.contains(blocked));
   }
@@ -110,6 +129,11 @@ class _ReelPlayerPageState extends State<ReelPlayerPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Landscape means a reel went fullscreen — hand the whole screen over:
+    // no close button on top of the video, no swiping to the next reel.
+    final isFullScreen =
+        MediaQuery.orientationOf(context) == Orientation.landscape;
+
     return Scaffold(
       backgroundColor: AppColors.black,
       body: Stack(
@@ -117,6 +141,9 @@ class _ReelPlayerPageState extends State<ReelPlayerPage> {
           PageView.builder(
             controller: _pageController,
             scrollDirection: Axis.vertical,
+            physics: isFullScreen
+                ? const NeverScrollableScrollPhysics()
+                : const PageScrollPhysics(),
             itemCount: widget.reels.length,
             onPageChanged: _onPageChanged,
             itemBuilder: (context, index) {
@@ -127,18 +154,19 @@ class _ReelPlayerPageState extends State<ReelPlayerPage> {
               );
             },
           ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: const CircleAvatar(
-                  backgroundColor: Colors.black45,
-                  child: Icon(Icons.close, color: AppColors.white),
+          if (!isFullScreen)
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: const CircleAvatar(
+                    backgroundColor: Colors.black45,
+                    child: Icon(Icons.close, color: AppColors.white),
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -159,6 +187,57 @@ class _ReelPage extends StatefulWidget {
 class _ReelPageState extends State<_ReelPage> {
   bool _showPauseIcon = false;
   bool _isMuted = false;
+
+  /// Non-null only for YouTube reels; owned by this page, not the parent.
+  YoutubePlayerController? _youtubeController;
+  String? _youtubeId;
+
+  @override
+  void initState() {
+    super.initState();
+    _youtubeId = _ReelPlayerPageState.youtubeIdOf(widget.reel.url);
+    // Booting a webview costs ~a second, so only the visible reel gets one.
+    // PageView builds neighbours eagerly — creating a player for each of them
+    // meant three webviews racing for the network on open.
+    if (_youtubeId != null && widget.isActive) _createYoutubeController();
+  }
+
+  void _createYoutubeController() {
+    _youtubeController = YoutubePlayerController(
+      initialVideoId: _youtubeId!,
+      flags: const YoutubePlayerFlags(
+        autoPlay: true,
+        mute: false,
+        // Cheapest stream the device can pick; HD would buffer longer.
+        forceHD: false,
+        // `hideThumbnail` stays false on purpose — it gates the placeholder
+        // image below, which is what makes the open feel instant.
+      ),
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant _ReelPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive == oldWidget.isActive) return;
+
+    if (widget.isActive) {
+      // First time this reel is reached — spin the player up now.
+      if (_youtubeId != null && _youtubeController == null) {
+        setState(_createYoutubeController);
+      } else {
+        _youtubeController?.play();
+      }
+    } else {
+      _youtubeController?.pause();
+    }
+  }
+
+  @override
+  void dispose() {
+    _youtubeController?.dispose();
+    super.dispose();
+  }
 
   void _togglePlayPause() {
     final controller = widget.controller;
@@ -198,9 +277,23 @@ class _ReelPageState extends State<_ReelPage> {
 
   @override
   Widget build(BuildContext context) {
+    // YouTube reels get their own player and skip the video_player path.
+    if (_youtubeId != null) {
+      final youtubeController = _youtubeController;
+      // Not reached yet — the thumbnail stands in until it becomes active.
+      if (youtubeController == null) {
+        return _YoutubeThumbnailStandIn(thumbnail: widget.reel.thumbnail);
+      }
+      return _YoutubeReel(
+        controller: youtubeController,
+        title: widget.reel.title,
+        thumbnail: widget.reel.thumbnail,
+      );
+    }
+
     final controller = widget.controller;
     final isReady = controller != null && controller.value.isInitialized;
-    // Nothing to initialise (YouTube & friends) → show the external fallback.
+    // Nothing to initialise (Vimeo, TikTok, …) → show the external fallback.
     final isExternalOnly = !_ReelPlayerPageState.isInlinePlayable(widget.reel.url);
 
     return GestureDetector(
@@ -307,6 +400,154 @@ class _ReelPageState extends State<_ReelPage> {
             ),
         ],
       ),
+    );
+  }
+}
+
+/// Placeholder for a YouTube reel the user hasn't scrolled to yet — the cached
+/// thumbnail, so swiping is instant and no webview is created off-screen.
+class _YoutubeThumbnailStandIn extends StatelessWidget {
+  const _YoutubeThumbnailStandIn({this.thumbnail});
+
+  final String? thumbnail;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: AppColors.black,
+      child: Center(
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              CustomNetworkImage(imageUrl: thumbnail ?? '', fit: BoxFit.cover),
+              // A play glyph, not a spinner — nothing is loading here yet.
+              Center(
+                child: FaIcon(
+                  FontAwesomeIcons.circlePlay,
+                  size: 46,
+                  color: AppColors.white.withOpacity(0.85),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// YouTube reel — 16:9 player centred on the black reel background, with the
+/// title underneath.
+///
+/// Wrapped in [YoutubePlayerBuilder] so the fullscreen button works: it swaps
+/// to immersive mode, stretches the player to the full height in landscape, and
+/// makes back exit fullscreen instead of closing the reel.
+class _YoutubeReel extends StatelessWidget {
+  const _YoutubeReel({
+    required this.controller,
+    this.title,
+    this.thumbnail,
+  });
+
+  final YoutubePlayerController controller;
+  final String? title;
+  final String? thumbnail;
+
+  @override
+  Widget build(BuildContext context) {
+    return _PlayerMenuTheme(
+      child: YoutubePlayerBuilder(
+        player: YoutubePlayer(
+          controller: controller,
+          showVideoProgressIndicator: true,
+          progressIndicatorColor: AppColors.primaryLight,
+          // Shown while the iframe boots — the same cached image the grid
+          // already downloaded, so it appears immediately.
+          thumbnail: CustomNetworkImage(
+            imageUrl: thumbnail ?? '',
+            fit: BoxFit.cover,
+          ),
+          progressColors: const ProgressBarColors(
+            playedColor: AppColors.primaryLight,
+            handleColor: AppColors.primaryLight,
+          ),
+        ),
+        // The package restores only portraitUp on exit, which would quietly
+        // drop the portraitDown that app.dart allows.
+        onExitFullScreen: () => SystemChrome.setPreferredOrientations(
+          const [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown],
+        ),
+        builder: (context, player) {
+          // In landscape the player owns the whole screen — drop the caption.
+          final isLandscape =
+              MediaQuery.orientationOf(context) == Orientation.landscape;
+
+          return ColoredBox(
+            color: AppColors.black,
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  player,
+                  if (!isLandscape && (title ?? '').isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
+                      child: Text(
+                        title!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: AppColors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Restyles the player's overflow menus (playback speed) — the package builds a
+/// bare [PopupMenuButton], so its colours come from the ambient theme.
+class _PlayerMenuTheme extends StatelessWidget {
+  const _PlayerMenuTheme({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        popupMenuTheme: PopupMenuThemeData(
+          color: AppColors.textDark,
+          surfaceTintColor: AppColors.textDark,
+          elevation: 8,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          textStyle: const TextStyle(
+            color: AppColors.white,
+            fontWeight: FontWeight.w700,
+            fontSize: 14,
+          ),
+        ),
+        // CheckedPopupMenuItem renders a ListTile — this colours its label and
+        // the tick next to the active speed.
+        listTileTheme: const ListTileThemeData(
+          textColor: AppColors.white,
+          iconColor: AppColors.primaryLight,
+        ),
+      ),
+      child: child,
     );
   }
 }

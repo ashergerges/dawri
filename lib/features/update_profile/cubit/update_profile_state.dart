@@ -12,6 +12,8 @@ abstract class UpdateProfileState with _$UpdateProfileState {
     int? dynamicId, // sport_position_id
 
     // ─── Read-only context ───────────────────────────────────
+    /// Signed-in participant id — needed by the videos "see all" route.
+    int? userId,
     @Default('') String phone,
     @Default('') String avatarPath,
     @Default(false) bool isLocalAvatar,
@@ -42,9 +44,27 @@ abstract class UpdateProfileState with _$UpdateProfileState {
     @Default(false) bool isPickingAvatar,
     @Default(false) bool isUpdating,
     @Default(false) bool isSuccess,
+
+    // ─── Reels ───────────────────────────────────────────────
+    @Default([]) List<PartnerVideoModel> videos,
+    @Default(UpdateProfileStatus.initial()) UpdateProfileStatus addVideoStatus,
+
+    // ─── Account deactivation ────────────────────────────────
+    @Default(UpdateProfileStatus.initial()) UpdateProfileStatus deactivateStatus,
   }) = _UpdateProfileState;
 
   const UpdateProfileState._();
+
+  bool get isDeactivating => deactivateStatus is UpdateProfileStatusLoading;
+
+  bool get isAddingVideo => addVideoStatus is UpdateProfileStatusLoading;
+
+  /// Only the first few show inline — the rest live behind "see all".
+  List<PartnerVideoModel> get previewVideos =>
+      videos.take(UpdateProfileConstants.videosPreviewCount).toList();
+
+  bool get hasMoreVideos =>
+      videos.length >= UpdateProfileConstants.videosPreviewCount;
 
   bool get isLoading => loadStatus is UpdateProfileStatusLoading;
 
