@@ -110,12 +110,12 @@ class _HeroHeader extends StatelessWidget {
                     iconColor: AppColors.white,
                     onTap: () => Navigator.pop(context),
                   ),
-                  _CircleIconButton(
-                    icon: FontAwesomeIcons.gear,
-                    backgroundColor: AppColors.white.withOpacity(0.2),
-                    iconColor: AppColors.white,
-                    onTap: () {},
-                  ),
+                  // _CircleIconButton(
+                  //   icon: FontAwesomeIcons.gear,
+                  //   backgroundColor: AppColors.white.withOpacity(0.2),
+                  //   iconColor: AppColors.white,
+                  //   onTap: () {},
+                  // ),
                 ],
               ),
               10.h.sizedHeight,

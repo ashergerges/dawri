@@ -1,4 +1,5 @@
 // lib/features/login/ui/widgets/auth_scaffold.dart
+import 'package:dawri/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -75,7 +76,14 @@ class _AuthHero extends StatelessWidget {
                 ],
               ),
             ),
-            FaIcon(FontAwesomeIcons.futbol, size: 70.sp, color: AppColors.white),
+            ClipOval(
+              child: Assets.svg.logoName.svg(
+                height: 100.sp,
+                width: 100.sp,
+                fit: BoxFit.cover,
+              ),
+            )
+            // FaIcon(FontAwesomeIcons.futbol, size: 70.sp, color: AppColors.white),
           ],
         ),
       ),
