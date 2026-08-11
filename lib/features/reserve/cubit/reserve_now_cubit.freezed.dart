@@ -14,8 +14,11 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ReserveNowState {
 
-// ─── Stadium details ─────────────────────────────────────
- StadiumModel? get stadium; ReserveStatus get stadiumStatus;// ─── Durations ───────────────────────────────────────────
+// ─── Date ────────────────────────────────────────────────
+/// The same week strip the stadiums list shows, so the booking date can be
+/// changed here instead of going back.
+ List<DateOption> get dates; int get selectedDateIndex;// ─── Stadium details ─────────────────────────────────────
+ StadiumDetailsModel? get stadium; ReserveStatus get stadiumStatus;// ─── Durations ───────────────────────────────────────────
  List<BookingDurationModel> get durations; ReserveStatus get durationsStatus; BookingDurationModel? get selectedDuration;// ─── Slots ───────────────────────────────────────────────
  List<BookingSlotModel> get slots; ReserveStatus get slotsStatus; BookingSlotModel? get selectedSlot;// ─── Payment (static) ────────────────────────────────────
  int get selectedPaymentIndex;// ─── Booking submission ──────────────────────────────────
@@ -30,16 +33,16 @@ $ReserveNowStateCopyWith<ReserveNowState> get copyWith => _$ReserveNowStateCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReserveNowState&&(identical(other.stadium, stadium) || other.stadium == stadium)&&(identical(other.stadiumStatus, stadiumStatus) || other.stadiumStatus == stadiumStatus)&&const DeepCollectionEquality().equals(other.durations, durations)&&(identical(other.durationsStatus, durationsStatus) || other.durationsStatus == durationsStatus)&&(identical(other.selectedDuration, selectedDuration) || other.selectedDuration == selectedDuration)&&const DeepCollectionEquality().equals(other.slots, slots)&&(identical(other.slotsStatus, slotsStatus) || other.slotsStatus == slotsStatus)&&(identical(other.selectedSlot, selectedSlot) || other.selectedSlot == selectedSlot)&&(identical(other.selectedPaymentIndex, selectedPaymentIndex) || other.selectedPaymentIndex == selectedPaymentIndex)&&(identical(other.bookingStatus, bookingStatus) || other.bookingStatus == bookingStatus)&&(identical(other.bookingMessage, bookingMessage) || other.bookingMessage == bookingMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReserveNowState&&const DeepCollectionEquality().equals(other.dates, dates)&&(identical(other.selectedDateIndex, selectedDateIndex) || other.selectedDateIndex == selectedDateIndex)&&(identical(other.stadium, stadium) || other.stadium == stadium)&&(identical(other.stadiumStatus, stadiumStatus) || other.stadiumStatus == stadiumStatus)&&const DeepCollectionEquality().equals(other.durations, durations)&&(identical(other.durationsStatus, durationsStatus) || other.durationsStatus == durationsStatus)&&(identical(other.selectedDuration, selectedDuration) || other.selectedDuration == selectedDuration)&&const DeepCollectionEquality().equals(other.slots, slots)&&(identical(other.slotsStatus, slotsStatus) || other.slotsStatus == slotsStatus)&&(identical(other.selectedSlot, selectedSlot) || other.selectedSlot == selectedSlot)&&(identical(other.selectedPaymentIndex, selectedPaymentIndex) || other.selectedPaymentIndex == selectedPaymentIndex)&&(identical(other.bookingStatus, bookingStatus) || other.bookingStatus == bookingStatus)&&(identical(other.bookingMessage, bookingMessage) || other.bookingMessage == bookingMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,stadium,stadiumStatus,const DeepCollectionEquality().hash(durations),durationsStatus,selectedDuration,const DeepCollectionEquality().hash(slots),slotsStatus,selectedSlot,selectedPaymentIndex,bookingStatus,bookingMessage);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(dates),selectedDateIndex,stadium,stadiumStatus,const DeepCollectionEquality().hash(durations),durationsStatus,selectedDuration,const DeepCollectionEquality().hash(slots),slotsStatus,selectedSlot,selectedPaymentIndex,bookingStatus,bookingMessage);
 
 @override
 String toString() {
-  return 'ReserveNowState(stadium: $stadium, stadiumStatus: $stadiumStatus, durations: $durations, durationsStatus: $durationsStatus, selectedDuration: $selectedDuration, slots: $slots, slotsStatus: $slotsStatus, selectedSlot: $selectedSlot, selectedPaymentIndex: $selectedPaymentIndex, bookingStatus: $bookingStatus, bookingMessage: $bookingMessage)';
+  return 'ReserveNowState(dates: $dates, selectedDateIndex: $selectedDateIndex, stadium: $stadium, stadiumStatus: $stadiumStatus, durations: $durations, durationsStatus: $durationsStatus, selectedDuration: $selectedDuration, slots: $slots, slotsStatus: $slotsStatus, selectedSlot: $selectedSlot, selectedPaymentIndex: $selectedPaymentIndex, bookingStatus: $bookingStatus, bookingMessage: $bookingMessage)';
 }
 
 
@@ -50,7 +53,7 @@ abstract mixin class $ReserveNowStateCopyWith<$Res>  {
   factory $ReserveNowStateCopyWith(ReserveNowState value, $Res Function(ReserveNowState) _then) = _$ReserveNowStateCopyWithImpl;
 @useResult
 $Res call({
- StadiumModel? stadium, ReserveStatus stadiumStatus, List<BookingDurationModel> durations, ReserveStatus durationsStatus, BookingDurationModel? selectedDuration, List<BookingSlotModel> slots, ReserveStatus slotsStatus, BookingSlotModel? selectedSlot, int selectedPaymentIndex, ReserveStatus bookingStatus, String? bookingMessage
+ List<DateOption> dates, int selectedDateIndex, StadiumDetailsModel? stadium, ReserveStatus stadiumStatus, List<BookingDurationModel> durations, ReserveStatus durationsStatus, BookingDurationModel? selectedDuration, List<BookingSlotModel> slots, ReserveStatus slotsStatus, BookingSlotModel? selectedSlot, int selectedPaymentIndex, ReserveStatus bookingStatus, String? bookingMessage
 });
 
 
@@ -67,10 +70,12 @@ class _$ReserveNowStateCopyWithImpl<$Res>
 
 /// Create a copy of ReserveNowState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? stadium = freezed,Object? stadiumStatus = null,Object? durations = null,Object? durationsStatus = null,Object? selectedDuration = freezed,Object? slots = null,Object? slotsStatus = null,Object? selectedSlot = freezed,Object? selectedPaymentIndex = null,Object? bookingStatus = null,Object? bookingMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? dates = null,Object? selectedDateIndex = null,Object? stadium = freezed,Object? stadiumStatus = null,Object? durations = null,Object? durationsStatus = null,Object? selectedDuration = freezed,Object? slots = null,Object? slotsStatus = null,Object? selectedSlot = freezed,Object? selectedPaymentIndex = null,Object? bookingStatus = null,Object? bookingMessage = freezed,}) {
   return _then(_self.copyWith(
-stadium: freezed == stadium ? _self.stadium : stadium // ignore: cast_nullable_to_non_nullable
-as StadiumModel?,stadiumStatus: null == stadiumStatus ? _self.stadiumStatus : stadiumStatus // ignore: cast_nullable_to_non_nullable
+dates: null == dates ? _self.dates : dates // ignore: cast_nullable_to_non_nullable
+as List<DateOption>,selectedDateIndex: null == selectedDateIndex ? _self.selectedDateIndex : selectedDateIndex // ignore: cast_nullable_to_non_nullable
+as int,stadium: freezed == stadium ? _self.stadium : stadium // ignore: cast_nullable_to_non_nullable
+as StadiumDetailsModel?,stadiumStatus: null == stadiumStatus ? _self.stadiumStatus : stadiumStatus // ignore: cast_nullable_to_non_nullable
 as ReserveStatus,durations: null == durations ? _self.durations : durations // ignore: cast_nullable_to_non_nullable
 as List<BookingDurationModel>,durationsStatus: null == durationsStatus ? _self.durationsStatus : durationsStatus // ignore: cast_nullable_to_non_nullable
 as ReserveStatus,selectedDuration: freezed == selectedDuration ? _self.selectedDuration : selectedDuration // ignore: cast_nullable_to_non_nullable
@@ -201,10 +206,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( StadiumModel? stadium,  ReserveStatus stadiumStatus,  List<BookingDurationModel> durations,  ReserveStatus durationsStatus,  BookingDurationModel? selectedDuration,  List<BookingSlotModel> slots,  ReserveStatus slotsStatus,  BookingSlotModel? selectedSlot,  int selectedPaymentIndex,  ReserveStatus bookingStatus,  String? bookingMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<DateOption> dates,  int selectedDateIndex,  StadiumDetailsModel? stadium,  ReserveStatus stadiumStatus,  List<BookingDurationModel> durations,  ReserveStatus durationsStatus,  BookingDurationModel? selectedDuration,  List<BookingSlotModel> slots,  ReserveStatus slotsStatus,  BookingSlotModel? selectedSlot,  int selectedPaymentIndex,  ReserveStatus bookingStatus,  String? bookingMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ReserveNowState() when $default != null:
-return $default(_that.stadium,_that.stadiumStatus,_that.durations,_that.durationsStatus,_that.selectedDuration,_that.slots,_that.slotsStatus,_that.selectedSlot,_that.selectedPaymentIndex,_that.bookingStatus,_that.bookingMessage);case _:
+return $default(_that.dates,_that.selectedDateIndex,_that.stadium,_that.stadiumStatus,_that.durations,_that.durationsStatus,_that.selectedDuration,_that.slots,_that.slotsStatus,_that.selectedSlot,_that.selectedPaymentIndex,_that.bookingStatus,_that.bookingMessage);case _:
   return orElse();
 
 }
@@ -222,10 +227,10 @@ return $default(_that.stadium,_that.stadiumStatus,_that.durations,_that.duration
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( StadiumModel? stadium,  ReserveStatus stadiumStatus,  List<BookingDurationModel> durations,  ReserveStatus durationsStatus,  BookingDurationModel? selectedDuration,  List<BookingSlotModel> slots,  ReserveStatus slotsStatus,  BookingSlotModel? selectedSlot,  int selectedPaymentIndex,  ReserveStatus bookingStatus,  String? bookingMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<DateOption> dates,  int selectedDateIndex,  StadiumDetailsModel? stadium,  ReserveStatus stadiumStatus,  List<BookingDurationModel> durations,  ReserveStatus durationsStatus,  BookingDurationModel? selectedDuration,  List<BookingSlotModel> slots,  ReserveStatus slotsStatus,  BookingSlotModel? selectedSlot,  int selectedPaymentIndex,  ReserveStatus bookingStatus,  String? bookingMessage)  $default,) {final _that = this;
 switch (_that) {
 case _ReserveNowState():
-return $default(_that.stadium,_that.stadiumStatus,_that.durations,_that.durationsStatus,_that.selectedDuration,_that.slots,_that.slotsStatus,_that.selectedSlot,_that.selectedPaymentIndex,_that.bookingStatus,_that.bookingMessage);case _:
+return $default(_that.dates,_that.selectedDateIndex,_that.stadium,_that.stadiumStatus,_that.durations,_that.durationsStatus,_that.selectedDuration,_that.slots,_that.slotsStatus,_that.selectedSlot,_that.selectedPaymentIndex,_that.bookingStatus,_that.bookingMessage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -242,10 +247,10 @@ return $default(_that.stadium,_that.stadiumStatus,_that.durations,_that.duration
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( StadiumModel? stadium,  ReserveStatus stadiumStatus,  List<BookingDurationModel> durations,  ReserveStatus durationsStatus,  BookingDurationModel? selectedDuration,  List<BookingSlotModel> slots,  ReserveStatus slotsStatus,  BookingSlotModel? selectedSlot,  int selectedPaymentIndex,  ReserveStatus bookingStatus,  String? bookingMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<DateOption> dates,  int selectedDateIndex,  StadiumDetailsModel? stadium,  ReserveStatus stadiumStatus,  List<BookingDurationModel> durations,  ReserveStatus durationsStatus,  BookingDurationModel? selectedDuration,  List<BookingSlotModel> slots,  ReserveStatus slotsStatus,  BookingSlotModel? selectedSlot,  int selectedPaymentIndex,  ReserveStatus bookingStatus,  String? bookingMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _ReserveNowState() when $default != null:
-return $default(_that.stadium,_that.stadiumStatus,_that.durations,_that.durationsStatus,_that.selectedDuration,_that.slots,_that.slotsStatus,_that.selectedSlot,_that.selectedPaymentIndex,_that.bookingStatus,_that.bookingMessage);case _:
+return $default(_that.dates,_that.selectedDateIndex,_that.stadium,_that.stadiumStatus,_that.durations,_that.durationsStatus,_that.selectedDuration,_that.slots,_that.slotsStatus,_that.selectedSlot,_that.selectedPaymentIndex,_that.bookingStatus,_that.bookingMessage);case _:
   return null;
 
 }
@@ -256,12 +261,26 @@ return $default(_that.stadium,_that.stadiumStatus,_that.durations,_that.duration
 /// @nodoc
 
 
-class _ReserveNowState implements ReserveNowState {
-  const _ReserveNowState({this.stadium, this.stadiumStatus = const ReserveStatus.initial(), final  List<BookingDurationModel> durations = const [], this.durationsStatus = const ReserveStatus.initial(), this.selectedDuration, final  List<BookingSlotModel> slots = const [], this.slotsStatus = const ReserveStatus.initial(), this.selectedSlot, this.selectedPaymentIndex = 0, this.bookingStatus = const ReserveStatus.initial(), this.bookingMessage}): _durations = durations,_slots = slots;
+class _ReserveNowState extends ReserveNowState {
+  const _ReserveNowState({final  List<DateOption> dates = const [], this.selectedDateIndex = 0, this.stadium, this.stadiumStatus = const ReserveStatus.initial(), final  List<BookingDurationModel> durations = const [], this.durationsStatus = const ReserveStatus.initial(), this.selectedDuration, final  List<BookingSlotModel> slots = const [], this.slotsStatus = const ReserveStatus.initial(), this.selectedSlot, this.selectedPaymentIndex = 0, this.bookingStatus = const ReserveStatus.initial(), this.bookingMessage}): _dates = dates,_durations = durations,_slots = slots,super._();
   
 
+// ─── Date ────────────────────────────────────────────────
+/// The same week strip the stadiums list shows, so the booking date can be
+/// changed here instead of going back.
+ final  List<DateOption> _dates;
+// ─── Date ────────────────────────────────────────────────
+/// The same week strip the stadiums list shows, so the booking date can be
+/// changed here instead of going back.
+@override@JsonKey() List<DateOption> get dates {
+  if (_dates is EqualUnmodifiableListView) return _dates;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_dates);
+}
+
+@override@JsonKey() final  int selectedDateIndex;
 // ─── Stadium details ─────────────────────────────────────
-@override final  StadiumModel? stadium;
+@override final  StadiumDetailsModel? stadium;
 @override@JsonKey() final  ReserveStatus stadiumStatus;
 // ─── Durations ───────────────────────────────────────────
  final  List<BookingDurationModel> _durations;
@@ -301,16 +320,16 @@ _$ReserveNowStateCopyWith<_ReserveNowState> get copyWith => __$ReserveNowStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReserveNowState&&(identical(other.stadium, stadium) || other.stadium == stadium)&&(identical(other.stadiumStatus, stadiumStatus) || other.stadiumStatus == stadiumStatus)&&const DeepCollectionEquality().equals(other._durations, _durations)&&(identical(other.durationsStatus, durationsStatus) || other.durationsStatus == durationsStatus)&&(identical(other.selectedDuration, selectedDuration) || other.selectedDuration == selectedDuration)&&const DeepCollectionEquality().equals(other._slots, _slots)&&(identical(other.slotsStatus, slotsStatus) || other.slotsStatus == slotsStatus)&&(identical(other.selectedSlot, selectedSlot) || other.selectedSlot == selectedSlot)&&(identical(other.selectedPaymentIndex, selectedPaymentIndex) || other.selectedPaymentIndex == selectedPaymentIndex)&&(identical(other.bookingStatus, bookingStatus) || other.bookingStatus == bookingStatus)&&(identical(other.bookingMessage, bookingMessage) || other.bookingMessage == bookingMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReserveNowState&&const DeepCollectionEquality().equals(other._dates, _dates)&&(identical(other.selectedDateIndex, selectedDateIndex) || other.selectedDateIndex == selectedDateIndex)&&(identical(other.stadium, stadium) || other.stadium == stadium)&&(identical(other.stadiumStatus, stadiumStatus) || other.stadiumStatus == stadiumStatus)&&const DeepCollectionEquality().equals(other._durations, _durations)&&(identical(other.durationsStatus, durationsStatus) || other.durationsStatus == durationsStatus)&&(identical(other.selectedDuration, selectedDuration) || other.selectedDuration == selectedDuration)&&const DeepCollectionEquality().equals(other._slots, _slots)&&(identical(other.slotsStatus, slotsStatus) || other.slotsStatus == slotsStatus)&&(identical(other.selectedSlot, selectedSlot) || other.selectedSlot == selectedSlot)&&(identical(other.selectedPaymentIndex, selectedPaymentIndex) || other.selectedPaymentIndex == selectedPaymentIndex)&&(identical(other.bookingStatus, bookingStatus) || other.bookingStatus == bookingStatus)&&(identical(other.bookingMessage, bookingMessage) || other.bookingMessage == bookingMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,stadium,stadiumStatus,const DeepCollectionEquality().hash(_durations),durationsStatus,selectedDuration,const DeepCollectionEquality().hash(_slots),slotsStatus,selectedSlot,selectedPaymentIndex,bookingStatus,bookingMessage);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_dates),selectedDateIndex,stadium,stadiumStatus,const DeepCollectionEquality().hash(_durations),durationsStatus,selectedDuration,const DeepCollectionEquality().hash(_slots),slotsStatus,selectedSlot,selectedPaymentIndex,bookingStatus,bookingMessage);
 
 @override
 String toString() {
-  return 'ReserveNowState(stadium: $stadium, stadiumStatus: $stadiumStatus, durations: $durations, durationsStatus: $durationsStatus, selectedDuration: $selectedDuration, slots: $slots, slotsStatus: $slotsStatus, selectedSlot: $selectedSlot, selectedPaymentIndex: $selectedPaymentIndex, bookingStatus: $bookingStatus, bookingMessage: $bookingMessage)';
+  return 'ReserveNowState(dates: $dates, selectedDateIndex: $selectedDateIndex, stadium: $stadium, stadiumStatus: $stadiumStatus, durations: $durations, durationsStatus: $durationsStatus, selectedDuration: $selectedDuration, slots: $slots, slotsStatus: $slotsStatus, selectedSlot: $selectedSlot, selectedPaymentIndex: $selectedPaymentIndex, bookingStatus: $bookingStatus, bookingMessage: $bookingMessage)';
 }
 
 
@@ -321,7 +340,7 @@ abstract mixin class _$ReserveNowStateCopyWith<$Res> implements $ReserveNowState
   factory _$ReserveNowStateCopyWith(_ReserveNowState value, $Res Function(_ReserveNowState) _then) = __$ReserveNowStateCopyWithImpl;
 @override @useResult
 $Res call({
- StadiumModel? stadium, ReserveStatus stadiumStatus, List<BookingDurationModel> durations, ReserveStatus durationsStatus, BookingDurationModel? selectedDuration, List<BookingSlotModel> slots, ReserveStatus slotsStatus, BookingSlotModel? selectedSlot, int selectedPaymentIndex, ReserveStatus bookingStatus, String? bookingMessage
+ List<DateOption> dates, int selectedDateIndex, StadiumDetailsModel? stadium, ReserveStatus stadiumStatus, List<BookingDurationModel> durations, ReserveStatus durationsStatus, BookingDurationModel? selectedDuration, List<BookingSlotModel> slots, ReserveStatus slotsStatus, BookingSlotModel? selectedSlot, int selectedPaymentIndex, ReserveStatus bookingStatus, String? bookingMessage
 });
 
 
@@ -338,10 +357,12 @@ class __$ReserveNowStateCopyWithImpl<$Res>
 
 /// Create a copy of ReserveNowState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? stadium = freezed,Object? stadiumStatus = null,Object? durations = null,Object? durationsStatus = null,Object? selectedDuration = freezed,Object? slots = null,Object? slotsStatus = null,Object? selectedSlot = freezed,Object? selectedPaymentIndex = null,Object? bookingStatus = null,Object? bookingMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? dates = null,Object? selectedDateIndex = null,Object? stadium = freezed,Object? stadiumStatus = null,Object? durations = null,Object? durationsStatus = null,Object? selectedDuration = freezed,Object? slots = null,Object? slotsStatus = null,Object? selectedSlot = freezed,Object? selectedPaymentIndex = null,Object? bookingStatus = null,Object? bookingMessage = freezed,}) {
   return _then(_ReserveNowState(
-stadium: freezed == stadium ? _self.stadium : stadium // ignore: cast_nullable_to_non_nullable
-as StadiumModel?,stadiumStatus: null == stadiumStatus ? _self.stadiumStatus : stadiumStatus // ignore: cast_nullable_to_non_nullable
+dates: null == dates ? _self._dates : dates // ignore: cast_nullable_to_non_nullable
+as List<DateOption>,selectedDateIndex: null == selectedDateIndex ? _self.selectedDateIndex : selectedDateIndex // ignore: cast_nullable_to_non_nullable
+as int,stadium: freezed == stadium ? _self.stadium : stadium // ignore: cast_nullable_to_non_nullable
+as StadiumDetailsModel?,stadiumStatus: null == stadiumStatus ? _self.stadiumStatus : stadiumStatus // ignore: cast_nullable_to_non_nullable
 as ReserveStatus,durations: null == durations ? _self._durations : durations // ignore: cast_nullable_to_non_nullable
 as List<BookingDurationModel>,durationsStatus: null == durationsStatus ? _self.durationsStatus : durationsStatus // ignore: cast_nullable_to_non_nullable
 as ReserveStatus,selectedDuration: freezed == selectedDuration ? _self.selectedDuration : selectedDuration // ignore: cast_nullable_to_non_nullable

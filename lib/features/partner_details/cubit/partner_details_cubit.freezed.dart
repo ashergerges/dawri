@@ -15,7 +15,10 @@ T _$identity<T>(T value) => value;
 mixin _$PartnerDetailsState {
 
  PartnerDetailsModel? get partner; PartnerDetailsStatus get detailsStatus;/// Kept apart from [partner] so the heart flips instantly (optimistic).
- bool get isFavorite;
+ bool get isFavorite;/// Videos whose view the server counted during this visit. Held separately
+/// because [videos] is derived from [partner], which has no copyWith —
+/// cleared on reload, when the fresh payload already includes them.
+ Set<int> get extraViewIds;
 /// Create a copy of PartnerDetailsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +29,16 @@ $PartnerDetailsStateCopyWith<PartnerDetailsState> get copyWith => _$PartnerDetai
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerDetailsState&&(identical(other.partner, partner) || other.partner == partner)&&(identical(other.detailsStatus, detailsStatus) || other.detailsStatus == detailsStatus)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerDetailsState&&(identical(other.partner, partner) || other.partner == partner)&&(identical(other.detailsStatus, detailsStatus) || other.detailsStatus == detailsStatus)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite)&&const DeepCollectionEquality().equals(other.extraViewIds, extraViewIds));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,partner,detailsStatus,isFavorite);
+int get hashCode => Object.hash(runtimeType,partner,detailsStatus,isFavorite,const DeepCollectionEquality().hash(extraViewIds));
 
 @override
 String toString() {
-  return 'PartnerDetailsState(partner: $partner, detailsStatus: $detailsStatus, isFavorite: $isFavorite)';
+  return 'PartnerDetailsState(partner: $partner, detailsStatus: $detailsStatus, isFavorite: $isFavorite, extraViewIds: $extraViewIds)';
 }
 
 
@@ -46,7 +49,7 @@ abstract mixin class $PartnerDetailsStateCopyWith<$Res>  {
   factory $PartnerDetailsStateCopyWith(PartnerDetailsState value, $Res Function(PartnerDetailsState) _then) = _$PartnerDetailsStateCopyWithImpl;
 @useResult
 $Res call({
- PartnerDetailsModel? partner, PartnerDetailsStatus detailsStatus, bool isFavorite
+ PartnerDetailsModel? partner, PartnerDetailsStatus detailsStatus, bool isFavorite, Set<int> extraViewIds
 });
 
 
@@ -63,12 +66,13 @@ class _$PartnerDetailsStateCopyWithImpl<$Res>
 
 /// Create a copy of PartnerDetailsState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? partner = freezed,Object? detailsStatus = null,Object? isFavorite = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? partner = freezed,Object? detailsStatus = null,Object? isFavorite = null,Object? extraViewIds = null,}) {
   return _then(_self.copyWith(
 partner: freezed == partner ? _self.partner : partner // ignore: cast_nullable_to_non_nullable
 as PartnerDetailsModel?,detailsStatus: null == detailsStatus ? _self.detailsStatus : detailsStatus // ignore: cast_nullable_to_non_nullable
 as PartnerDetailsStatus,isFavorite: null == isFavorite ? _self.isFavorite : isFavorite // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,extraViewIds: null == extraViewIds ? _self.extraViewIds : extraViewIds // ignore: cast_nullable_to_non_nullable
+as Set<int>,
   ));
 }
 /// Create a copy of PartnerDetailsState
@@ -162,10 +166,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( PartnerDetailsModel? partner,  PartnerDetailsStatus detailsStatus,  bool isFavorite)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( PartnerDetailsModel? partner,  PartnerDetailsStatus detailsStatus,  bool isFavorite,  Set<int> extraViewIds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PartnerDetailsState() when $default != null:
-return $default(_that.partner,_that.detailsStatus,_that.isFavorite);case _:
+return $default(_that.partner,_that.detailsStatus,_that.isFavorite,_that.extraViewIds);case _:
   return orElse();
 
 }
@@ -183,10 +187,10 @@ return $default(_that.partner,_that.detailsStatus,_that.isFavorite);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( PartnerDetailsModel? partner,  PartnerDetailsStatus detailsStatus,  bool isFavorite)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( PartnerDetailsModel? partner,  PartnerDetailsStatus detailsStatus,  bool isFavorite,  Set<int> extraViewIds)  $default,) {final _that = this;
 switch (_that) {
 case _PartnerDetailsState():
-return $default(_that.partner,_that.detailsStatus,_that.isFavorite);case _:
+return $default(_that.partner,_that.detailsStatus,_that.isFavorite,_that.extraViewIds);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -203,10 +207,10 @@ return $default(_that.partner,_that.detailsStatus,_that.isFavorite);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( PartnerDetailsModel? partner,  PartnerDetailsStatus detailsStatus,  bool isFavorite)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( PartnerDetailsModel? partner,  PartnerDetailsStatus detailsStatus,  bool isFavorite,  Set<int> extraViewIds)?  $default,) {final _that = this;
 switch (_that) {
 case _PartnerDetailsState() when $default != null:
-return $default(_that.partner,_that.detailsStatus,_that.isFavorite);case _:
+return $default(_that.partner,_that.detailsStatus,_that.isFavorite,_that.extraViewIds);case _:
   return null;
 
 }
@@ -218,13 +222,26 @@ return $default(_that.partner,_that.detailsStatus,_that.isFavorite);case _:
 
 
 class _PartnerDetailsState extends PartnerDetailsState {
-  const _PartnerDetailsState({this.partner, this.detailsStatus = const PartnerDetailsStatus.initial(), this.isFavorite = false}): super._();
+  const _PartnerDetailsState({this.partner, this.detailsStatus = const PartnerDetailsStatus.initial(), this.isFavorite = false, final  Set<int> extraViewIds = const <int>{}}): _extraViewIds = extraViewIds,super._();
   
 
 @override final  PartnerDetailsModel? partner;
 @override@JsonKey() final  PartnerDetailsStatus detailsStatus;
 /// Kept apart from [partner] so the heart flips instantly (optimistic).
 @override@JsonKey() final  bool isFavorite;
+/// Videos whose view the server counted during this visit. Held separately
+/// because [videos] is derived from [partner], which has no copyWith —
+/// cleared on reload, when the fresh payload already includes them.
+ final  Set<int> _extraViewIds;
+/// Videos whose view the server counted during this visit. Held separately
+/// because [videos] is derived from [partner], which has no copyWith —
+/// cleared on reload, when the fresh payload already includes them.
+@override@JsonKey() Set<int> get extraViewIds {
+  if (_extraViewIds is EqualUnmodifiableSetView) return _extraViewIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableSetView(_extraViewIds);
+}
+
 
 /// Create a copy of PartnerDetailsState
 /// with the given fields replaced by the non-null parameter values.
@@ -236,16 +253,16 @@ _$PartnerDetailsStateCopyWith<_PartnerDetailsState> get copyWith => __$PartnerDe
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PartnerDetailsState&&(identical(other.partner, partner) || other.partner == partner)&&(identical(other.detailsStatus, detailsStatus) || other.detailsStatus == detailsStatus)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PartnerDetailsState&&(identical(other.partner, partner) || other.partner == partner)&&(identical(other.detailsStatus, detailsStatus) || other.detailsStatus == detailsStatus)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite)&&const DeepCollectionEquality().equals(other._extraViewIds, _extraViewIds));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,partner,detailsStatus,isFavorite);
+int get hashCode => Object.hash(runtimeType,partner,detailsStatus,isFavorite,const DeepCollectionEquality().hash(_extraViewIds));
 
 @override
 String toString() {
-  return 'PartnerDetailsState(partner: $partner, detailsStatus: $detailsStatus, isFavorite: $isFavorite)';
+  return 'PartnerDetailsState(partner: $partner, detailsStatus: $detailsStatus, isFavorite: $isFavorite, extraViewIds: $extraViewIds)';
 }
 
 
@@ -256,7 +273,7 @@ abstract mixin class _$PartnerDetailsStateCopyWith<$Res> implements $PartnerDeta
   factory _$PartnerDetailsStateCopyWith(_PartnerDetailsState value, $Res Function(_PartnerDetailsState) _then) = __$PartnerDetailsStateCopyWithImpl;
 @override @useResult
 $Res call({
- PartnerDetailsModel? partner, PartnerDetailsStatus detailsStatus, bool isFavorite
+ PartnerDetailsModel? partner, PartnerDetailsStatus detailsStatus, bool isFavorite, Set<int> extraViewIds
 });
 
 
@@ -273,12 +290,13 @@ class __$PartnerDetailsStateCopyWithImpl<$Res>
 
 /// Create a copy of PartnerDetailsState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? partner = freezed,Object? detailsStatus = null,Object? isFavorite = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? partner = freezed,Object? detailsStatus = null,Object? isFavorite = null,Object? extraViewIds = null,}) {
   return _then(_PartnerDetailsState(
 partner: freezed == partner ? _self.partner : partner // ignore: cast_nullable_to_non_nullable
 as PartnerDetailsModel?,detailsStatus: null == detailsStatus ? _self.detailsStatus : detailsStatus // ignore: cast_nullable_to_non_nullable
 as PartnerDetailsStatus,isFavorite: null == isFavorite ? _self.isFavorite : isFavorite // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,extraViewIds: null == extraViewIds ? _self._extraViewIds : extraViewIds // ignore: cast_nullable_to_non_nullable
+as Set<int>,
   ));
 }
 

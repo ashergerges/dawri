@@ -2,6 +2,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:dawri/features/reserve/data/models/reserve_now_model.dart';
 import 'package:dawri/features/reserve/data/repositories/interfaces/i_reserve_repository.dart';
+import 'package:dawri/features/stadium_profile/data/models/stadium_profile_model.dart';
 import 'package:dawri/features/stadiums/data/models/stadium_model.dart';
 import 'package:dawri/main_common.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -11,19 +12,25 @@ part 'reserve_now_cubit.freezed.dart';
 
 class ReserveNowCubit extends Cubit<ReserveNowState> {
   ReserveNowCubit({required this.stadiumId, String? date})
-      : date = date ?? _todayIso(),
-        _repository = getIt<IReserveRepository>(),
-        super(const ReserveNowState());
+      : _repository = getIt<IReserveRepository>(),
+        super(_initialState(date));
 
   final int stadiumId;
-  final String date;
   final IReserveRepository _repository;
 
-  static String _todayIso() {
-    final now = DateTime.now();
-    String two(int n) => n.toString().padLeft(2, '0');
-    return '${now.year}-${two(now.month)}-${two(now.day)}';
+  /// Seeds the week strip and preselects whichever day was passed in from the
+  /// stadiums list, falling back to today when it isn't in range.
+  static ReserveNowState _initialState(String? date) {
+    final dates = DateOptionsBuilder.buildWeek();
+    final index = dates.indexWhere((d) => d.apiDate == date);
+    return ReserveNowState(
+      dates: dates,
+      selectedDateIndex: index < 0 ? 0 : index,
+    );
   }
+
+  /// Date sent to the API — driven by the strip.
+  String get date => state.selectedApiDate ?? '';
 
   // ─── Load sequence ─────────────────────────────────────────────────────────
   Future<void> init() async {
@@ -34,6 +41,13 @@ class ReserveNowCubit extends Cubit<ReserveNowState> {
       emit(state.copyWith(selectedDuration: state.durations.first));
       await getSlots();
     }
+  }
+
+  /// Changing the day invalidates the picked slot — availability is per-date.
+  Future<void> selectDate(int index) async {
+    if (state.selectedDateIndex == index) return;
+    emit(state.copyWith(selectedDateIndex: index, selectedSlot: null));
+    await getSlots();
   }
 
   Future<void> getStadiumDetails() async {

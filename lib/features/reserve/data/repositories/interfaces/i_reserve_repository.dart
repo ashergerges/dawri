@@ -1,9 +1,9 @@
 import 'package:async/async.dart';
 import 'package:dawri/features/reserve/data/models/reserve_now_model.dart';
-import 'package:dawri/features/stadiums/data/models/stadium_model.dart';
+import 'package:dawri/features/stadium_profile/data/models/stadium_profile_model.dart';
 
 abstract class IReserveRepository {
-  Future<Result<StadiumModel>> getStadiumDetails(int stadiumId);
+  Future<Result<StadiumDetailsModel>> getStadiumDetails(int stadiumId);
 
   Future<Result<List<BookingDurationModel>>> getBookingDurations();
 

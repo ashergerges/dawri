@@ -286,7 +286,9 @@ class _ParticipationsTab extends StatelessWidget {
               completeDuration: Duration(milliseconds: 500),
             ),
           child: items.isEmpty
-              ? _EmptyState(message: LocaleKeys.myChampEmptyTitle.tr())
+              ? (isHistory
+                  ? _EmptyState.history()
+                  : _EmptyState.participations(context))
               : ListView(
                   padding: EdgeInsets.all(20.w),
                   children: [
@@ -336,7 +338,7 @@ class _OrganizedTab extends StatelessWidget {
             completeDuration: Duration(milliseconds: 500),
           ),
           child: items.isEmpty
-              ? _EmptyState(message: LocaleKeys.myChampEmptyTitle.tr())
+              ? _EmptyState.organized(context)
               : ListView(
                   padding: EdgeInsets.all(20.w),
                   children: [
@@ -710,31 +712,133 @@ class _CardsShimmer extends StatelessWidget {
   }
 }
 
+/// Empty placeholder for a tab.
+///
+/// Each tab explains its own situation and offers the action that fills it —
+/// a single shared "No Tournaments" line told the user nothing about why the
+/// list was empty or what to do next.
 class _EmptyState extends StatelessWidget {
-  final String message;
-  const _EmptyState({required this.message});
+  final IconData icon;
+  final String title;
+  final String description;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  const _EmptyState({
+    required this.icon,
+    required this.title,
+    required this.description,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  /// Nothing joined yet → send the user to the tournaments list.
+  factory _EmptyState.participations(BuildContext context) => _EmptyState(
+        icon: FontAwesomeIcons.trophy,
+        title: LocaleKeys.myChampEmptyParticipationsTitle.tr(),
+        description: LocaleKeys.myChampEmptyParticipationsDesc.tr(),
+        actionLabel: LocaleKeys.myChampEmptyParticipationsAction.tr(),
+        onAction: () => context.router.replaceAll(
+          [HomeBottomTabsRoute(index: 1)],
+          updateExistingRoutes: false,
+        ),
+      );
+
+  /// Nothing organized yet → straight into the create flow.
+  factory _EmptyState.organized(BuildContext context) => _EmptyState(
+        icon: FontAwesomeIcons.flag,
+        title: LocaleKeys.myChampEmptyOrganizedTitle.tr(),
+        description: LocaleKeys.myChampEmptyOrganizedDesc.tr(),
+        actionLabel: LocaleKeys.myChampEmptyOrganizedAction.tr(),
+        onAction: () => const CreateChampionshipRoute().push(context),
+      );
+
+  /// History fills itself as tournaments finish — nothing to act on.
+  factory _EmptyState.history() => _EmptyState(
+        icon: FontAwesomeIcons.clockRotateLeft,
+        title: LocaleKeys.myChampEmptyHistoryTitle.tr(),
+        description: LocaleKeys.myChampEmptyHistoryDesc.tr(),
+      );
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       // ListView so pull-to-refresh still works on an empty tab.
+      padding: EdgeInsets.fromLTRB(30.w, 90.h, 30.w, 40.h),
       children: [
-        SizedBox(height: 120.h),
-        Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              FaIcon(FontAwesomeIcons.trophy, size: 50.sp, color: AppColors.slate200),
-              12.h.sizedHeight,
-              Text(
-                message,
-                style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textDark,
+        Column(
+          children: [
+            Container(
+              width: 96.w,
+              height: 96.w,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.06),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: FaIcon(icon, size: 38.sp, color: AppColors.primaryLight),
+              ),
+            ),
+            20.h.sizedHeight,
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: AppTextTheme.bodyLargeSemiBold(context).copyWith(
+                fontWeight: FontWeight.w900,
+                color: AppColors.textDark,
+              ),
+            ),
+            8.h.sizedHeight,
+            Text(
+              description,
+              textAlign: TextAlign.center,
+              style: AppTextTheme.bodySmall(context).copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppColors.textMuted,
+                height: 1.6,
+              ),
+            ),
+            if (actionLabel != null && onAction != null) ...[
+              24.h.sizedHeight,
+              OnTap(
+                onTap: onAction,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(16.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.25),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 26.w, vertical: 13.h),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        FaIcon(
+                          FontAwesomeIcons.plus,
+                          size: 13.sp,
+                          color: AppColors.white,
+                        ),
+                        8.w.sizedWidth,
+                        Text(
+                          actionLabel!,
+                          style: AppTextTheme.bodySmallSemiBold(context).copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],
-          ),
+          ],
         ),
       ],
     );

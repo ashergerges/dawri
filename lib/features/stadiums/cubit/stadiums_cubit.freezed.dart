@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$StadiumsState {
 
- int get selectedDateIndex; int get selectedSportIndex; List<DateOption> get dates; List<SportModel> get sports; List<StadiumModel> get stadiums; StadiumsStatus get status;
+ int get selectedDateIndex; int get selectedSportIndex; List<DateOption> get dates; List<SportModel> get sports; List<StadiumModel> get stadiums; StadiumsStatus get status; int get page;
 /// Create a copy of StadiumsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $StadiumsStateCopyWith<StadiumsState> get copyWith => _$StadiumsStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StadiumsState&&(identical(other.selectedDateIndex, selectedDateIndex) || other.selectedDateIndex == selectedDateIndex)&&(identical(other.selectedSportIndex, selectedSportIndex) || other.selectedSportIndex == selectedSportIndex)&&const DeepCollectionEquality().equals(other.dates, dates)&&const DeepCollectionEquality().equals(other.sports, sports)&&const DeepCollectionEquality().equals(other.stadiums, stadiums)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is StadiumsState&&(identical(other.selectedDateIndex, selectedDateIndex) || other.selectedDateIndex == selectedDateIndex)&&(identical(other.selectedSportIndex, selectedSportIndex) || other.selectedSportIndex == selectedSportIndex)&&const DeepCollectionEquality().equals(other.dates, dates)&&const DeepCollectionEquality().equals(other.sports, sports)&&const DeepCollectionEquality().equals(other.stadiums, stadiums)&&(identical(other.status, status) || other.status == status)&&(identical(other.page, page) || other.page == page));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,selectedDateIndex,selectedSportIndex,const DeepCollectionEquality().hash(dates),const DeepCollectionEquality().hash(sports),const DeepCollectionEquality().hash(stadiums),status);
+int get hashCode => Object.hash(runtimeType,selectedDateIndex,selectedSportIndex,const DeepCollectionEquality().hash(dates),const DeepCollectionEquality().hash(sports),const DeepCollectionEquality().hash(stadiums),status,page);
 
 @override
 String toString() {
-  return 'StadiumsState(selectedDateIndex: $selectedDateIndex, selectedSportIndex: $selectedSportIndex, dates: $dates, sports: $sports, stadiums: $stadiums, status: $status)';
+  return 'StadiumsState(selectedDateIndex: $selectedDateIndex, selectedSportIndex: $selectedSportIndex, dates: $dates, sports: $sports, stadiums: $stadiums, status: $status, page: $page)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $StadiumsStateCopyWith<$Res>  {
   factory $StadiumsStateCopyWith(StadiumsState value, $Res Function(StadiumsState) _then) = _$StadiumsStateCopyWithImpl;
 @useResult
 $Res call({
- int selectedDateIndex, int selectedSportIndex, List<DateOption> dates, List<SportModel> sports, List<StadiumModel> stadiums, StadiumsStatus status
+ int selectedDateIndex, int selectedSportIndex, List<DateOption> dates, List<SportModel> sports, List<StadiumModel> stadiums, StadiumsStatus status, int page
 });
 
 
@@ -62,7 +62,7 @@ class _$StadiumsStateCopyWithImpl<$Res>
 
 /// Create a copy of StadiumsState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? selectedDateIndex = null,Object? selectedSportIndex = null,Object? dates = null,Object? sports = null,Object? stadiums = null,Object? status = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? selectedDateIndex = null,Object? selectedSportIndex = null,Object? dates = null,Object? sports = null,Object? stadiums = null,Object? status = null,Object? page = null,}) {
   return _then(_self.copyWith(
 selectedDateIndex: null == selectedDateIndex ? _self.selectedDateIndex : selectedDateIndex // ignore: cast_nullable_to_non_nullable
 as int,selectedSportIndex: null == selectedSportIndex ? _self.selectedSportIndex : selectedSportIndex // ignore: cast_nullable_to_non_nullable
@@ -70,7 +70,8 @@ as int,dates: null == dates ? _self.dates : dates // ignore: cast_nullable_to_no
 as List<DateOption>,sports: null == sports ? _self.sports : sports // ignore: cast_nullable_to_non_nullable
 as List<SportModel>,stadiums: null == stadiums ? _self.stadiums : stadiums // ignore: cast_nullable_to_non_nullable
 as List<StadiumModel>,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as StadiumsStatus,
+as StadiumsStatus,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 /// Create a copy of StadiumsState
@@ -164,10 +165,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int selectedDateIndex,  int selectedSportIndex,  List<DateOption> dates,  List<SportModel> sports,  List<StadiumModel> stadiums,  StadiumsStatus status)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int selectedDateIndex,  int selectedSportIndex,  List<DateOption> dates,  List<SportModel> sports,  List<StadiumModel> stadiums,  StadiumsStatus status,  int page)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _StadiumsState() when $default != null:
-return $default(_that.selectedDateIndex,_that.selectedSportIndex,_that.dates,_that.sports,_that.stadiums,_that.status);case _:
+return $default(_that.selectedDateIndex,_that.selectedSportIndex,_that.dates,_that.sports,_that.stadiums,_that.status,_that.page);case _:
   return orElse();
 
 }
@@ -185,10 +186,10 @@ return $default(_that.selectedDateIndex,_that.selectedSportIndex,_that.dates,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int selectedDateIndex,  int selectedSportIndex,  List<DateOption> dates,  List<SportModel> sports,  List<StadiumModel> stadiums,  StadiumsStatus status)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int selectedDateIndex,  int selectedSportIndex,  List<DateOption> dates,  List<SportModel> sports,  List<StadiumModel> stadiums,  StadiumsStatus status,  int page)  $default,) {final _that = this;
 switch (_that) {
 case _StadiumsState():
-return $default(_that.selectedDateIndex,_that.selectedSportIndex,_that.dates,_that.sports,_that.stadiums,_that.status);case _:
+return $default(_that.selectedDateIndex,_that.selectedSportIndex,_that.dates,_that.sports,_that.stadiums,_that.status,_that.page);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -205,10 +206,10 @@ return $default(_that.selectedDateIndex,_that.selectedSportIndex,_that.dates,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int selectedDateIndex,  int selectedSportIndex,  List<DateOption> dates,  List<SportModel> sports,  List<StadiumModel> stadiums,  StadiumsStatus status)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int selectedDateIndex,  int selectedSportIndex,  List<DateOption> dates,  List<SportModel> sports,  List<StadiumModel> stadiums,  StadiumsStatus status,  int page)?  $default,) {final _that = this;
 switch (_that) {
 case _StadiumsState() when $default != null:
-return $default(_that.selectedDateIndex,_that.selectedSportIndex,_that.dates,_that.sports,_that.stadiums,_that.status);case _:
+return $default(_that.selectedDateIndex,_that.selectedSportIndex,_that.dates,_that.sports,_that.stadiums,_that.status,_that.page);case _:
   return null;
 
 }
@@ -220,7 +221,7 @@ return $default(_that.selectedDateIndex,_that.selectedSportIndex,_that.dates,_th
 
 
 class _StadiumsState implements StadiumsState {
-  const _StadiumsState({this.selectedDateIndex = 0, this.selectedSportIndex = 0, final  List<DateOption> dates = const [], final  List<SportModel> sports = const [], final  List<StadiumModel> stadiums = const [], this.status = const StadiumsStatus.initial()}): _dates = dates,_sports = sports,_stadiums = stadiums;
+  const _StadiumsState({this.selectedDateIndex = 0, this.selectedSportIndex = 0, final  List<DateOption> dates = const [], final  List<SportModel> sports = const [], final  List<StadiumModel> stadiums = const [], this.status = const StadiumsStatus.initial(), this.page = 1}): _dates = dates,_sports = sports,_stadiums = stadiums;
   
 
 @override@JsonKey() final  int selectedDateIndex;
@@ -247,6 +248,7 @@ class _StadiumsState implements StadiumsState {
 }
 
 @override@JsonKey() final  StadiumsStatus status;
+@override@JsonKey() final  int page;
 
 /// Create a copy of StadiumsState
 /// with the given fields replaced by the non-null parameter values.
@@ -258,16 +260,16 @@ _$StadiumsStateCopyWith<_StadiumsState> get copyWith => __$StadiumsStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StadiumsState&&(identical(other.selectedDateIndex, selectedDateIndex) || other.selectedDateIndex == selectedDateIndex)&&(identical(other.selectedSportIndex, selectedSportIndex) || other.selectedSportIndex == selectedSportIndex)&&const DeepCollectionEquality().equals(other._dates, _dates)&&const DeepCollectionEquality().equals(other._sports, _sports)&&const DeepCollectionEquality().equals(other._stadiums, _stadiums)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StadiumsState&&(identical(other.selectedDateIndex, selectedDateIndex) || other.selectedDateIndex == selectedDateIndex)&&(identical(other.selectedSportIndex, selectedSportIndex) || other.selectedSportIndex == selectedSportIndex)&&const DeepCollectionEquality().equals(other._dates, _dates)&&const DeepCollectionEquality().equals(other._sports, _sports)&&const DeepCollectionEquality().equals(other._stadiums, _stadiums)&&(identical(other.status, status) || other.status == status)&&(identical(other.page, page) || other.page == page));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,selectedDateIndex,selectedSportIndex,const DeepCollectionEquality().hash(_dates),const DeepCollectionEquality().hash(_sports),const DeepCollectionEquality().hash(_stadiums),status);
+int get hashCode => Object.hash(runtimeType,selectedDateIndex,selectedSportIndex,const DeepCollectionEquality().hash(_dates),const DeepCollectionEquality().hash(_sports),const DeepCollectionEquality().hash(_stadiums),status,page);
 
 @override
 String toString() {
-  return 'StadiumsState(selectedDateIndex: $selectedDateIndex, selectedSportIndex: $selectedSportIndex, dates: $dates, sports: $sports, stadiums: $stadiums, status: $status)';
+  return 'StadiumsState(selectedDateIndex: $selectedDateIndex, selectedSportIndex: $selectedSportIndex, dates: $dates, sports: $sports, stadiums: $stadiums, status: $status, page: $page)';
 }
 
 
@@ -278,7 +280,7 @@ abstract mixin class _$StadiumsStateCopyWith<$Res> implements $StadiumsStateCopy
   factory _$StadiumsStateCopyWith(_StadiumsState value, $Res Function(_StadiumsState) _then) = __$StadiumsStateCopyWithImpl;
 @override @useResult
 $Res call({
- int selectedDateIndex, int selectedSportIndex, List<DateOption> dates, List<SportModel> sports, List<StadiumModel> stadiums, StadiumsStatus status
+ int selectedDateIndex, int selectedSportIndex, List<DateOption> dates, List<SportModel> sports, List<StadiumModel> stadiums, StadiumsStatus status, int page
 });
 
 
@@ -295,7 +297,7 @@ class __$StadiumsStateCopyWithImpl<$Res>
 
 /// Create a copy of StadiumsState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? selectedDateIndex = null,Object? selectedSportIndex = null,Object? dates = null,Object? sports = null,Object? stadiums = null,Object? status = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? selectedDateIndex = null,Object? selectedSportIndex = null,Object? dates = null,Object? sports = null,Object? stadiums = null,Object? status = null,Object? page = null,}) {
   return _then(_StadiumsState(
 selectedDateIndex: null == selectedDateIndex ? _self.selectedDateIndex : selectedDateIndex // ignore: cast_nullable_to_non_nullable
 as int,selectedSportIndex: null == selectedSportIndex ? _self.selectedSportIndex : selectedSportIndex // ignore: cast_nullable_to_non_nullable
@@ -303,7 +305,8 @@ as int,dates: null == dates ? _self._dates : dates // ignore: cast_nullable_to_n
 as List<DateOption>,sports: null == sports ? _self._sports : sports // ignore: cast_nullable_to_non_nullable
 as List<SportModel>,stadiums: null == stadiums ? _self._stadiums : stadiums // ignore: cast_nullable_to_non_nullable
 as List<StadiumModel>,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as StadiumsStatus,
+as StadiumsStatus,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

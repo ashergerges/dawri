@@ -186,7 +186,7 @@ class PartnersCubit extends Cubit<PartnersState> {
     emit(state.copyWith(
       joiningTeamIds: joining,
       teams: state.teams
-          .map((t) => t.id == teamId ? t.copyWith(joined: true) : t)
+          .map((t) => t.id == teamId ? t.copyWith(canJoin: false) : t)
           .toList(),
     ));
     MessageService.showToast(
@@ -200,7 +200,7 @@ class PartnersCubit extends Cubit<PartnersState> {
     if (isClosed) return;
     emit(state.copyWith(
       teams: state.teams
-          .map((t) => t.id == teamId ? t.copyWith(joined: true) : t)
+          .map((t) => t.id == teamId ? t.copyWith(canJoin: false) : t)
           .toList(),
     ));
   }

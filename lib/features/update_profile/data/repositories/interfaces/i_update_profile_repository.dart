@@ -22,4 +22,7 @@ abstract class IUpdateProfileRepository {
     required String url,
     required String title,
   });
+
+  /// Removes one of the signed-in participant's reels.
+  Future<Result<String>> deleteVideo({required int videoId});
 }

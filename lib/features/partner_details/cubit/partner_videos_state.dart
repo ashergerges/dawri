@@ -6,6 +6,9 @@ abstract class PartnerVideosState with _$PartnerVideosState {
     @Default([]) List<PartnerVideoModel> videos,
     @Default(1) int page,
     @Default(PartnerVideosStatus.initial()) PartnerVideosStatus status,
+
+    /// Deletions in flight, by video id (own-profile mode only).
+    @Default(<int>{}) Set<int> deletingIds,
   }) = _PartnerVideosState;
 
   const PartnerVideosState._();

@@ -20,6 +20,7 @@ class   StadiumModel {
   @JsonKey(name: 'discount_percentage')
   final int? discountPercentage;
   final String? image;
+  final bool? isFav;
   @JsonKey(name: 'opening_time')
   final String? openingTime;
   @JsonKey(name: 'closing_time')
@@ -35,6 +36,7 @@ class   StadiumModel {
     this.pricePerHour,
     this.discountPercentage,
     this.image,
+    this.isFav,
     this.openingTime,
     this.closingTime,
     this.features,

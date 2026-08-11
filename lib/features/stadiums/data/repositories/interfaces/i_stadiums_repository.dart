@@ -8,5 +8,7 @@ abstract class IStadiumsRepository {
   Future<Result<List<StadiumModel>>> getStadiums({
     required String date,
     int? sportId,
+    required int page,
+    int limit = 10,
   });
 }

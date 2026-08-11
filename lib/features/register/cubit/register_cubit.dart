@@ -3,6 +3,8 @@ import 'package:bloc/bloc.dart';
 import 'package:dawri/core/interfaces/i_local_preference.dart';
 import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/services/dialogs/message_service.dart';
+import 'package:dawri/core/utils/helper/picked_image_helper.dart';
+import 'package:dawri/features/common/data/local/models/app_user.dart';
 import 'package:dawri/features/create_championship/data/models/championship_option_model.dart';
 import 'package:dawri/features/partners/data/models/partners_model.dart';
 import 'package:dawri/features/register/data/repositories/interfaces/i_register_repository.dart';
@@ -132,7 +134,12 @@ class RegisterCubit extends Cubit<RegisterState> {
         maxHeight: 512,
         imageQuality: 80,
       );
-      if (image != null) emit(state.copyWith(avatarFile: image, avatarError: null));
+      if (image == null) return;
+
+      // The picker's scaled file lives in the OS cache and can be evicted
+      // before this form is submitted — keep our own copy.
+      final durable = await PickedImageHelper.persist(image);
+      emit(state.copyWith(avatarFile: durable, avatarError: null));
     } catch (_) {}
   }
 
@@ -191,6 +198,21 @@ class RegisterCubit extends Cubit<RegisterState> {
   // ─── Submit ────────────────────────────────────────────────────────────────
   Future<void> submit() async {
     if (!validate() || state.isSubmitting) return;
+
+    // A pick made minutes ago may no longer be on disk; asking for it again
+    // beats failing the whole request.
+    if (!await PickedImageHelper.exists(state.avatarFile)) {
+      emit(state.copyWith(
+        avatarFile: null,
+        avatarError: LocaleKeys.registerAvatarMissing.tr(),
+      ));
+      MessageService.showToast(
+        msg: LocaleKeys.registerAvatarMissing.tr(),
+        state: ToastStates.error,
+      );
+      return;
+    }
+
     emit(state.copyWith(isSubmitting: true));
 
     final result = await _repository.completeProfile(
@@ -209,25 +231,41 @@ class RegisterCubit extends Cubit<RegisterState> {
     if (result.isError) {
       emit(state.copyWith(isSubmitting: false));
       MessageService.showToast(
-        msg: LocaleKeys.errorGeneric.tr(),
+        msg: result.asError?.error.toString() ?? LocaleKeys.errorGeneric.tr(),
         state: ToastStates.error,
       );
       return;
     }
 
-    // Reflect the completed profile locally so other screens (participants
-    // banner) see hasProfile == true without a re-login.
-    final localPreference = getIt<ILocalPreference>();
-    final currentUser = localPreference.appUser.value;
-    if (currentUser != null) {
-      localPreference.saveAppUser(currentUser.copyWith(hasProfile: true));
-    }
+    _persistLocally(result.asValue!.value);
 
+    // Emitted before navigating — the replaceAll below disposes this screen,
+    // and with it the cubit.
+    emit(state.copyWith(isSubmitting: false, isSuccess: true));
     MessageService.showToast(
       msg: LocaleKeys.registerSuccessTitle.tr(),
       state: ToastStates.success,
     );
     getIt<AppRouter>().replaceAll([HomeBottomTabsRoute(),PartnersRoute()],updateExistingRoutes: false);
-    emit(state.copyWith(isSubmitting: false, isSuccess: true));
+  }
+
+  /// Caches the user the endpoint echoed back — profile, avatar and all — so
+  /// every screen reading the cached user (participants banner, profile tab)
+  /// sees the completed profile without a re-login.
+  void _persistLocally(AppUser completed) {
+    final preference = getIt<ILocalPreference>();
+    final current = preference.appUser.value;
+
+    preference.saveAppUser(
+      completed.copyWith(
+        // The response carries no tokens — carry the stored ones over or the
+        // session is wiped on the next launch.
+        token: current?.token,
+        refreshToken: current?.refreshToken,
+        haveTeam: current?.haveTeam,
+        // Not part of the payload, but true by definition now.
+        hasProfile: true,
+      ),
+    );
   }
 }

@@ -219,6 +219,7 @@ abstract class  LocaleKeys {
   static const reserveNowLocationValue = 'reserveNowLocationValue';
   static const reserveNowDuration = 'reserveNowDuration';
   static const reserveNowMinutes = 'reserveNowMinutes';
+  static const reserveNowChooseDate = 'reserveNowChooseDate';
   static const reserveNowChooseTime = 'reserveNowChooseTime';
   static const reserveNowPaymentMethod = 'reserveNowPaymentMethod';
   static const reserveNowWalletTitle = 'reserveNowWalletTitle';
@@ -722,6 +723,9 @@ abstract class  LocaleKeys {
   static const updateProfileVideoUrlHint = 'updateProfileVideoUrlHint';
   static const updateProfileVideoUrlInvalid = 'updateProfileVideoUrlInvalid';
   static const updateProfileVideoAdded = 'updateProfileVideoAdded';
+  static const updateProfileVideoDeleteTitle = 'updateProfileVideoDeleteTitle';
+  static const updateProfileVideoDeleteBody = 'updateProfileVideoDeleteBody';
+  static const updateProfileVideoDeleted = 'updateProfileVideoDeleted';
   static const updateProfileDeleteAccount = 'updateProfileDeleteAccount';
   static const updateProfileDeleteAccountTitle = 'updateProfileDeleteAccountTitle';
   static const updateProfileDeleteAccountBody = 'updateProfileDeleteAccountBody';
@@ -937,6 +941,13 @@ abstract class  LocaleKeys {
   static const invalidDateFormat = 'invalidDateFormat';
   static const startDateMustBeBeforeEndDate = 'startDateMustBeBeforeEndDate';
   static const championshipsEmpty = 'championshipsEmpty';
+  static const championshipsEmptyAvailableTitle = 'championshipsEmptyAvailableTitle';
+  static const championshipsEmptyAvailableDesc = 'championshipsEmptyAvailableDesc';
+  static const championshipsEmptyOngoingTitle = 'championshipsEmptyOngoingTitle';
+  static const championshipsEmptyOngoingDesc = 'championshipsEmptyOngoingDesc';
+  static const championshipsEmptyCompletedTitle = 'championshipsEmptyCompletedTitle';
+  static const championshipsEmptyCompletedDesc = 'championshipsEmptyCompletedDesc';
+  static const championshipsEmptyBrowseOpen = 'championshipsEmptyBrowseOpen';
   static const somethingWentWrongRetry = 'somethingWentWrongRetry';
   static const myChampTitle = 'myChampTitle';
   static const myChampStatParticipations = 'myChampStatParticipations';
@@ -946,6 +957,14 @@ abstract class  LocaleKeys {
   static const myChampTabOrganized = 'myChampTabOrganized';
   static const myChampTabHistory = 'myChampTabHistory';
   static const myChampEmptyTitle = 'myChampEmptyTitle';
+  static const myChampEmptyParticipationsTitle = 'myChampEmptyParticipationsTitle';
+  static const myChampEmptyParticipationsDesc = 'myChampEmptyParticipationsDesc';
+  static const myChampEmptyParticipationsAction = 'myChampEmptyParticipationsAction';
+  static const myChampEmptyOrganizedTitle = 'myChampEmptyOrganizedTitle';
+  static const myChampEmptyOrganizedDesc = 'myChampEmptyOrganizedDesc';
+  static const myChampEmptyOrganizedAction = 'myChampEmptyOrganizedAction';
+  static const myChampEmptyHistoryTitle = 'myChampEmptyHistoryTitle';
+  static const myChampEmptyHistoryDesc = 'myChampEmptyHistoryDesc';
   static const myChampStatusUpcoming = 'myChampStatusUpcoming';
   static const myChampStatusOngoing = 'myChampStatusOngoing';
   static const myChampStatusRegistrationOpen = 'myChampStatusRegistrationOpen';
@@ -1088,6 +1107,7 @@ abstract class  LocaleKeys {
   static const registerCityLabel = 'registerCityLabel';
   static const registerPositionLabel = 'registerPositionLabel';
   static const registerAvatarError = 'registerAvatarError';
+  static const registerAvatarMissing = 'registerAvatarMissing';
   static const registerBioError = 'registerBioError';
   static const registerRefereeRoleLabel = 'registerRefereeRoleLabel';
   static const registerCoachSpecLabel = 'registerCoachSpecLabel';

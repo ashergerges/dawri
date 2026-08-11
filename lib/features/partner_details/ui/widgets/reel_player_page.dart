@@ -2,7 +2,9 @@
 import 'package:dawri/core/services/dialogs/message_service.dart';
 import 'package:dawri/core/services/launcher/url_launcher.dart';
 import 'package:dawri/core/utils/common_widgets/custom_network_image.dart';
+import 'package:dawri/features/partner_details/data/repositories/interfaces/i_partner_details_repository.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
+import 'package:dawri/main_common.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,7 +25,17 @@ class ReelPlayerPage extends StatefulWidget {
   final List<PartnerVideoModel> reels;
   final int initialIndex;
 
-  const ReelPlayerPage({super.key, required this.reels, this.initialIndex = 0});
+  /// Called once per video, only after the server confirms the view. Callers
+  /// use it to bump their list's counter, so the new number is on screen when
+  /// the viewer closes the reel.
+  final void Function(int videoId)? onViewCounted;
+
+  const ReelPlayerPage({
+    super.key,
+    required this.reels,
+    this.initialIndex = 0,
+    this.onViewCounted,
+  });
 
   @override
   State<ReelPlayerPage> createState() => _ReelPlayerPageState();
@@ -33,6 +45,10 @@ class _ReelPlayerPageState extends State<ReelPlayerPage> {
   late final PageController _pageController;
   late int _currentIndex;
   final Map<int, VideoPlayerController> _controllers = {};
+
+  /// Videos already counted this session — one POST per video no matter how
+  /// often it loops or the viewer pauses and resumes.
+  final Set<int> _reportedViews = {};
 
   /// Embed pages `video_player` can't decode. YouTube is absent on purpose —
   /// it has its own in-app player below.
@@ -105,6 +121,20 @@ class _ReelPlayerPageState extends State<ReelPlayerPage> {
     });
   }
 
+  /// Called the moment a reel actually starts playing — not when it's merely
+  /// opened, so a video the user scrolls straight past isn't counted.
+  Future<void> _reportView(int? videoId) async {
+    if (videoId == null || !_reportedViews.add(videoId)) return;
+
+    final result =
+        await getIt<IPartnerDetailsRepository>().registerVideoView(videoId: videoId);
+
+    // Only a confirmed view moves the counter. A failure is swallowed on
+    // purpose — it must never surface to the viewer or fake a count.
+    if (result.isError) return;
+    widget.onViewCounted?.call(videoId);
+  }
+
   void _preloadAdjacent(int index) {
     _initController(index + 1);
     _initController(index - 1);
@@ -151,6 +181,7 @@ class _ReelPlayerPageState extends State<ReelPlayerPage> {
                 reel: widget.reels[index],
                 controller: _controllers[index],
                 isActive: index == _currentIndex,
+                onStartedPlaying: () => _reportView(widget.reels[index].id),
               );
             },
           ),
@@ -178,7 +209,15 @@ class _ReelPage extends StatefulWidget {
   final VideoPlayerController? controller;
   final bool isActive;
 
-  const _ReelPage({required this.reel, required this.controller, required this.isActive});
+  /// Fired on every playing tick; the parent de-duplicates.
+  final VoidCallback onStartedPlaying;
+
+  const _ReelPage({
+    required this.reel,
+    required this.controller,
+    required this.isActive,
+    required this.onStartedPlaying,
+  });
 
   @override
   State<_ReelPage> createState() => _ReelPageState();
@@ -192,6 +231,9 @@ class _ReelPageState extends State<_ReelPage> {
   YoutubePlayerController? _youtubeController;
   String? _youtubeId;
 
+  /// The `video_player` controller we're currently listening to, if any.
+  VideoPlayerController? _observedVideoController;
+
   @override
   void initState() {
     super.initState();
@@ -200,6 +242,30 @@ class _ReelPageState extends State<_ReelPage> {
     // PageView builds neighbours eagerly — creating a player for each of them
     // meant three webviews racing for the network on open.
     if (_youtubeId != null && widget.isActive) _createYoutubeController();
+    _syncVideoListener();
+  }
+
+  // ─── View counting ─────────────────────────────────────────────────────────
+  /// Watches the direct-media controller, which the parent owns and may hand
+  /// over after this page is first built.
+  void _syncVideoListener() {
+    final controller = widget.controller;
+    if (identical(controller, _observedVideoController)) return;
+    _observedVideoController?.removeListener(_onVideoTick);
+    _observedVideoController = controller;
+    controller?.addListener(_onVideoTick);
+  }
+
+  void _onVideoTick() {
+    if (_observedVideoController?.value.isPlaying ?? false) {
+      widget.onStartedPlaying();
+    }
+  }
+
+  void _onYoutubeTick() {
+    if (_youtubeController?.value.playerState == PlayerState.playing) {
+      widget.onStartedPlaying();
+    }
   }
 
   void _createYoutubeController() {
@@ -213,12 +279,13 @@ class _ReelPageState extends State<_ReelPage> {
         // `hideThumbnail` stays false on purpose — it gates the placeholder
         // image below, which is what makes the open feel instant.
       ),
-    );
+    )..addListener(_onYoutubeTick);
   }
 
   @override
   void didUpdateWidget(covariant _ReelPage oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _syncVideoListener();
     if (widget.isActive == oldWidget.isActive) return;
 
     if (widget.isActive) {
@@ -235,6 +302,8 @@ class _ReelPageState extends State<_ReelPage> {
 
   @override
   void dispose() {
+    _observedVideoController?.removeListener(_onVideoTick);
+    _youtubeController?.removeListener(_onYoutubeTick);
     _youtubeController?.dispose();
     super.dispose();
   }

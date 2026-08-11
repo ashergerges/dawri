@@ -3,7 +3,7 @@ import 'package:dawri/core/services/network/network_service.dart';
 import 'package:dawri/core/utils/constants/constants.dart';
 import 'package:dawri/features/reserve/data/models/reserve_now_model.dart';
 import 'package:dawri/features/reserve/data/repositories/interfaces/i_reserve_repository.dart';
-import 'package:dawri/features/stadiums/data/models/stadium_model.dart';
+import 'package:dawri/features/stadium_profile/data/models/stadium_profile_model.dart';
 import 'package:injectable/injectable.dart';
 
 @Injectable(as: IReserveRepository)
@@ -16,7 +16,7 @@ class ReserveRepository implements IReserveRepository {
   static const int _bookingType = 1;
 
   @override
-  Future<Result<StadiumModel>> getStadiumDetails(int stadiumId) async {
+  Future<Result<StadiumDetailsModel>> getStadiumDetails(int stadiumId) async {
     final response = await networkService.getAsync(
       url: AppStrings.urls.stadiumDetailsUrl,
       queryParameters: {'stadium_id': stadiumId},
@@ -27,7 +27,7 @@ class ReserveRepository implements IReserveRepository {
       final data = response.asValue!.value.data['data'];
       final stadium = data is Map ? (data['stadium'] ?? data) : data;
       return Result.value(
-        StadiumModel.fromJson(Map<String, dynamic>.from(stadium)),
+        StadiumDetailsModel.fromJson(Map<String, dynamic>.from(stadium)),
       );
     } catch (e) {
       return Result.error(e);

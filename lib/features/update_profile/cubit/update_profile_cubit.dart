@@ -5,6 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:dawri/core/interfaces/i_local_preference.dart';
 import 'package:dawri/core/services/dialogs/message_service.dart';
 import 'package:dawri/core/services/session/session_service.dart';
+import 'package:dawri/core/utils/helper/picked_image_helper.dart';
 import 'package:dawri/features/common/data/local/models/app_user.dart';
 import 'package:dawri/features/create_championship/data/models/championship_option_model.dart';
 import 'package:dawri/features/partner_details/data/models/partner_details_model.dart';
@@ -171,11 +172,14 @@ class UpdateProfileCubit extends Cubit<UpdateProfileState> {
         return;
       }
 
+      // The picker's file lives in the OS cache and can be evicted before the
+      // form is saved — keep our own copy.
+      final durable = await PickedImageHelper.persist(picked);
       emit(state.copyWith(
         isPickingAvatar: false,
-        avatarPath: picked.path,
+        avatarPath: durable.path,
         isLocalAvatar: true,
-        avatarFile: picked,
+        avatarFile: durable,
       ));
     } catch (_) {
       emit(state.copyWith(
@@ -333,6 +337,47 @@ class UpdateProfileCubit extends Cubit<UpdateProfileState> {
       state: ToastStates.success,
     );
     return true;
+  }
+
+  /// Reflects a view the server already accepted.
+  void bumpViews(int videoId) {
+    if (isClosed) return;
+    emit(state.copyWith(
+      videos: state.videos
+          .map((v) => v.id == videoId ? v.withExtraView() : v)
+          .toList(),
+    ));
+  }
+
+  Future<void> deleteVideo(int videoId) async {
+    if (state.deletingVideoIds.contains(videoId)) return;
+
+    emit(state.copyWith(
+      deletingVideoIds: {...state.deletingVideoIds, videoId},
+    ));
+
+    final result = await _repository.deleteVideo(videoId: videoId);
+    final pending = {...state.deletingVideoIds}..remove(videoId);
+
+    if (result.isError) {
+      emit(state.copyWith(deletingVideoIds: pending));
+      MessageService.showToast(
+        msg: result.asError?.error.toString() ?? LocaleKeys.errorGeneric.tr(),
+        state: ToastStates.error,
+      );
+      return;
+    }
+
+    emit(state.copyWith(
+      deletingVideoIds: pending,
+      videos: state.videos.where((v) => v.id != videoId).toList(),
+    ));
+
+    final message = result.asValue!.value;
+    MessageService.showToast(
+      msg: message.isNotEmpty ? message : LocaleKeys.updateProfileVideoDeleted.tr(),
+      state: ToastStates.success,
+    );
   }
 
   // ─── Delete / deactivate account ───────────────────────────────────────────

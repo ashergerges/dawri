@@ -1,6 +1,7 @@
 import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
 import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
+import 'package:dawri/features/common/ui/widgets/date_slider.dart';
 import 'package:dawri/features/stadiums/data/models/stadium_model.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -12,8 +13,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:dawri/core/utils/common_widgets/custom_network_image.dart';
 import 'package:dawri/core/utils/constants/app_colors.dart';
 import 'package:dawri/core/utils/constants/app_text_them.dart';
+import 'package:dawri/core/utils/constants/pull_refresh.dart';
 import 'package:dawri/core/utils/extensions/padding_extensions.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../cubit/stadiums_cubit.dart';
 
@@ -34,21 +37,36 @@ class _StadiumsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<StadiumsCubit>();
+
     return Scaffold(
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const _SubHeader(),
-
           Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children:  [
-                  10.verticalSpace,
-                  _DateSlider(),
-                  10.verticalSpace,
-                  _SportFilters(),
-                  _StadiumsList(),
-                  SizedBox(height: 20),
+            // CustomScrollView (rather than a Column in a SingleChildScrollView)
+            // so the date slider and filters still scroll away with the list
+            // while SmartRefresher owns the pull-down / pull-up.
+            child: SmartRefresher(
+              controller: cubit.refreshController,
+              enablePullDown: true,
+              enablePullUp: true,
+              onRefresh: cubit.getStadiums,
+              onLoading: cubit.loadMore,
+              header: PullRefresh.pullRefresh,
+              footer: const ClassicFooter(
+                loadStyle: LoadStyle.ShowAlways,
+                completeDuration: Duration(milliseconds: 500),
+              ),
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(child: 10.verticalSpace),
+                  const SliverToBoxAdapter(child: _DateSlider()),
+                  SliverToBoxAdapter(child: 10.verticalSpace),
+                  const SliverToBoxAdapter(child: _SportFilters()),
+                  const _StadiumsList(),
+                  SliverToBoxAdapter(child: 20.verticalSpace),
                 ],
               ),
             ),
@@ -81,43 +99,14 @@ class _SubHeader extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            LocaleKeys.stadiumsTitle.tr(),
-            style: AppTextTheme.headingSmall(context).copyWith(
-              fontWeight: FontWeight.w800,
-              color: AppColors.textDark,
-            ),
-          ),
-          _CircleIconButton(
-            icon: FontAwesomeIcons.sliders,
-            onTap: () {},
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CircleIconButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _CircleIconButton({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        width: 40.w,
-        height: 40.w,
-        child: Center(
-          child: FaIcon(icon, size: 20.sp, color: AppColors.textDark),
+      child:           Text(
+        LocaleKeys.stadiumsTitle.tr(),
+        style: AppTextTheme.headingSmall(context).copyWith(
+          fontWeight: FontWeight.w800,
+          color: AppColors.textDark,
         ),
       ),
+
     );
   }
 }
@@ -131,61 +120,10 @@ class _DateSlider extends StatelessWidget {
     return BlocBuilder<StadiumsCubit, StadiumsState>(
       buildWhen: (p, c) => p.selectedDateIndex != c.selectedDateIndex,
       builder: (context, state) {
-        return SizedBox(
-          height: 75.h,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: 20.w.padHorizontal,
-            itemCount: state.dates.length,
-            separatorBuilder: (_, __) => 12.w.sizedWidth,
-            itemBuilder: (_, i) {
-              final date = state.dates[i];
-              final isActive = i == state.selectedDateIndex;
-              return OnTap(
-                onTap: () => context.read<StadiumsCubit>().selectDate(i),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  width: 65.w,
-                  padding:12.padVertical,
-                  decoration: BoxDecoration(
-                    color: isActive ? AppColors.primary : AppColors.white,
-                    borderRadius: BorderRadius.circular(18.r),
-                    border: Border.all(
-                      color: isActive ? AppColors.primary : AppColors.slate100,
-
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.black.withOpacity(0.02),
-                        blurRadius: 5,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        date.dayLabel,
-                        style: AppTextTheme.bodyXXSmall(context).copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: isActive ? AppColors.white.withOpacity(0.85) : AppColors.textMuted,
-                        ),
-                      ),
-                      6.verticalSpace,
-                      Text(
-                        date.dayNumber,
-                        style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
-                          fontWeight: FontWeight.w900,
-                          color: isActive ? AppColors.white : AppColors.textDark,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
+        return DateSlider(
+          dates: state.dates,
+          selectedIndex: state.selectedDateIndex,
+          onSelect: context.read<StadiumsCubit>().selectDate,
         );
       },
     );
@@ -218,7 +156,7 @@ class _SportFilters extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.only(right: 20.w, left: 20.w, bottom: 16.h),
             itemCount: labels.length,
-            separatorBuilder: (_, __) => 10.w.sizedWidth,
+            separatorBuilder: (_, _) => 10.w.sizedWidth,
             itemBuilder: (_, i) {
               final isActive = i == state.selectedSportIndex;
               final iconUrl = i == 0 ? null : state.sports[i - 1].icon;
@@ -279,10 +217,11 @@ class _StadiumsList extends StatelessWidget {
       buildWhen: (p, c) => p.stadiums != c.stadiums || p.status != c.status,
       builder: (context, state) {
         if (state.status is StadiumsStatusLoading && state.stadiums.isEmpty) {
-          return const _StadiumsShimmer();
+          return const SliverToBoxAdapter(child: _StadiumsShimmer());
         }
         if (state.status is StadiumsStatusError && state.stadiums.isEmpty) {
-          return Padding(
+          return SliverToBoxAdapter(
+            child: Padding(
             padding: EdgeInsets.symmetric(vertical: 50.h),
             child: Center(
               child: Column(
@@ -308,35 +247,41 @@ class _StadiumsList extends StatelessWidget {
                 ],
               ),
             ),
+            ),
           );
         }
         if (state.stadiums.isEmpty) {
-          return Padding(
-            padding: EdgeInsets.symmetric(vertical: 60.h),
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  FaIcon(FontAwesomeIcons.futbol, size: 46.sp, color: AppColors.slate300),
-                  12.h.sizedHeight,
-                  Text(
-                    LocaleKeys.stadiumsEmpty.tr(),
-                    style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
-                        fontWeight: FontWeight.w700, color: AppColors.textMuted),
-                  ),
-                ],
+          return SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 60.h),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    FaIcon(FontAwesomeIcons.futbol,
+                        size: 46.sp, color: AppColors.slate300),
+                    12.h.sizedHeight,
+                    Text(
+                      LocaleKeys.stadiumsEmpty.tr(),
+                      style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
+                          fontWeight: FontWeight.w700, color: AppColors.textMuted),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
         }
 
-        return ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
+        // SliverList rather than a shrink-wrapped ListView: paging grows this
+        // list, and shrinkWrap would build every card on each frame.
+        return SliverPadding(
           padding: 20.w.padHorizontal,
-          itemCount: state.stadiums.length,
-          separatorBuilder: (_, __) => 18.h.sizedHeight,
-          itemBuilder: (_, i) => _StadiumCard(stadium: state.stadiums[i]),
+          sliver: SliverList.separated(
+            itemCount: state.stadiums.length,
+            separatorBuilder: (_, _) => 18.h.sizedHeight,
+            itemBuilder: (_, i) => _StadiumCard(stadium: state.stadiums[i]),
+          ),
         );
       },
     );
@@ -350,8 +295,13 @@ class _StadiumCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OnTap(
-      onTap: (){
-        StadiumProfileRoute(stadiumId: stadium.id??0).push(context);
+      onTap: () async {
+        // Read the cubit before awaiting — this context may be gone by the
+        // time the profile pops.
+        final cubit = context.read<StadiumsCubit>();
+        await StadiumProfileRoute(stadiumId: stadium.id ?? 0).push(context);
+        // The favourite and the rating can both change over there.
+        await cubit.refreshLoadedPages();
       },
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -536,7 +486,7 @@ class _StadiumImage extends StatelessWidget {
           Positioned(
             top: 12.h,
             left: 12.w,
-            child: const _FavoriteButton(isFavorite: false),
+            child:  _FavoriteButton(isFavorite:stadium.isFav??false),
           ),
         ],
       ),
@@ -650,8 +600,8 @@ class _SportFiltersShimmer extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.only(right: 20.w, left: 20.w, bottom: 16.h),
         itemCount: 4,
-        separatorBuilder: (_, __) => 10.w.sizedWidth,
-        itemBuilder: (_, __) => ShimmerWidget.rectangular(
+        separatorBuilder: (_, _) => 10.w.sizedWidth,
+        itemBuilder: (_, _) => ShimmerWidget.rectangular(
           width: 80.w,
           height: 36.h,
           shapeBorder: RoundedRectangleBorder(

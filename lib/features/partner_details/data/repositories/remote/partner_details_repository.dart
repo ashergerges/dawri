@@ -68,6 +68,16 @@ class PartnerDetailsRepository implements IPartnerDetailsRepository {
   }
 
   @override
+  Future<Result<String>> registerVideoView({required int videoId}) async {
+    final response = await networkService.postAsync(
+      url: AppStrings.urls.participantVideoViewUrl,
+      body: {'video_id': videoId},
+    );
+    if (response.isError) return Result.error(response.asError!.error);
+    return Result.value(response.asValue?.value.data['message'] ?? '');
+  }
+
+  @override
   Future<Result<PartnerReviewsPageModel>> getReviews({
     required int partnerId,
     required int page,

@@ -124,8 +124,7 @@ class _SearchBox extends StatelessWidget {
                         .copyWith(color: AppColors.textDark),
                   ),
                 ),
-                FaIcon(FontAwesomeIcons.sliders, size: 15.sp, color: AppColors.primary),
-              ],
+                ],
             ),
           ),
         ),
@@ -459,7 +458,7 @@ class _IndividualCard extends StatelessWidget {
                           ),
                         ),
                         10.w.sizedWidth,
-                        if((participant.isAvailable ?? false))GestureDetector(
+                        if((participant.isAvailable ?? false)&&(getIt<ILocalPreference>().appUser?.value?.haveTeam??false))GestureDetector(
                           onTap: () {
                             CreateContractRoute(
                               userId: participant.id ?? 0,
@@ -689,7 +688,7 @@ class _JoinButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final joined = team.isJoined;
+    final joined = (team.isJoined);
     final color = joined ? AppColors.textMuted : AppColors.primary;
 
     return GestureDetector(

@@ -86,7 +86,7 @@ class AppUser {
 
 @JsonSerializable()
 class Profile {
-  final int id;
+
 
   @JsonKey(name: 'full_name')
   final String? fullName;
@@ -137,7 +137,6 @@ class Profile {
   final String? updatedAt;
 
   const Profile({
-    required this.id,
     this.fullName,
     this.birthDate,
     this.email,
@@ -163,7 +162,6 @@ class Profile {
   int? get participantTypeId => typeId ?? type?.id;
 
   Profile copyWith({
-    int? id,
     String? fullName,
     String? birthDate,
     String? email,
@@ -185,7 +183,6 @@ class Profile {
     String? updatedAt,
   }) {
     return Profile(
-      id: id ?? this.id,
       fullName: fullName ?? this.fullName,
       birthDate: birthDate ?? this.birthDate,
       email: email ?? this.email,

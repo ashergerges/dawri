@@ -45,5 +45,35 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- Firebase Cloud Messaging: required for background/silent pushes. -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+		<string>fetch</string>
+	</array>
+
+	<!-- iOS terminates the app if a permission is requested without a reason
+	     string. One per capability the plugins actually use. -->
+	<key>NSCameraUsageDescription</key>
+	<string>Dawri needs camera access so you can take a profile photo.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Dawri needs access to your photos so you can choose a profile picture.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Dawri needs permission to save images to your photo library.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Dawri uses your location to show nearby stadiums and tournaments.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Dawri uses your location to show nearby stadiums and tournaments.</string>
+
+	<!-- url_launcher: canLaunchUrl returns false for schemes not listed here. -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>http</string>
+		<string>tel</string>
+		<string>mailto</string>
+		<string>whatsapp</string>
+	</array>
 </dict>
 </plist>

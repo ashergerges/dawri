@@ -9,6 +9,7 @@ abstract class StadiumsState with _$StadiumsState {
     @Default([]) List<SportModel> sports,
     @Default([]) List<StadiumModel> stadiums,
     @Default(StadiumsStatus.initial()) StadiumsStatus status,
+    @Default(1) int page,
   }) = _StadiumsState;
 }
 

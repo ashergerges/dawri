@@ -704,6 +704,14 @@ class _TicketsSection extends StatelessWidget {
     return BlocBuilder<HomeCubit, HomeState>(
       buildWhen: (p, c) => p.status != c.status || p.tickets != c.tickets,
       builder: (context, state) {
+        final isLoading = state.status == HomeStateStatus.loading();
+
+        // Nothing to show once the load settles → drop the whole section
+        // rather than leaving a title and "view all" over empty space.
+        if (!isLoading && state.tickets.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -712,7 +720,7 @@ class _TicketsSection extends StatelessWidget {
               actionLabel: LocaleKeys.viewAll.tr(),
               onAction: () => TicketsRoute().push(context),
             ),
-            if (state.status == HomeStateStatus.loading())
+            if (isLoading)
               ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),

@@ -1,4 +1,7 @@
 // lib/features/account/data/account_model.dart
+import 'dart:developer';
+
+import 'package:dawri/core/interfaces/i_local_preference.dart';
 import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/main_common.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +37,12 @@ class AccountMockData {
       iconBg: AppColors.slate100,
       labelKey: LocaleKeys.accountEditProfile,
       onTap: (_){
-        getIt<AppRouter>().push(UpdateProfileRoute());
+        log("getIt<ILocalPreference>().appUser.value?.profile?.typeId::${getIt<ILocalPreference>().appUser.value?.profile?.typeId}");
+        if(getIt<ILocalPreference>().appUser.value?.profile?.typeId==null){
+          return         getIt<AppRouter>().push(RegisterRoute());
+
+        }
+         getIt<AppRouter>().push(UpdateProfileRoute());
 
       }
     ),

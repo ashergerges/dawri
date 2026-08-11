@@ -160,9 +160,12 @@ StadiumDetailsModel _$StadiumDetailsModelFromJson(
   verified: json['verified'] as bool?,
   isFav: json['isFav'] as bool?,
   images: (json['images'] as List<dynamic>?)?.map((e) => e as String).toList(),
+  image: json['image'] as String?,
   rating: json['rating'] == null
       ? null
       : StadiumRatingModel.fromJson(json['rating'] as Map<String, dynamic>),
+  pricePerHour: json['price_per_hour'] as num?,
+  discountPercentage: (json['discount_percentage'] as num?)?.toInt(),
   distanceKm: (json['distance_km'] as num?)?.toDouble(),
   description: json['description'] as String?,
   price: json['price'] == null
@@ -191,8 +194,11 @@ Map<String, dynamic> _$StadiumDetailsModelToJson(
   'name': instance.name,
   'verified': instance.verified,
   'isFav': instance.isFav,
+  'image': instance.image,
   'images': instance.images,
   'rating': instance.rating,
+  'price_per_hour': instance.pricePerHour,
+  'discount_percentage': instance.discountPercentage,
   'distance_km': instance.distanceKm,
   'description': instance.description,
   'price': instance.price,

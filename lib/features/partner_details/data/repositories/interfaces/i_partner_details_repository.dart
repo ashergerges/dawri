@@ -17,4 +17,8 @@ abstract class IPartnerDetailsRepository {
     required int page,
     int limit = 10,
   });
+
+  /// Counts a view once playback has actually started. Fire-and-forget — a
+  /// failure here must never interrupt watching.
+  Future<Result<String>> registerVideoView({required int videoId});
 }

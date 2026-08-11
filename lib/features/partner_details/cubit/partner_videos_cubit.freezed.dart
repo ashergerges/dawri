@@ -14,7 +14,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PartnerVideosState {
 
- List<PartnerVideoModel> get videos; int get page; PartnerVideosStatus get status;
+ List<PartnerVideoModel> get videos; int get page; PartnerVideosStatus get status;/// Deletions in flight, by video id (own-profile mode only).
+ Set<int> get deletingIds;
 /// Create a copy of PartnerVideosState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +26,16 @@ $PartnerVideosStateCopyWith<PartnerVideosState> get copyWith => _$PartnerVideosS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerVideosState&&const DeepCollectionEquality().equals(other.videos, videos)&&(identical(other.page, page) || other.page == page)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerVideosState&&const DeepCollectionEquality().equals(other.videos, videos)&&(identical(other.page, page) || other.page == page)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.deletingIds, deletingIds));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(videos),page,status);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(videos),page,status,const DeepCollectionEquality().hash(deletingIds));
 
 @override
 String toString() {
-  return 'PartnerVideosState(videos: $videos, page: $page, status: $status)';
+  return 'PartnerVideosState(videos: $videos, page: $page, status: $status, deletingIds: $deletingIds)';
 }
 
 
@@ -45,7 +46,7 @@ abstract mixin class $PartnerVideosStateCopyWith<$Res>  {
   factory $PartnerVideosStateCopyWith(PartnerVideosState value, $Res Function(PartnerVideosState) _then) = _$PartnerVideosStateCopyWithImpl;
 @useResult
 $Res call({
- List<PartnerVideoModel> videos, int page, PartnerVideosStatus status
+ List<PartnerVideoModel> videos, int page, PartnerVideosStatus status, Set<int> deletingIds
 });
 
 
@@ -62,12 +63,13 @@ class _$PartnerVideosStateCopyWithImpl<$Res>
 
 /// Create a copy of PartnerVideosState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? videos = null,Object? page = null,Object? status = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? videos = null,Object? page = null,Object? status = null,Object? deletingIds = null,}) {
   return _then(_self.copyWith(
 videos: null == videos ? _self.videos : videos // ignore: cast_nullable_to_non_nullable
 as List<PartnerVideoModel>,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
 as int,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as PartnerVideosStatus,
+as PartnerVideosStatus,deletingIds: null == deletingIds ? _self.deletingIds : deletingIds // ignore: cast_nullable_to_non_nullable
+as Set<int>,
   ));
 }
 /// Create a copy of PartnerVideosState
@@ -161,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<PartnerVideoModel> videos,  int page,  PartnerVideosStatus status)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<PartnerVideoModel> videos,  int page,  PartnerVideosStatus status,  Set<int> deletingIds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PartnerVideosState() when $default != null:
-return $default(_that.videos,_that.page,_that.status);case _:
+return $default(_that.videos,_that.page,_that.status,_that.deletingIds);case _:
   return orElse();
 
 }
@@ -182,10 +184,10 @@ return $default(_that.videos,_that.page,_that.status);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<PartnerVideoModel> videos,  int page,  PartnerVideosStatus status)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<PartnerVideoModel> videos,  int page,  PartnerVideosStatus status,  Set<int> deletingIds)  $default,) {final _that = this;
 switch (_that) {
 case _PartnerVideosState():
-return $default(_that.videos,_that.page,_that.status);case _:
+return $default(_that.videos,_that.page,_that.status,_that.deletingIds);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +204,10 @@ return $default(_that.videos,_that.page,_that.status);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<PartnerVideoModel> videos,  int page,  PartnerVideosStatus status)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<PartnerVideoModel> videos,  int page,  PartnerVideosStatus status,  Set<int> deletingIds)?  $default,) {final _that = this;
 switch (_that) {
 case _PartnerVideosState() when $default != null:
-return $default(_that.videos,_that.page,_that.status);case _:
+return $default(_that.videos,_that.page,_that.status,_that.deletingIds);case _:
   return null;
 
 }
@@ -217,7 +219,7 @@ return $default(_that.videos,_that.page,_that.status);case _:
 
 
 class _PartnerVideosState extends PartnerVideosState {
-  const _PartnerVideosState({final  List<PartnerVideoModel> videos = const [], this.page = 1, this.status = const PartnerVideosStatus.initial()}): _videos = videos,super._();
+  const _PartnerVideosState({final  List<PartnerVideoModel> videos = const [], this.page = 1, this.status = const PartnerVideosStatus.initial(), final  Set<int> deletingIds = const <int>{}}): _videos = videos,_deletingIds = deletingIds,super._();
   
 
  final  List<PartnerVideoModel> _videos;
@@ -229,6 +231,15 @@ class _PartnerVideosState extends PartnerVideosState {
 
 @override@JsonKey() final  int page;
 @override@JsonKey() final  PartnerVideosStatus status;
+/// Deletions in flight, by video id (own-profile mode only).
+ final  Set<int> _deletingIds;
+/// Deletions in flight, by video id (own-profile mode only).
+@override@JsonKey() Set<int> get deletingIds {
+  if (_deletingIds is EqualUnmodifiableSetView) return _deletingIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableSetView(_deletingIds);
+}
+
 
 /// Create a copy of PartnerVideosState
 /// with the given fields replaced by the non-null parameter values.
@@ -240,16 +251,16 @@ _$PartnerVideosStateCopyWith<_PartnerVideosState> get copyWith => __$PartnerVide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PartnerVideosState&&const DeepCollectionEquality().equals(other._videos, _videos)&&(identical(other.page, page) || other.page == page)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PartnerVideosState&&const DeepCollectionEquality().equals(other._videos, _videos)&&(identical(other.page, page) || other.page == page)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other._deletingIds, _deletingIds));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_videos),page,status);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_videos),page,status,const DeepCollectionEquality().hash(_deletingIds));
 
 @override
 String toString() {
-  return 'PartnerVideosState(videos: $videos, page: $page, status: $status)';
+  return 'PartnerVideosState(videos: $videos, page: $page, status: $status, deletingIds: $deletingIds)';
 }
 
 
@@ -260,7 +271,7 @@ abstract mixin class _$PartnerVideosStateCopyWith<$Res> implements $PartnerVideo
   factory _$PartnerVideosStateCopyWith(_PartnerVideosState value, $Res Function(_PartnerVideosState) _then) = __$PartnerVideosStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<PartnerVideoModel> videos, int page, PartnerVideosStatus status
+ List<PartnerVideoModel> videos, int page, PartnerVideosStatus status, Set<int> deletingIds
 });
 
 
@@ -277,12 +288,13 @@ class __$PartnerVideosStateCopyWithImpl<$Res>
 
 /// Create a copy of PartnerVideosState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? videos = null,Object? page = null,Object? status = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? videos = null,Object? page = null,Object? status = null,Object? deletingIds = null,}) {
   return _then(_PartnerVideosState(
 videos: null == videos ? _self._videos : videos // ignore: cast_nullable_to_non_nullable
 as List<PartnerVideoModel>,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
 as int,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as PartnerVideosStatus,
+as PartnerVideosStatus,deletingIds: null == deletingIds ? _self._deletingIds : deletingIds // ignore: cast_nullable_to_non_nullable
+as Set<int>,
   ));
 }
 

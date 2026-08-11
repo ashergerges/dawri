@@ -37,11 +37,25 @@ class UpdateProfileRepository implements IUpdateProfileRepository {
     required Map<String, dynamic> fields,
     XFile? avatar,
   }) async {
+    // Built before the request so a missing/evicted pick becomes a Result.error
+    // instead of an unhandled PathNotFoundException.
+    MultipartFile? avatarPart;
+    if (avatar != null) {
+      try {
+        avatarPart = await MultipartFile.fromFile(
+          avatar.path,
+          filename: avatar.name,
+        );
+      } catch (e) {
+        return Result.error(e);
+      }
+    }
+
     final response = await networkService.postMultiPartFormDataAsync(
       url: AppStrings.urls.updateUserProfileUrl,
       formMap: {
         ...fields,
-        if (avatar != null) 'avatar': await MultipartFile.fromFile(avatar.path),
+        'avatar': ?avatarPart,
       },
     );
     if (response.isError) return Result.error(response.asError!.error);
@@ -75,6 +89,16 @@ class UpdateProfileRepository implements IUpdateProfileRepository {
     } catch (e) {
       return Result.error(e);
     }
+  }
+
+  @override
+  Future<Result<String>> deleteVideo({required int videoId}) async {
+    final response = await networkService.postAsync(
+      url: AppStrings.urls.participantVideoDeleteUrl,
+      queryParameters: {'id': videoId},
+    );
+    if (response.isError) return Result.error(response.asError!.error);
+    return Result.value(response.asValue?.value.data['message'] ?? '');
   }
 
   @override

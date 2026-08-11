@@ -3,10 +3,11 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.example.dawri"
+    namespace = "com.dawry.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -22,7 +23,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.dawri"
+        applicationId = "com.dawry.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -46,4 +47,13 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+
+    // Must match the `FirebaseSDKVersion` that firebase_core declares in
+    // android/gradle.properties (currently 34.15.0 for firebase_core 4.11.0).
+    // Gradle picks the highest BoM across modules, so a newer pin here silently
+    // upgrades every plugin: 34.17.0 pulls firebase-common 22.2.0, which dropped
+    // FirebaseOptions.getRecaptchaSiteKey() and crashes FlutterFirebaseCorePlugin
+    // at startup with NoSuchMethodError. Bump this only alongside firebase_core.
+    implementation(platform("com.google.firebase:firebase-bom:34.15.0"))
+    implementation("com.google.firebase:firebase-analytics")
 }

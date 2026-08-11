@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:async/async.dart';
 import 'package:dawri/core/services/network/network_service.dart';
 import 'package:dawri/features/login/data/models/login_response_body.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../../core/utils/constants/constants.dart';
@@ -48,7 +50,7 @@ class AuthRepo implements IAuthRepo {
       body: {
         "phone": phone,
         "code": code,
-        "device_token": "await FirebaseMessaging.instance.getToken()",
+        "device_token": await FirebaseMessaging.instance.getToken(),
 
       },
     );

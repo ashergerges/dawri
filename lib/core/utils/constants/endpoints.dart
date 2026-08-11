@@ -13,6 +13,7 @@ class Endpoints {
   String get validateOTPUrl => r'api/app/auth/verify-otp';
   //home
   String get homeUrl => r'api/app/home';
+  String get homeSearchUrl => r'api/app/home/search';
   //categories
   String get categoriesUrl => r'api/app/categories';
   //venues
@@ -93,6 +94,8 @@ class Endpoints {
   String get participantDetailsUrl => r'api/app/participants/details';
   String get participantFavoriteUrl => r'api/app/participants/favorite';
   String get participantVideosUrl => r'api/app/participants/videos';
+  String get participantVideoDeleteUrl => r'api/app/participants/videos/delete';
+  String get participantVideoViewUrl => r'api/app/participants/videos/view';
   String get participantReviewsUrl => r'api/app/participants/reviews';
   String get teamJoinRequestCreateUrl => r'api/app/user/team/join-requests';
 

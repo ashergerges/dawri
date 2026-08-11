@@ -35,7 +35,6 @@ Map<String, dynamic> _$AppUserToJson(AppUser instance) => <String, dynamic>{
 };
 
 Profile _$ProfileFromJson(Map<String, dynamic> json) => Profile(
-  id: (json['id'] as num).toInt(),
   fullName: json['full_name'] as String?,
   birthDate: json['birth_date'] as String?,
   email: json['email'] as String?,
@@ -60,7 +59,6 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) => Profile(
 );
 
 Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
-  'id': instance.id,
   'full_name': instance.fullName,
   'birth_date': instance.birthDate,
   'email': instance.email,

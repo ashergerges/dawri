@@ -944,10 +944,16 @@ class _VideosSection extends StatelessWidget {
                 ),
                 if (state.hasMoreVideos && state.userId != null)
                   OnTap(
-                    onTap: () => PartnerVideosRoute(
-                      partnerId: state.userId!,
-                      title: LocaleKeys.partnerDetailsReelsTitle.tr(),
-                    ).push(context),
+                    onTap: () async {
+                      await PartnerVideosRoute(
+                        partnerId: state.userId!,
+                        title: LocaleKeys.partnerDetailsReelsTitle.tr(),
+                        // These are the signed-in user's own reels.
+                        canDelete: true,
+                      ).push(context);
+                      // Deletions there aren't visible to this cubit — refresh.
+                      if (context.mounted) context.read<UpdateProfileCubit>().init();
+                    },
                     child: Text(
                       LocaleKeys.partnerDetailsSeeAll.tr(),
                       style: AppTextTheme.bodyXSmall(context).copyWith(
@@ -968,21 +974,40 @@ class _VideosSection extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   itemCount: videos.length,
                   separatorBuilder: (_, _) => 12.w.sizedWidth,
-                  itemBuilder: (context, index) => SizedBox(
-                    width: 120.w,
-                    child: PartnerVideoCard(
-                      video: videos[index],
-                      showTitle: true,
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => ReelPlayerPage(
-                            reels: videos,
-                            initialIndex: index,
+                  itemBuilder: (context, index) {
+                    final video = videos[index];
+                    return SizedBox(
+                      width: 120.w,
+                      child: Stack(
+                        children: [
+                          PartnerVideoCard(
+                            video: video,
+                            showTitle: true,
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => ReelPlayerPage(
+                                  reels: videos,
+                                  initialIndex: index,
+                                  onViewCounted: context
+                                      .read<UpdateProfileCubit>()
+                                      .bumpViews,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                          PositionedDirectional(
+                            top: 6.h,
+                            end: 6.w,
+                            child: _DeleteVideoButton(
+                              videoId: video.id,
+                              isDeleting:
+                                  state.deletingVideoIds.contains(video.id),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
               ),
               12.h.sizedHeight,
@@ -1043,6 +1068,102 @@ class _VideosEmptyState extends StatelessWidget {
             ),
             14.h.sizedHeight,
             _AddVideoButton(onTap: onAdd),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Small destructive overlay on a reel thumbnail. Confirms before deleting so
+/// a mis-tap on a 120px tile can't destroy a video.
+class _DeleteVideoButton extends StatelessWidget {
+  final int? videoId;
+  final bool isDeleting;
+
+  const _DeleteVideoButton({required this.videoId, required this.isDeleting});
+
+  @override
+  Widget build(BuildContext context) {
+    if (videoId == null) return const SizedBox.shrink();
+
+    return OnTap(
+      onTap: isDeleting ? null : () => _confirm(context),
+      child: Container(
+        width: 26.w,
+        height: 26.w,
+        decoration: BoxDecoration(
+          color: AppColors.black.withOpacity(0.55),
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: isDeleting
+              ? SizedBox(
+                  width: 11.w,
+                  height: 11.w,
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 1.8,
+                    color: AppColors.white,
+                  ),
+                )
+              : FaIcon(
+                  FontAwesomeIcons.trash,
+                  size: 11.sp,
+                  color: AppColors.white,
+                ),
+        ),
+      ),
+    );
+  }
+
+  void _confirm(BuildContext context) {
+    final cubit = context.read<UpdateProfileCubit>();
+
+    MessageService.showNewCustomDialog(
+      context,
+      child: Padding(
+        padding: 16.padAll,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            30.verticalSpace,
+            Text(
+              LocaleKeys.updateProfileVideoDeleteTitle.tr(),
+              textAlign: TextAlign.center,
+              style: AppTextTheme.bodyLarge(context)
+                  .copyWith(fontWeight: FontWeight.w600),
+            ),
+            8.verticalSpace,
+            Text(
+              LocaleKeys.updateProfileVideoDeleteBody.tr(),
+              textAlign: TextAlign.center,
+              style: AppTextTheme.bodyXSmall(context)
+                  .copyWith(color: AppColors.neutral400),
+            ),
+            15.verticalSpace,
+            Row(
+              children: [
+                Expanded(
+                  child: AppButton(
+                    text: LocaleKeys.delete.tr(),
+                    background: AppColors.white,
+                    textColor: AppColors.error,
+                    onTap: () {
+                      getIt<AppRouter>().maybePop();
+                      cubit.deleteVideo(videoId!);
+                    },
+                  ),
+                ),
+                10.horizontalSpace,
+                Expanded(
+                  child: AppButton(
+                    text: LocaleKeys.championshipControlCancel.tr(),
+                    onTap: () => getIt<AppRouter>().maybePop(),
+                  ),
+                ),
+              ],
+            ),
+            20.verticalSpace,
           ],
         ),
       ),

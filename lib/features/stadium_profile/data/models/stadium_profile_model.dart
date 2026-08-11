@@ -150,8 +150,13 @@ class StadiumDetailsModel {
   final String? name;
   final bool? verified;
   final bool? isFav;
+  final String? image;
   final List<String>? images;
   final StadiumRatingModel? rating;
+  @JsonKey(name: 'price_per_hour')
+  final num? pricePerHour;
+  @JsonKey(name: 'discount_percentage')
+  final int? discountPercentage;
   @JsonKey(name: 'distance_km')
   final double? distanceKm;
   final String? description;
@@ -167,7 +172,10 @@ class StadiumDetailsModel {
     this.verified,
     this.isFav,
     this.images,
+    this.image,
     this.rating,
+    this.pricePerHour,
+    this.discountPercentage,
     this.distanceKm,
     this.description,
     this.price,

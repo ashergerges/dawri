@@ -49,6 +49,9 @@ abstract class UpdateProfileState with _$UpdateProfileState {
     @Default([]) List<PartnerVideoModel> videos,
     @Default(UpdateProfileStatus.initial()) UpdateProfileStatus addVideoStatus,
 
+    /// Deletions in flight, by video id.
+    @Default(<int>{}) Set<int> deletingVideoIds,
+
     // ─── Account deactivation ────────────────────────────────
     @Default(UpdateProfileStatus.initial()) UpdateProfileStatus deactivateStatus,
   }) = _UpdateProfileState;

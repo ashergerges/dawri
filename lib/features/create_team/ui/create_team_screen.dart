@@ -37,7 +37,7 @@ class _CreateTeamView extends StatelessWidget {
       body: BlocConsumer<CreateTeamCubit, CreateTeamState>(
         listener: (context, state) {
           if (state.isSuccess) {
-            context.router.replace(const ManageTeamRoute());
+            context.router.replaceAll([HomeBottomTabsRoute(index: 4), ManageTeamRoute()],updateExistingRoutes: false);
           }
         },
         builder: (context, state) {
@@ -499,6 +499,7 @@ class _TextAreaField extends StatelessWidget {
                 12.w.sizedWidth,
                 Expanded(
                   child: TextFormField(
+                    onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
                     initialValue: initialValue,
                     onChanged: onChanged,
                     maxLines: 4,

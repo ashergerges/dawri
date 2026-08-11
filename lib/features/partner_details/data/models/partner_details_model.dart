@@ -58,6 +58,19 @@ class PartnerVideoModel {
     this.createdAt,
   });
 
+  /// Copy with the view counter bumped by one, applied after the server has
+  /// confirmed the view. [views] is dropped because a pre-formatted label like
+  /// `"1.2k"` would otherwise keep winning over the fresher count.
+  PartnerVideoModel withExtraView() => PartnerVideoModel(
+        id: id,
+        url: url,
+        title: title,
+        thumbnail: thumbnail,
+        views: null,
+        viewsCount: (viewsCount ?? 0) + 1,
+        createdAt: createdAt,
+      );
+
   factory PartnerVideoModel.fromJson(Map<String, dynamic> json) =>
       _$PartnerVideoModelFromJson(json);
   Map<String, dynamic> toJson() => _$PartnerVideoModelToJson(this);

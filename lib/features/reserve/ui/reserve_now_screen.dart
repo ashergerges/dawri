@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/services/dialogs/message_service.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
 import 'package:dawri/core/utils/common_widgets/shimmer_widget.dart';
+import 'package:dawri/features/common/ui/widgets/date_slider.dart';
 import 'package:dawri/features/reserve/data/models/reserve_now_model.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -64,6 +65,8 @@ class _ReserveNowView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
                     _StadiumSummary(),
+                    _SectionTitle(titleKey: LocaleKeys.reserveNowChooseDate),
+                    _DateStrip(),
                     _SectionTitle(titleKey: LocaleKeys.reserveNowDuration),
                     _DurationChips(),
                     _SectionTitle(titleKey: LocaleKeys.reserveNowChooseTime),
@@ -108,18 +111,20 @@ class _SubHeader extends StatelessWidget {
             icon: FontAwesomeIcons.arrowRight,
             onTap: () => Navigator.pop(context),
           ),
-          Text(
-            LocaleKeys.reserveNowTitle.tr(),
-            style: AppTextTheme.headingSmall(context).copyWith(
-              fontWeight: FontWeight.w800,
-              color: AppColors.textDark,
+          Expanded(
+            child: Text(
+              LocaleKeys.reserveNowTitle.tr(),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextTheme.headingSmall(context).copyWith(
+                fontWeight: FontWeight.w800,
+                color: AppColors.textDark,
+              ),
             ),
           ),
-          _CircleIconButton(
-            icon: FontAwesomeIcons.headset,
-            background: Colors.transparent,
-            onTap: () {},
-          ),
+          // Mirrors the back button's footprint so the title stays centred.
+          SizedBox(width: 40.w, height: 40.w),
         ],
       ),
     );
@@ -129,20 +134,18 @@ class _SubHeader extends StatelessWidget {
 class _CircleIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
-  final Color background;
 
-  const _CircleIconButton({
-    required this.icon,
-    required this.onTap,
-    this.background = AppColors.slate100,
-  });
+  const _CircleIconButton({required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: DecoratedBox(
-        decoration: BoxDecoration(color: background, shape: BoxShape.circle),
+        decoration: const BoxDecoration(
+          color: AppColors.slate100,
+          shape: BoxShape.circle,
+        ),
         child: SizedBox(
           width: 40.w,
           height: 40.w,
@@ -169,8 +172,11 @@ class _StadiumSummary extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
         child: BlocBuilder<ReserveNowCubit, ReserveNowState>(
+          // selectedDateIndex included so the date line below tracks the strip.
           buildWhen: (p, c) =>
-              p.stadium != c.stadium || p.stadiumStatus != c.stadiumStatus,
+              p.stadium != c.stadium ||
+              p.stadiumStatus != c.stadiumStatus ||
+              p.selectedDateIndex != c.selectedDateIndex,
           builder: (context, state) {
             if (state.stadium == null &&
                 state.stadiumStatus is! ReserveStatusError) {
@@ -210,7 +216,7 @@ class _StadiumSummary extends StatelessWidget {
                       4.h.sizedHeight,
                       _IconLine(
                         icon: FontAwesomeIcons.locationDot,
-                        text: stadium?.location ?? '',
+                        text: stadium?.location?.address ?? '',
                       ),
                     ],
                   ),
@@ -268,6 +274,27 @@ class _StadiumSummaryShimmer extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ─── DATE STRIP ────────────────────────────────────────────────────────────
+/// Same week picker as the stadiums list; changing the day reloads the slots.
+class _DateStrip extends StatelessWidget {
+  const _DateStrip();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ReserveNowCubit, ReserveNowState>(
+      buildWhen: (p, c) =>
+          p.selectedDateIndex != c.selectedDateIndex || p.dates != c.dates,
+      builder: (context, state) {
+        return DateSlider(
+          dates: state.dates,
+          selectedIndex: state.selectedDateIndex,
+          onSelect: context.read<ReserveNowCubit>().selectDate,
+        );
+      },
     );
   }
 }
@@ -382,7 +409,7 @@ class _TimeGrid extends StatelessWidget {
                 crossAxisSpacing: 10.w,
                 childAspectRatio: 2.4,
               ),
-              itemBuilder: (_, __) =>
+              itemBuilder: (_, _) =>
                   ShimmerWidget.rectangular(width: double.infinity, height: 44.h),
             ),
           );

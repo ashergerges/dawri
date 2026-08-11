@@ -69,6 +69,7 @@ class _PartnerDetailsView extends StatelessWidget {
                   padding: EdgeInsets.only(bottom: 110.h),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Stack(
                         clipBehavior: Clip.none,
@@ -569,7 +570,11 @@ class _VideosSlider extends StatelessWidget {
             // Opens the Instagram-style vertical reels viewer on the tapped one.
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => ReelPlayerPage(reels: videos, initialIndex: index),
+                builder: (_) => ReelPlayerPage(
+                  reels: videos,
+                  initialIndex: index,
+                  onViewCounted: context.read<PartnerDetailsCubit>().bumpViews,
+                ),
               ),
             ),
           );

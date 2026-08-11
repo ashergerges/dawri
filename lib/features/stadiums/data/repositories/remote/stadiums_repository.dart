@@ -31,12 +31,16 @@ class StadiumsRepository implements IStadiumsRepository {
   Future<Result<List<StadiumModel>>> getStadiums({
     required String date,
     int? sportId,
+    required int page,
+    int limit = 10,
   }) async {
     final response = await networkService.getAsync(
       url: AppStrings.urls.stadiumsUrl,
       queryParameters: {
         'date': date,
-        if (sportId != null) 'sport_id': sportId,
+        'sport_id': ?sportId,
+        'page': page,
+        'limit': limit,
       },
     );
     if (response.isError) return Result.error(response.asError!.error);

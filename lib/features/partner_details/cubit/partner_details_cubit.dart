@@ -36,7 +36,16 @@ class PartnerDetailsCubit extends Cubit<PartnerDetailsState> {
       detailsStatus: const PartnerDetailsStatus.success(),
       partner: partner,
       isFavorite: partner.isFav ?? false,
+      // The fresh payload already counts them — drop the local bumps so they
+      // aren't added twice.
+      extraViewIds: const {},
     ));
+  }
+
+  /// Reflects a view the server already accepted.
+  void bumpViews(int videoId) {
+    if (isClosed) return;
+    emit(state.copyWith(extraViewIds: {...state.extraViewIds, videoId}));
   }
 
   // ─── Favorite (optimistic) ─────────────────────────────────────────────────

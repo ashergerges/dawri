@@ -1,6 +1,7 @@
 import 'package:async/async.dart';
 import 'package:dawri/core/services/network/network_service.dart';
 import 'package:dawri/core/utils/constants/constants.dart';
+import 'package:dawri/features/common/data/local/models/app_user.dart';
 import 'package:dawri/features/create_championship/data/models/championship_option_model.dart';
 import 'package:dawri/features/partners/data/models/partners_model.dart';
 import 'package:dawri/features/register/data/repositories/interfaces/i_register_repository.dart';
@@ -93,19 +94,41 @@ class RegisterRepository implements IRegisterRepository {
   }
 
   @override
-  Future<Result<String>> completeProfile({
+  Future<Result<AppUser>> completeProfile({
     required Map<String, dynamic> fields,
     XFile? avatar,
   }) async {
+    // Built before the request so a missing/evicted pick becomes a Result.error
+    // instead of an unhandled PathNotFoundException.
+    MultipartFile? avatarPart;
+    if (avatar != null) {
+      try {
+        avatarPart = await MultipartFile.fromFile(
+          avatar.path,
+          filename: avatar.name,
+        );
+      } catch (e) {
+        return Result.error(e);
+      }
+    }
+
     final response = await networkService.postMultiPartFormDataAsync(
       url: AppStrings.urls.completeProfileUrl,
       formMap: {
         ...fields,
-        if (avatar != null) 'avatar': await MultipartFile.fromFile(avatar.path),
+        'avatar': ?avatarPart,
       },
     );
     if (response.isError) return Result.error(response.asError!.error);
-    return Result.value(response.asValue?.value.data['message'] ?? '');
+
+    try {
+      final user = response.asValue!.value.data['data']['user'];
+      return Result.value(
+        AppUser.fromJson(Map<String, dynamic>.from(user as Map)),
+      );
+    } catch (e) {
+      return Result.error(e);
+    }
   }
 
   /// Tolerates a list arriving directly or wrapped in a Map (items/data/…).

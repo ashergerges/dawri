@@ -16,6 +16,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
 
+/// Vertical space the pinned submit bar occupies (design pixels). Text fields
+/// keep the caret this far above the viewport bottom so the bar — and the
+/// keyboard under it — never hide the field being typed into.
+const double _kSubmitBarSpace = 120;
+
 @RoutePage()
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -35,11 +40,9 @@ class _RegisterView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocConsumer<RegisterCubit, RegisterState>(
-        listenWhen: (p, c) => p.isSuccess != c.isSuccess,
-        listener: (context, state) {
-          if (state.isSuccess) context.router.maybePop();
-        },
+      // The cubit owns the post-success navigation (replaceAll to
+      // Home + Partners) — popping here as well would undo it.
+      body: BlocBuilder<RegisterCubit, RegisterState>(
         builder: (context, state) {
           if (state.optionsStatus is RegisterStatusLoading &&
               state.types.isEmpty) {
@@ -75,7 +78,12 @@ class _RegisterForm extends StatelessWidget {
         return Stack(
           children: [
             SingleChildScrollView(
-              padding: EdgeInsets.only(bottom: 120.h),
+              // Room for the pinned submit bar, plus the keyboard so the last
+              // fields can still be scrolled clear of it.
+              padding: EdgeInsets.only(
+                bottom: _kSubmitBarSpace.h + MediaQuery.viewInsetsOf(context).bottom,
+              ),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -505,8 +513,15 @@ class _TextField extends StatelessWidget {
                 12.w.sizedWidth,
                 Expanded(
                   child: TextFormField(
+                    onTapOutside: (v) {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                    },
                     initialValue: initialValue,
                     onChanged: onChanged,
+                    textInputAction: TextInputAction.next,
+                    textCapitalization: TextCapitalization.words,
+                    // Keeps the field above the keyboard *and* the submit bar.
+                    scrollPadding: EdgeInsets.only(bottom: _kSubmitBarSpace.h),
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: hint,
@@ -577,9 +592,16 @@ class _TextAreaField extends StatelessWidget {
                 12.w.sizedWidth,
                 Expanded(
                   child: TextFormField(
+                    onTapOutside: (v) {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                    },
                     initialValue: initialValue,
                     onChanged: onChanged,
                     maxLines: 3,
+                    keyboardType: TextInputType.multiline,
+                    textCapitalization: TextCapitalization.sentences,
+                    // Keeps the field above the keyboard *and* the submit bar.
+                    scrollPadding: EdgeInsets.only(bottom: _kSubmitBarSpace.h),
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: hint,

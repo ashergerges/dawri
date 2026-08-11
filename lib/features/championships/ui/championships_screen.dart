@@ -71,44 +71,11 @@ class _Header extends StatelessWidget {
               color: AppColors.textDark,
             ),
           ),
-          _IconButton(
-            icon: FontAwesomeIcons.magnifyingGlass,
-            onTap: () {},
-          ),
+          // _IconButton(
+          //   icon: FontAwesomeIcons.magnifyingGlass,
+          //   onTap: () {},
+          // ),
         ],
-      ),
-    );
-  }
-}
-
-class _IconButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _IconButton({
-    required this.icon,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isBack = icon == FontAwesomeIcons.arrowRight;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 40.w,
-        height: 40.w,
-        decoration: BoxDecoration(
-          color: isBack ? AppColors.slate100 : Colors.transparent,
-          shape: BoxShape.circle,
-        ),
-        child: Center(
-          child: FaIcon(
-            icon,
-            size: 18.sp,
-            color: AppColors.textDark,
-          ),
-        ),
       ),
     );
   }
@@ -275,10 +242,7 @@ class _ChampionshipsListView extends StatelessWidget {
             children: [
               if (tab == 0) const _CreateBanner(),
               if (items.isEmpty)
-                Padding(
-                  padding: EdgeInsets.only(top: 60.h),
-                  child: Center(child: Text(LocaleKeys.championshipsEmpty.tr())),
-                )
+                _EmptyState(tab: tab)
               else
                 for (final champ in items)
                   Padding(
@@ -320,6 +284,115 @@ class _ChampionshipsListView extends StatelessWidget {
     }
   }
 }
+/// Per-tab empty placeholder.
+///
+/// Each tab says why it's empty rather than sharing one "no championships
+/// found" line, and the two passive tabs point back at open registrations.
+/// Tab 0 gets no button — [_CreateBanner] already sits directly above it.
+class _EmptyState extends StatelessWidget {
+  final int tab;
+  const _EmptyState({required this.tab});
+
+  @override
+  Widget build(BuildContext context) {
+    final (icon, title, description) = switch (tab) {
+      0 => (
+          FontAwesomeIcons.calendarPlus,
+          LocaleKeys.championshipsEmptyAvailableTitle.tr(),
+          LocaleKeys.championshipsEmptyAvailableDesc.tr(),
+        ),
+      1 => (
+          FontAwesomeIcons.futbol,
+          LocaleKeys.championshipsEmptyOngoingTitle.tr(),
+          LocaleKeys.championshipsEmptyOngoingDesc.tr(),
+        ),
+      _ => (
+          FontAwesomeIcons.medal,
+          LocaleKeys.championshipsEmptyCompletedTitle.tr(),
+          LocaleKeys.championshipsEmptyCompletedDesc.tr(),
+        ),
+    };
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(10.w, 50.h, 10.w, 40.h),
+      child: Column(
+        children: [
+          Container(
+            width: 96.w,
+            height: 96.w,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.06),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: FaIcon(icon, size: 38.sp, color: AppColors.primaryLight),
+            ),
+          ),
+          20.h.sizedHeight,
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: AppTextTheme.bodyLargeSemiBold(context).copyWith(
+              fontWeight: FontWeight.w900,
+              color: AppColors.textDark,
+            ),
+          ),
+          8.h.sizedHeight,
+          Text(
+            description,
+            textAlign: TextAlign.center,
+            style: AppTextTheme.bodySmall(context).copyWith(
+              fontWeight: FontWeight.w600,
+              color: AppColors.textMuted,
+              height: 1.6,
+            ),
+          ),
+          if (tab != 0) ...[
+            24.h.sizedHeight,
+            OnTap(
+              onTap: () => context.read<ChampionshipsCubit>().selectTab(0),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(16.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.25),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 26.w, vertical: 13.h),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      FaIcon(
+                        FontAwesomeIcons.magnifyingGlass,
+                        size: 13.sp,
+                        color: AppColors.white,
+                      ),
+                      8.w.sizedWidth,
+                      Text(
+                        LocaleKeys.championshipsEmptyBrowseOpen.tr(),
+                        style: AppTextTheme.bodySmallSemiBold(context).copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class _ChampionshipsListShimmer extends StatelessWidget {
   const _ChampionshipsListShimmer();
 
@@ -575,7 +648,7 @@ class _TournamentCard extends StatelessWidget {
                           6.h.sizedHeight,
                           _DetailRow(
                             icon: _isOngoing ? FontAwesomeIcons.clock : FontAwesomeIcons.users,
-                            text: ' ${LocaleKeys.championshipsTeams.tr() }${data.registeredTeams?.map((e)=>"$e")}',
+                            text: ' ${LocaleKeys.championshipsTeams.tr()}${data.registeredTeams?.join(', ') ?? ''}',
                           ),
                         ],
                       ],

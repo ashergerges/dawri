@@ -1071,6 +1071,7 @@ class PartnerVideosRoute extends PageRouteInfo<PartnerVideosRouteArgs> {
     Key? key,
     required int partnerId,
     String? title,
+    bool canDelete = false,
     List<PageRouteInfo>? children,
   }) : super(
          PartnerVideosRoute.name,
@@ -1078,6 +1079,7 @@ class PartnerVideosRoute extends PageRouteInfo<PartnerVideosRouteArgs> {
            key: key,
            partnerId: partnerId,
            title: title,
+           canDelete: canDelete,
          ),
          initialChildren: children,
        );
@@ -1092,13 +1094,19 @@ class PartnerVideosRoute extends PageRouteInfo<PartnerVideosRouteArgs> {
         key: args.key,
         partnerId: args.partnerId,
         title: args.title,
+        canDelete: args.canDelete,
       );
     },
   );
 }
 
 class PartnerVideosRouteArgs {
-  const PartnerVideosRouteArgs({this.key, required this.partnerId, this.title});
+  const PartnerVideosRouteArgs({
+    this.key,
+    required this.partnerId,
+    this.title,
+    this.canDelete = false,
+  });
 
   final Key? key;
 
@@ -1106,9 +1114,11 @@ class PartnerVideosRouteArgs {
 
   final String? title;
 
+  final bool canDelete;
+
   @override
   String toString() {
-    return 'PartnerVideosRouteArgs{key: $key, partnerId: $partnerId, title: $title}';
+    return 'PartnerVideosRouteArgs{key: $key, partnerId: $partnerId, title: $title, canDelete: $canDelete}';
   }
 
   @override
@@ -1117,11 +1127,13 @@ class PartnerVideosRouteArgs {
     if (other is! PartnerVideosRouteArgs) return false;
     return key == other.key &&
         partnerId == other.partnerId &&
-        title == other.title;
+        title == other.title &&
+        canDelete == other.canDelete;
   }
 
   @override
-  int get hashCode => key.hashCode ^ partnerId.hashCode ^ title.hashCode;
+  int get hashCode =>
+      key.hashCode ^ partnerId.hashCode ^ title.hashCode ^ canDelete.hashCode;
 }
 
 /// generated route for

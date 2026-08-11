@@ -138,6 +138,10 @@ import 'features/reserve/data/repositories/interfaces/i_reserve_repository.dart'
     as _i817;
 import 'features/reserve/data/repositories/remote/reserve_repository.dart'
     as _i124;
+import 'features/search/data/repositories/interfaces/i_search_repository.dart'
+    as _i310;
+import 'features/search/data/repositories/remote/search_repository.dart'
+    as _i361;
 import 'features/splash/cubits/splash_cubit/splash_cubit.dart' as _i331;
 import 'features/splash/data/repositories/interfaces/i_splash_repository.dart'
     as _i561;
@@ -204,6 +208,9 @@ _i174.GetIt $initGetIt(
       tokenService: gh<_i797.TokenService>(),
       aliceService: gh<_i854.AliceService>(),
     ),
+  );
+  gh.factory<_i310.ISearchRepository>(
+    () => _i361.SearchRepository(networkService: gh<_i969.NetworkService>()),
   );
   gh.factory<_i359.IPurchaseHistoryRepository>(
     () => _i72.PurchaseHistoryRepository(

@@ -43,14 +43,8 @@ class SubHeader extends StatelessWidget {
               color: AppColors.textDark,
             ),
           ),
-          OnTap(
-            onTap: () {},
-            child: SizedBox(
-              width: 40.w,
-              height: 40.w,
-              child: FaIcon(FontAwesomeIcons.sliders, size: 18.sp, color: AppColors.textDark),
-            ),
-          ),
+          SizedBox(width: 40.w, height: 40.w),
+
         ],
       ),
     );

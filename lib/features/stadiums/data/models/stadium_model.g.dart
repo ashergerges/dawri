@@ -15,6 +15,7 @@ StadiumModel _$StadiumModelFromJson(Map<String, dynamic> json) => StadiumModel(
   pricePerHour: json['price_per_hour'] as num?,
   discountPercentage: (json['discount_percentage'] as num?)?.toInt(),
   image: json['image'] as String?,
+  isFav: json['isFav'] as bool?,
   openingTime: json['opening_time'] as String?,
   closingTime: json['closing_time'] as String?,
   features: (json['features'] as List<dynamic>?)
@@ -32,6 +33,7 @@ Map<String, dynamic> _$StadiumModelToJson(StadiumModel instance) =>
       'price_per_hour': instance.pricePerHour,
       'discount_percentage': instance.discountPercentage,
       'image': instance.image,
+      'isFav': instance.isFav,
       'opening_time': instance.openingTime,
       'closing_time': instance.closingTime,
       'features': instance.features,
