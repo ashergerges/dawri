@@ -1,5 +1,7 @@
 import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dawri/core/cubit/bloc_observer.dart';
+import 'package:dawri/firebase_options.dart';
 import 'package:dawri/core/utils/constants/constants.dart';
 import 'package:dawri/features/common/cubit/main_cubit/main_cubit.dart';
 import 'package:dawri/features/splash/cubits/splash_cubit/splash_cubit.dart';
@@ -13,7 +15,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import 'core/services/download/download_service.dart';
@@ -55,13 +56,28 @@ void configLoading() {
 
 Future<void> initFirebase() async {
   try {
-    if (await InternetConnectionChecker().hasConnection) {
-      await Firebase.initializeApp().then((value) async {
-        if (kDebugMode) {
-          final String fcm = await FirebaseMessaging.instance.getToken() ?? '';
-          log(name: 'fcm::T', fcm);
-        }
-      });
+    // Initialized unconditionally (this used to be gated on connectivity):
+    // Firestore backs the chat feature and is built to serve reads from its
+    // local cache while offline, so skipping init would leave chat permanently
+    // broken for anyone who launched the app without a connection.
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    // Queue writes made while offline and replay them on reconnect, so sending
+    // a message in a dead zone isn't silently lost.
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+    );
+
+    if (kDebugMode) {
+      // Fetching the FCM token needs the network; don't let it fail the init.
+      try {
+        final String fcm = await FirebaseMessaging.instance.getToken() ?? '';
+        log(name: 'fcm::T', fcm);
+      } catch (e) {
+        log("FCM token fetch failed: ${e.toString()}");
+      }
     }
   } catch (e) {
     log("Firebase init error: ${e.toString()}");

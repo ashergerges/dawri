@@ -14,7 +14,13 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PartnerChatState {
 
- List<ChatMessageModel> get messages; String? get attachmentError; bool get isPickingAttachment;
+/// Messages from Firestore, oldest first. Includes the user's own
+/// unacknowledged writes (Firestore replays local pending writes into the
+/// snapshot), which is why sending needs no separate optimistic list.
+ List<ChatMessageModel> get messages;/// Current user's backend id, as a string. Empty until [PartnerChatCubit.init]
+/// resolves it; the UI uses it to decide which side a bubble belongs on.
+ String get myId; String get peerName; String get peerAvatar; String? get peerPhone; bool get isPeerTyping; bool get isPeerOnline; bool get isLoading;/// Translation key for a fatal load error (no session, stream failure).
+ String? get errorKey;
 /// Create a copy of PartnerChatState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +31,16 @@ $PartnerChatStateCopyWith<PartnerChatState> get copyWith => _$PartnerChatStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerChatState&&const DeepCollectionEquality().equals(other.messages, messages)&&(identical(other.attachmentError, attachmentError) || other.attachmentError == attachmentError)&&(identical(other.isPickingAttachment, isPickingAttachment) || other.isPickingAttachment == isPickingAttachment));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerChatState&&const DeepCollectionEquality().equals(other.messages, messages)&&(identical(other.myId, myId) || other.myId == myId)&&(identical(other.peerName, peerName) || other.peerName == peerName)&&(identical(other.peerAvatar, peerAvatar) || other.peerAvatar == peerAvatar)&&(identical(other.peerPhone, peerPhone) || other.peerPhone == peerPhone)&&(identical(other.isPeerTyping, isPeerTyping) || other.isPeerTyping == isPeerTyping)&&(identical(other.isPeerOnline, isPeerOnline) || other.isPeerOnline == isPeerOnline)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorKey, errorKey) || other.errorKey == errorKey));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(messages),attachmentError,isPickingAttachment);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(messages),myId,peerName,peerAvatar,peerPhone,isPeerTyping,isPeerOnline,isLoading,errorKey);
 
 @override
 String toString() {
-  return 'PartnerChatState(messages: $messages, attachmentError: $attachmentError, isPickingAttachment: $isPickingAttachment)';
+  return 'PartnerChatState(messages: $messages, myId: $myId, peerName: $peerName, peerAvatar: $peerAvatar, peerPhone: $peerPhone, isPeerTyping: $isPeerTyping, isPeerOnline: $isPeerOnline, isLoading: $isLoading, errorKey: $errorKey)';
 }
 
 
@@ -45,7 +51,7 @@ abstract mixin class $PartnerChatStateCopyWith<$Res>  {
   factory $PartnerChatStateCopyWith(PartnerChatState value, $Res Function(PartnerChatState) _then) = _$PartnerChatStateCopyWithImpl;
 @useResult
 $Res call({
- List<ChatMessageModel> messages, String? attachmentError, bool isPickingAttachment
+ List<ChatMessageModel> messages, String myId, String peerName, String peerAvatar, String? peerPhone, bool isPeerTyping, bool isPeerOnline, bool isLoading, String? errorKey
 });
 
 
@@ -62,12 +68,18 @@ class _$PartnerChatStateCopyWithImpl<$Res>
 
 /// Create a copy of PartnerChatState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? messages = null,Object? attachmentError = freezed,Object? isPickingAttachment = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? messages = null,Object? myId = null,Object? peerName = null,Object? peerAvatar = null,Object? peerPhone = freezed,Object? isPeerTyping = null,Object? isPeerOnline = null,Object? isLoading = null,Object? errorKey = freezed,}) {
   return _then(_self.copyWith(
 messages: null == messages ? _self.messages : messages // ignore: cast_nullable_to_non_nullable
-as List<ChatMessageModel>,attachmentError: freezed == attachmentError ? _self.attachmentError : attachmentError // ignore: cast_nullable_to_non_nullable
-as String?,isPickingAttachment: null == isPickingAttachment ? _self.isPickingAttachment : isPickingAttachment // ignore: cast_nullable_to_non_nullable
-as bool,
+as List<ChatMessageModel>,myId: null == myId ? _self.myId : myId // ignore: cast_nullable_to_non_nullable
+as String,peerName: null == peerName ? _self.peerName : peerName // ignore: cast_nullable_to_non_nullable
+as String,peerAvatar: null == peerAvatar ? _self.peerAvatar : peerAvatar // ignore: cast_nullable_to_non_nullable
+as String,peerPhone: freezed == peerPhone ? _self.peerPhone : peerPhone // ignore: cast_nullable_to_non_nullable
+as String?,isPeerTyping: null == isPeerTyping ? _self.isPeerTyping : isPeerTyping // ignore: cast_nullable_to_non_nullable
+as bool,isPeerOnline: null == isPeerOnline ? _self.isPeerOnline : isPeerOnline // ignore: cast_nullable_to_non_nullable
+as bool,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as bool,errorKey: freezed == errorKey ? _self.errorKey : errorKey // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -152,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<ChatMessageModel> messages,  String? attachmentError,  bool isPickingAttachment)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<ChatMessageModel> messages,  String myId,  String peerName,  String peerAvatar,  String? peerPhone,  bool isPeerTyping,  bool isPeerOnline,  bool isLoading,  String? errorKey)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PartnerChatState() when $default != null:
-return $default(_that.messages,_that.attachmentError,_that.isPickingAttachment);case _:
+return $default(_that.messages,_that.myId,_that.peerName,_that.peerAvatar,_that.peerPhone,_that.isPeerTyping,_that.isPeerOnline,_that.isLoading,_that.errorKey);case _:
   return orElse();
 
 }
@@ -173,10 +185,10 @@ return $default(_that.messages,_that.attachmentError,_that.isPickingAttachment);
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<ChatMessageModel> messages,  String? attachmentError,  bool isPickingAttachment)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<ChatMessageModel> messages,  String myId,  String peerName,  String peerAvatar,  String? peerPhone,  bool isPeerTyping,  bool isPeerOnline,  bool isLoading,  String? errorKey)  $default,) {final _that = this;
 switch (_that) {
 case _PartnerChatState():
-return $default(_that.messages,_that.attachmentError,_that.isPickingAttachment);case _:
+return $default(_that.messages,_that.myId,_that.peerName,_that.peerAvatar,_that.peerPhone,_that.isPeerTyping,_that.isPeerOnline,_that.isLoading,_that.errorKey);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -193,10 +205,10 @@ return $default(_that.messages,_that.attachmentError,_that.isPickingAttachment);
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<ChatMessageModel> messages,  String? attachmentError,  bool isPickingAttachment)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<ChatMessageModel> messages,  String myId,  String peerName,  String peerAvatar,  String? peerPhone,  bool isPeerTyping,  bool isPeerOnline,  bool isLoading,  String? errorKey)?  $default,) {final _that = this;
 switch (_that) {
 case _PartnerChatState() when $default != null:
-return $default(_that.messages,_that.attachmentError,_that.isPickingAttachment);case _:
+return $default(_that.messages,_that.myId,_that.peerName,_that.peerAvatar,_that.peerPhone,_that.isPeerTyping,_that.isPeerOnline,_that.isLoading,_that.errorKey);case _:
   return null;
 
 }
@@ -208,18 +220,33 @@ return $default(_that.messages,_that.attachmentError,_that.isPickingAttachment);
 
 
 class _PartnerChatState implements PartnerChatState {
-  const _PartnerChatState({final  List<ChatMessageModel> messages = PartnerChatMockData.initialMessages, this.attachmentError = '', this.isPickingAttachment = false}): _messages = messages;
+  const _PartnerChatState({final  List<ChatMessageModel> messages = const [], this.myId = '', this.peerName = '', this.peerAvatar = '', this.peerPhone, this.isPeerTyping = false, this.isPeerOnline = false, this.isLoading = true, this.errorKey}): _messages = messages;
   
 
+/// Messages from Firestore, oldest first. Includes the user's own
+/// unacknowledged writes (Firestore replays local pending writes into the
+/// snapshot), which is why sending needs no separate optimistic list.
  final  List<ChatMessageModel> _messages;
+/// Messages from Firestore, oldest first. Includes the user's own
+/// unacknowledged writes (Firestore replays local pending writes into the
+/// snapshot), which is why sending needs no separate optimistic list.
 @override@JsonKey() List<ChatMessageModel> get messages {
   if (_messages is EqualUnmodifiableListView) return _messages;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_messages);
 }
 
-@override@JsonKey() final  String? attachmentError;
-@override@JsonKey() final  bool isPickingAttachment;
+/// Current user's backend id, as a string. Empty until [PartnerChatCubit.init]
+/// resolves it; the UI uses it to decide which side a bubble belongs on.
+@override@JsonKey() final  String myId;
+@override@JsonKey() final  String peerName;
+@override@JsonKey() final  String peerAvatar;
+@override final  String? peerPhone;
+@override@JsonKey() final  bool isPeerTyping;
+@override@JsonKey() final  bool isPeerOnline;
+@override@JsonKey() final  bool isLoading;
+/// Translation key for a fatal load error (no session, stream failure).
+@override final  String? errorKey;
 
 /// Create a copy of PartnerChatState
 /// with the given fields replaced by the non-null parameter values.
@@ -231,16 +258,16 @@ _$PartnerChatStateCopyWith<_PartnerChatState> get copyWith => __$PartnerChatStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PartnerChatState&&const DeepCollectionEquality().equals(other._messages, _messages)&&(identical(other.attachmentError, attachmentError) || other.attachmentError == attachmentError)&&(identical(other.isPickingAttachment, isPickingAttachment) || other.isPickingAttachment == isPickingAttachment));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PartnerChatState&&const DeepCollectionEquality().equals(other._messages, _messages)&&(identical(other.myId, myId) || other.myId == myId)&&(identical(other.peerName, peerName) || other.peerName == peerName)&&(identical(other.peerAvatar, peerAvatar) || other.peerAvatar == peerAvatar)&&(identical(other.peerPhone, peerPhone) || other.peerPhone == peerPhone)&&(identical(other.isPeerTyping, isPeerTyping) || other.isPeerTyping == isPeerTyping)&&(identical(other.isPeerOnline, isPeerOnline) || other.isPeerOnline == isPeerOnline)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorKey, errorKey) || other.errorKey == errorKey));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_messages),attachmentError,isPickingAttachment);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_messages),myId,peerName,peerAvatar,peerPhone,isPeerTyping,isPeerOnline,isLoading,errorKey);
 
 @override
 String toString() {
-  return 'PartnerChatState(messages: $messages, attachmentError: $attachmentError, isPickingAttachment: $isPickingAttachment)';
+  return 'PartnerChatState(messages: $messages, myId: $myId, peerName: $peerName, peerAvatar: $peerAvatar, peerPhone: $peerPhone, isPeerTyping: $isPeerTyping, isPeerOnline: $isPeerOnline, isLoading: $isLoading, errorKey: $errorKey)';
 }
 
 
@@ -251,7 +278,7 @@ abstract mixin class _$PartnerChatStateCopyWith<$Res> implements $PartnerChatSta
   factory _$PartnerChatStateCopyWith(_PartnerChatState value, $Res Function(_PartnerChatState) _then) = __$PartnerChatStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<ChatMessageModel> messages, String? attachmentError, bool isPickingAttachment
+ List<ChatMessageModel> messages, String myId, String peerName, String peerAvatar, String? peerPhone, bool isPeerTyping, bool isPeerOnline, bool isLoading, String? errorKey
 });
 
 
@@ -268,12 +295,18 @@ class __$PartnerChatStateCopyWithImpl<$Res>
 
 /// Create a copy of PartnerChatState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? messages = null,Object? attachmentError = freezed,Object? isPickingAttachment = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? messages = null,Object? myId = null,Object? peerName = null,Object? peerAvatar = null,Object? peerPhone = freezed,Object? isPeerTyping = null,Object? isPeerOnline = null,Object? isLoading = null,Object? errorKey = freezed,}) {
   return _then(_PartnerChatState(
 messages: null == messages ? _self._messages : messages // ignore: cast_nullable_to_non_nullable
-as List<ChatMessageModel>,attachmentError: freezed == attachmentError ? _self.attachmentError : attachmentError // ignore: cast_nullable_to_non_nullable
-as String?,isPickingAttachment: null == isPickingAttachment ? _self.isPickingAttachment : isPickingAttachment // ignore: cast_nullable_to_non_nullable
-as bool,
+as List<ChatMessageModel>,myId: null == myId ? _self.myId : myId // ignore: cast_nullable_to_non_nullable
+as String,peerName: null == peerName ? _self.peerName : peerName // ignore: cast_nullable_to_non_nullable
+as String,peerAvatar: null == peerAvatar ? _self.peerAvatar : peerAvatar // ignore: cast_nullable_to_non_nullable
+as String,peerPhone: freezed == peerPhone ? _self.peerPhone : peerPhone // ignore: cast_nullable_to_non_nullable
+as String?,isPeerTyping: null == isPeerTyping ? _self.isPeerTyping : isPeerTyping // ignore: cast_nullable_to_non_nullable
+as bool,isPeerOnline: null == isPeerOnline ? _self.isPeerOnline : isPeerOnline // ignore: cast_nullable_to_non_nullable
+as bool,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as bool,errorKey: freezed == errorKey ? _self.errorKey : errorKey // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

@@ -1,0 +1,14 @@
+{
+  "indexes": [
+    {
+      "//": "Required by ChatRepository.watchMyChats: an array-contains filter combined with an orderBy needs a composite index. Without it the chat list stream fails at runtime with a FAILED_PRECONDITION and a console link.",
+      "collectionGroup": "chats",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "members", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

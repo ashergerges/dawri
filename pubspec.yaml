@@ -30,10 +30,17 @@ dependencies:
   file_picker: ^8.1.2
   video_player: ^2.9.2
 
-  # Firebase core setup
-  firebase_core: ^4.11.0
+  # Firebase core setup.
+  # NOTE: the Android Firebase BoM pinned in android/app/build.gradle.kts must
+  # match the `FirebaseSDKVersion` this version declares. See the comment there.
+  firebase_core: ^4.13.0
   # Push notifications
   firebase_messaging: ^16.4.0
+  # Chat backing store
+  cloud_firestore: ^6.8.0
+  # Signs in with a custom token minted by our backend, so Firestore rules can
+  # verify identity. See lib/core/services/firebase/firebase_auth_service.dart
+  firebase_auth: ^6.5.7
 
   # App navigation
   auto_route: ^11.1.0

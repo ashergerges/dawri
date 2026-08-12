@@ -3,6 +3,7 @@ import 'package:bloc/bloc.dart';
 import 'package:dawri/core/interfaces/i_local_preference.dart';
 import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/services/dialogs/message_service.dart';
+import 'package:dawri/core/services/firebase/firebase_user_sync_service.dart';
 import 'package:dawri/core/utils/helper/picked_image_helper.dart';
 import 'package:dawri/features/common/data/local/models/app_user.dart';
 import 'package:dawri/features/create_championship/data/models/championship_option_model.dart';
@@ -267,5 +268,10 @@ class RegisterCubit extends Cubit<RegisterState> {
         hasProfile: true,
       ),
     );
+
+    // First time this user has a name and avatar — mirror them into Firestore so
+    // they are not a blank entry in anyone's chat list. Not awaited; the service
+    // logs its own failures.
+    getIt<FirebaseUserSyncService>().syncCurrentUser();
   }
 }

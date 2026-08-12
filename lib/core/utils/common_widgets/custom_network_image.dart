@@ -30,6 +30,15 @@ class CustomNetworkImage extends StatelessWidget {
   final BoxFit?  fit;
   final Widget Function(BuildContext, String, Object)? errorWidget;
 
+  /// Treats a blank URL the same as a missing one.
+  ///
+  /// A null check alone isn't enough: the API returns `''` for records with no
+  /// image (and profile mirrors store `''` too), and an empty string reaches
+  /// `CachedNetworkImage`, which throws `Invalid argument(s): No host specified
+  /// in URI`. Every caller then has to remember to normalise, so it's handled
+  /// once here instead.
+  bool get _hasImage => imageUrl != null && imageUrl!.trim().isNotEmpty;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -40,7 +49,7 @@ class CustomNetworkImage extends StatelessWidget {
         borderRadius: BorderRadius.circular(radius.r),
         border: withBorder ? Border.all(color: borderColor) : null,
       ),
-      child: imageUrl != null
+      child: _hasImage
           ? ClipRRect(
               borderRadius: BorderRadius.circular(radius.r),
               child: imageUrl!.split(".").lastOrNull?.toLowerCase().contains("svg") ?? false

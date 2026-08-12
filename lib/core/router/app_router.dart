@@ -23,6 +23,7 @@ import 'package:dawri/features/login/ui/verification_screen.dart';
 import 'package:dawri/features/manage_team/ui/manage_team_screen.dart';
 import 'package:dawri/features/my_championships/ui/my_championships_screen.dart';
 import 'package:dawri/features/notifications/ui/notifications_screen.dart';
+import 'package:dawri/features/partner_chat/ui/chats_list_screen.dart';
 import 'package:dawri/features/partner_chat/ui/partner_chat_screen.dart';
 import 'package:dawri/features/partner_details/ui/partner_details_screen.dart';
 import 'package:dawri/features/partner_details/ui/partner_reviews_screen.dart';
@@ -83,6 +84,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute( page: ChallengesRoute.page),
     AutoRoute( page: ContractsRoute.page),
     AutoRoute( page: PartnersRoute.page),
+    AutoRoute( page: ChatsListRoute.page),
     AutoRoute( page: PartnerChatRoute.page),
     AutoRoute( page: PartnerDetailsRoute.page),
     AutoRoute( page: PartnerVideosRoute.page),

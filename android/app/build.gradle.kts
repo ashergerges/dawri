@@ -49,11 +49,13 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 
     // Must match the `FirebaseSDKVersion` that firebase_core declares in
-    // android/gradle.properties (currently 34.15.0 for firebase_core 4.11.0).
-    // Gradle picks the highest BoM across modules, so a newer pin here silently
-    // upgrades every plugin: 34.17.0 pulls firebase-common 22.2.0, which dropped
-    // FirebaseOptions.getRecaptchaSiteKey() and crashes FlutterFirebaseCorePlugin
-    // at startup with NoSuchMethodError. Bump this only alongside firebase_core.
-    implementation(platform("com.google.firebase:firebase-bom:34.15.0"))
+    // android/gradle.properties (currently 34.17.0 for firebase_core 4.13.0).
+    // Gradle picks the highest BoM across modules, so a pin that disagrees with
+    // firebase_core silently upgrades every plugin and breaks it: 34.17.0 pulls
+    // firebase-common 22.2.0, which dropped FirebaseOptions.getRecaptchaSiteKey()
+    // and crashed FlutterFirebaseCorePlugin at startup on firebase_core 4.11.0.
+    // firebase_core 4.13.0 ships against 34.17.0, so the two now agree.
+    // Bump this only alongside firebase_core.
+    implementation(platform("com.google.firebase:firebase-bom:34.17.0"))
     implementation("com.google.firebase:firebase-analytics")
 }

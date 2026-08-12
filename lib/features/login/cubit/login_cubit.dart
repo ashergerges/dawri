@@ -4,6 +4,8 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:dawri/core/interfaces/i_local_preference.dart';
 import 'package:dawri/core/router/app_router.dart';
+import 'package:dawri/core/services/firebase/firebase_auth_service.dart';
+import 'package:dawri/core/services/firebase/firebase_user_sync_service.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:dawri/features/login/data/models/login_model.dart';
@@ -131,12 +133,27 @@ class LoginCubit extends Cubit<LoginState> {
     );
     log("validateOtp.asValue?.value.token::${result.asValue?.value.token}");
     log("appUser::${getIt<ILocalPreference>().appUser.value?.token}");    // local session storage (whatever holds AppUser elsewhere) before routing.
+
+    // Open the chat session for this user: sign in to Firebase and refresh the
+    // Firestore mirror of their name/avatar. Not awaited — routing to home must
+    // not wait on Firebase, and the service logs its own failures.
+    _openChatSession();
+
     emit(state.copyWith(isVerifying: false, isVerified: true));
 
     getIt<AppRouter>().replaceAll(
       [HomeBottomTabsRoute()],
       updateExistingRoutes: false,
     );
+  }
+
+  /// Signs in to Firebase and mirrors the profile so the peer's chat list shows
+  /// this user correctly. Errors are swallowed inside the services — a Firebase
+  /// outage must not block a successful login.
+  Future<void> _openChatSession() async {
+    await getIt<FirebaseAuthService>().ensureSignedIn();
+    await getIt<FirebaseUserSyncService>().syncCurrentUser();
+    await getIt<FirebaseUserSyncService>().setOnline(true);
   }
 
   void _startTimer(int seconds) {

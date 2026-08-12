@@ -554,8 +554,17 @@ class _OrganizerCard extends StatelessWidget {
         '${organizer!.previousChampionshipsCount} ${LocaleKeys.champProfileOrganizerChamps.tr()}',
     ].join('  •  ');
 
+    final organizerId = organizer?.id;
+
     return OnTap(
-      onTap: () => PartnerChatRoute().push(context),
+      // Without an organizer id there is no one to open a chat with.
+      onTap: organizerId == null
+          ? null
+          : () => PartnerChatRoute(
+                peerId: organizerId.toString(),
+                peerName: organizer?.name,
+                peerAvatar: organizer?.avatar,
+              ).push(context),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.white,

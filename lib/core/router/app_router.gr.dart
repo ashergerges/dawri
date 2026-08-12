@@ -391,6 +391,22 @@ class ChargeWalletRouteArgs {
 }
 
 /// generated route for
+/// [ChatsListScreen]
+class ChatsListRoute extends PageRouteInfo<void> {
+  const ChatsListRoute({List<PageRouteInfo>? children})
+    : super(ChatsListRoute.name, initialChildren: children);
+
+  static const String name = 'ChatsListRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ChatsListScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [ContractDetailsScreen]
 class ContractDetailsRoute extends PageRouteInfo<ContractDetailsRouteArgs> {
   ContractDetailsRoute({
@@ -914,18 +930,85 @@ class OfflineInternetRouteArgs {
 
 /// generated route for
 /// [PartnerChatScreen]
-class PartnerChatRoute extends PageRouteInfo<void> {
-  const PartnerChatRoute({List<PageRouteInfo>? children})
-    : super(PartnerChatRoute.name, initialChildren: children);
+class PartnerChatRoute extends PageRouteInfo<PartnerChatRouteArgs> {
+  PartnerChatRoute({
+    Key? key,
+    required String peerId,
+    String? peerName,
+    String? peerAvatar,
+    String? peerPhone,
+    List<PageRouteInfo>? children,
+  }) : super(
+         PartnerChatRoute.name,
+         args: PartnerChatRouteArgs(
+           key: key,
+           peerId: peerId,
+           peerName: peerName,
+           peerAvatar: peerAvatar,
+           peerPhone: peerPhone,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'PartnerChatRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const PartnerChatScreen();
+      final args = data.argsAs<PartnerChatRouteArgs>();
+      return PartnerChatScreen(
+        key: args.key,
+        peerId: args.peerId,
+        peerName: args.peerName,
+        peerAvatar: args.peerAvatar,
+        peerPhone: args.peerPhone,
+      );
     },
   );
+}
+
+class PartnerChatRouteArgs {
+  const PartnerChatRouteArgs({
+    this.key,
+    required this.peerId,
+    this.peerName,
+    this.peerAvatar,
+    this.peerPhone,
+  });
+
+  final Key? key;
+
+  final String peerId;
+
+  final String? peerName;
+
+  final String? peerAvatar;
+
+  final String? peerPhone;
+
+  @override
+  String toString() {
+    return 'PartnerChatRouteArgs{key: $key, peerId: $peerId, peerName: $peerName, peerAvatar: $peerAvatar, peerPhone: $peerPhone}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! PartnerChatRouteArgs) return false;
+    return key == other.key &&
+        peerId == other.peerId &&
+        peerName == other.peerName &&
+        peerAvatar == other.peerAvatar &&
+        peerPhone == other.peerPhone;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^
+      peerId.hashCode ^
+      peerName.hashCode ^
+      peerAvatar.hashCode ^
+      peerPhone.hashCode;
 }
 
 /// generated route for

@@ -1,6 +1,8 @@
 // lib/core/services/session/session_service.dart
 import 'package:dawri/core/interfaces/i_local_preference.dart';
 import 'package:dawri/core/router/app_router.dart';
+import 'package:dawri/core/services/firebase/firebase_auth_service.dart';
+import 'package:dawri/core/services/firebase/firebase_user_sync_service.dart';
 import 'package:dawri/core/services/network/token_service.dart';
 import 'package:dawri/main_common.dart';
 
@@ -21,6 +23,14 @@ class SessionService {
   ///  * [ILocalPreference.removeAuthPrefs] drops the persisted token and the
   ///    cached `AppUser`.
   static Future<void> logout() async {
+    // Firebase (chat) has its own session, keyed to this user's id. Mark them
+    // offline and sign out *before* prefs are cleared — both steps read the
+    // cached `AppUser` to know which user doc to touch.
+    final userSync = getIt<FirebaseUserSyncService>();
+    await userSync.setOnline(false);
+    await userSync.removeThisDeviceToken();
+    await getIt<FirebaseAuthService>().signOut();
+
     await getIt<TokenService>().clearTokenAsync();
     await getIt<ILocalPreference>().removeAuthPrefs();
 

@@ -747,7 +747,11 @@ class _ActionBottomBar extends StatelessWidget {
           children: [
             OnTap(
               onTap: () {
-                PartnerChatRoute().push(context);
+                PartnerChatRoute(
+                  peerId: userId.toString(),
+                  peerName: name,
+                  peerAvatar: avatar,
+                ).push(context);
               },
               child: DecoratedBox(
                 decoration: BoxDecoration(

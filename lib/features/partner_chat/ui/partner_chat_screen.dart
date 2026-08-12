@@ -1,6 +1,4 @@
 // lib/features/partner_chat/ui/partner_chat_screen.dart
-import 'dart:io';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/services/launcher/url_launcher.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
@@ -15,17 +13,45 @@ import 'package:dawri/core/utils/constants/app_text_them.dart';
 import 'package:dawri/core/utils/extensions/padding_extensions.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
 
-import '../cubit/partner_chat_cubit.dart';
-import '../data/models/partner_chat_model.dart';
+// Absolute `package:` imports rather than relative ones, matching the rest of
+// this file. Relative imports resolve by filesystem path, which on Windows can
+// land in a second analysis context when the project is opened under a
+// different drive-letter case (`c:` vs `C:`) — the analyzer then reports the
+// symbols below as undefined even though compilation succeeds.
+import 'package:dawri/features/partner_chat/cubit/partner_chat_cubit.dart';
+import 'package:dawri/features/partner_chat/data/models/partner_chat_model.dart';
 
 @RoutePage()
 class PartnerChatScreen extends StatelessWidget {
-  const PartnerChatScreen({super.key});
+  /// Backend id of the person being chatted with. The chat document id is
+  /// derived from this plus the current user's id, so no conversation id is
+  /// needed to open a chat.
+  final String peerId;
+
+  /// Name/avatar/phone from the screen that opened this one. Only used to paint
+  /// the header before Firestore responds — the mirrored values win once they
+  /// arrive, which is how a peer's profile edit shows up here.
+  final String? peerName;
+  final String? peerAvatar;
+  final String? peerPhone;
+
+  const PartnerChatScreen({
+    super.key,
+    required this.peerId,
+    this.peerName,
+    this.peerAvatar,
+    this.peerPhone,
+  });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => PartnerChatCubit(),
+      create: (_) => PartnerChatCubit(
+        peerId: peerId,
+        peerName: peerName,
+        peerAvatar: peerAvatar,
+        peerPhone: peerPhone,
+      )..init(),
       child: const _PartnerChatView(),
     );
   }
@@ -72,14 +98,11 @@ class _PartnerChatViewState extends State<_PartnerChatView> {
     return Scaffold(
       body: BlocConsumer<PartnerChatCubit, PartnerChatState>(
         listenWhen: (p, c) =>
-        p.messages.length != c.messages.length || p.attachmentError != c.attachmentError,
+            p.messages.length != c.messages.length ||
+            p.isPeerTyping != c.isPeerTyping,
         listener: (context, state) {
-          if (state.messages.isNotEmpty) {
+          if (state.messages.isNotEmpty || state.isPeerTyping) {
             WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom(animated: true));
-          }
-          if (state.attachmentError != null) {
-            // _showAttachmentError(context, state.attachmentError!);
-            context.read<PartnerChatCubit>().clearAttachmentError();
           }
         },
         builder: (context, state) {
@@ -97,16 +120,6 @@ class _PartnerChatViewState extends State<_PartnerChatView> {
     );
   }
 
-  void _showAttachmentError(BuildContext context, String errorKey) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(errorKey.tr()),
-        backgroundColor: AppColors.danger,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-      ),
-    );
-  }
 }
 
 // ─── CHAT HEADER ─────────────────────────────────────────────────────────────
@@ -115,6 +128,7 @@ class _ChatHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final state = context.watch<PartnerChatCubit>().state;
     return Container(
       padding: EdgeInsets.fromLTRB(20.w, 50.h, 20.w, 15.h),
       decoration: BoxDecoration(
@@ -149,13 +163,15 @@ class _ChatHeader extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(23.r),
                       child: CustomNetworkImage(
-                        imageUrl: PartnerChatMockData.partnerAvatarUrl,
+                        // Blank is fine — CustomNetworkImage falls back to its
+                        // placeholder for an empty URL as well as a null one.
+                        imageUrl: state.peerAvatar,
                         width: 45.w,
                         height: 45.w,
                         fit: BoxFit.cover,
                       ),
                     ),
-                    if (PartnerChatMockData.isPartnerOnline)
+                    if (state.isPeerOnline)
                       Positioned(
                         bottom: 1,
                         right: 1,
@@ -177,7 +193,7 @@ class _ChatHeader extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        PartnerChatMockData.partnerName,
+                        state.peerName,
                         style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
                           fontWeight: FontWeight.w800,
                           color: AppColors.textDark,
@@ -186,12 +202,16 @@ class _ChatHeader extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        PartnerChatMockData.isPartnerOnline
-                            ? LocaleKeys.partnerChatOnlineNow.tr()
-                            : '',
+                        state.isPeerTyping
+                            ? LocaleKeys.partnerChatTyping.tr()
+                            : state.isPeerOnline
+                                ? LocaleKeys.partnerChatOnlineNow.tr()
+                                : LocaleKeys.partnerChatOffline.tr(),
                         style: AppTextTheme.bodyXSmall(context).copyWith(
                           fontWeight: FontWeight.w600,
-                          color: AppColors.success,
+                          color: state.isPeerTyping || state.isPeerOnline
+                              ? AppColors.success
+                              : AppColors.textMuted,
                         ),
                       ),
                     ],
@@ -200,20 +220,16 @@ class _ChatHeader extends StatelessWidget {
               ],
             ),
           ),
-          OnTap(
-            onTap: () {
-              UrlLauncher.makePhoneCall("201221167185");
-            },
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.w),
-              child: FaIcon(FontAwesomeIcons.phone, size: 18.sp, color: AppColors.textMuted),
+          // Hidden rather than dialing a placeholder: the peer's number is only
+          // known when the opening screen had it.
+          if ((state.peerPhone ?? '').isNotEmpty)
+            OnTap(
+              onTap: () => UrlLauncher.makePhoneCall(state.peerPhone!),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.w),
+                child: FaIcon(FontAwesomeIcons.phone, size: 18.sp, color: AppColors.textMuted),
+              ),
             ),
-          ),
-          20.horizontalSpace,
-          OnTap(
-            onTap: () {},
-            child: FaIcon(FontAwesomeIcons.ellipsisVertical, size: 18.sp, color: AppColors.textMuted),
-          ),
         ],
       ),
     );
@@ -228,31 +244,97 @@ class _MessagesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PartnerChatCubit, PartnerChatState>(
-      buildWhen: (p, c) => p.messages != c.messages,
+      buildWhen: (p, c) =>
+          p.messages != c.messages ||
+          p.isLoading != c.isLoading ||
+          p.errorKey != c.errorKey ||
+          p.isPeerTyping != c.isPeerTyping ||
+          p.myId != c.myId,
       builder: (context, state) {
+        if (state.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (state.errorKey != null) {
+          return Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40.w),
+              child: Text(
+                state.errorKey!.tr(),
+                textAlign: TextAlign.center,
+                style: AppTextTheme.bodySmall(context).copyWith(color: AppColors.textMuted),
+              ),
+            ),
+          );
+        }
+
+        final messages = state.messages;
+        if (messages.isEmpty && !state.isPeerTyping) {
+          return Center(
+            child: Text(
+              LocaleKeys.partnerChatEmpty.tr(),
+              style: AppTextTheme.bodySmall(context).copyWith(color: AppColors.textMuted),
+            ),
+          );
+        }
+
+        final rows = _buildRows(messages, state.isPeerTyping);
+
         return ListView.builder(
           controller: scrollController,
           padding: EdgeInsets.fromLTRB(20.w, 15.h, 20.w, 15.h),
-          itemCount: state.messages.length + 1,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return const _DateSeparator();
-            }
-            final message = state.messages[index - 1];
-            return Padding(
-              key: ValueKey(message.id),
-              padding: EdgeInsets.only(bottom: 15.h),
-              child: _MessageBubble(message: message),
-            );
-          },
+          itemCount: rows.length,
+          itemBuilder: (context, index) => rows[index],
         );
       },
     );
   }
+
+  /// Flattens the message list into rows, inserting a date separator whenever
+  /// the calendar day changes.
+  ///
+  /// Messages still awaiting their server timestamp have a null [createdAt];
+  /// they're grouped under today, which is where they belong anyway.
+  List<Widget> _buildRows(List<ChatMessageModel> messages, bool isPeerTyping) {
+    final rows = <Widget>[];
+    DateTime? previousDay;
+
+    for (final message in messages) {
+      final date = message.createdAt ?? DateTime.now();
+      final day = DateTime(date.year, date.month, date.day);
+
+      if (previousDay == null || day != previousDay) {
+        rows.add(_DateSeparator(day: day));
+        previousDay = day;
+      }
+
+      rows.add(Padding(
+        key: ValueKey(message.id),
+        padding: EdgeInsets.only(bottom: 15.h),
+        child: _MessageBubble(message: message),
+      ));
+    }
+
+    if (isPeerTyping) rows.add(const _TypingIndicator());
+    return rows;
+  }
 }
 
 class _DateSeparator extends StatelessWidget {
-  const _DateSeparator();
+  final DateTime day;
+  const _DateSeparator({required this.day});
+
+  /// "Today"/"Yesterday" for the recent days people actually scan for, and a
+  /// locale-aware date beyond that.
+  String _label(BuildContext context) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final difference = today.difference(day).inDays;
+
+    if (difference == 0) return LocaleKeys.partnerChatToday.tr();
+    if (difference == 1) return LocaleKeys.partnerChatYesterday.tr();
+    return DateFormat.yMMMd(context.locale.languageCode).format(day);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -267,9 +349,39 @@ class _DateSeparator extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
             child: Text(
-              LocaleKeys.partnerChatToday.tr(),
+              _label(context),
               style: AppTextTheme.bodyXSmall(context).copyWith(
                 fontWeight: FontWeight.w700,
+                color: AppColors.textMuted,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TypingIndicator extends StatelessWidget {
+  const _TypingIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: 15.h),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+            child: Text(
+              LocaleKeys.partnerChatTyping.tr(),
+              style: AppTextTheme.bodyXSmall(context).copyWith(
+                fontWeight: FontWeight.w600,
                 color: AppColors.textMuted,
               ),
             ),
@@ -285,9 +397,32 @@ class _MessageBubble extends StatelessWidget {
   final ChatMessageModel message;
   const _MessageBubble({required this.message});
 
+  /// Clock while the write is in flight, single check once stored, double check
+  /// once the peer has read it.
+  IconData get _statusIcon {
+    switch (message.status) {
+      case MessageStatus.sending:
+        return FontAwesomeIcons.clock;
+      case MessageStatus.sent:
+        return FontAwesomeIcons.check;
+      case MessageStatus.read:
+        return FontAwesomeIcons.checkDouble;
+    }
+  }
+
+  /// Locale-aware clock time. Blank until the server timestamp resolves, rather
+  /// than showing a local guess that could disagree with the peer's view.
+  String _timeLabel(BuildContext context) {
+    final createdAt = message.createdAt;
+    if (createdAt == null) return '';
+    return DateFormat.jm(context.locale.languageCode).format(createdAt);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isMe = message.isSentByMe;
+    final myId = context.read<PartnerChatCubit>().state.myId;
+    final isMe = message.senderId == myId;
+
     return Column(
       crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
@@ -300,15 +435,13 @@ class _MessageBubble extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              message.timeLabel,
+              _timeLabel(context),
               style: AppTextTheme.bodyXXSmall(context).copyWith(color: AppColors.textMuted),
             ),
             if (isMe) ...[
               4.w.sizedWidth,
               FaIcon(
-                message.status == MessageStatus.read
-                    ? FontAwesomeIcons.checkDouble
-                    : FontAwesomeIcons.check,
+                _statusIcon,
                 size: 11.sp,
                 color: message.status == MessageStatus.read ? AppColors.success : AppColors.textMuted,
               ),
@@ -323,14 +456,6 @@ class _MessageBubble extends StatelessWidget {
     switch (message.type) {
       case MessageType.text:
         return _TextBubble(text: message.text ?? '', isMe: isMe);
-      case MessageType.image:
-        return _ImageBubble(path: message.attachmentPath!);
-      case MessageType.file:
-        return _FileBubble(
-          name: message.attachmentName ?? '',
-          sizeBytes: message.attachmentSizeBytes ?? 0,
-          isMe: isMe,
-        );
       case MessageType.contractAction:
         return _ContractActionBubble(message: message);
     }
@@ -364,177 +489,12 @@ class _TextBubble extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         child: Text(
-          text.startsWith('partnerChatMsg') ? text.tr() : text,
+          text,
           style: AppTextTheme.bodySmall(context).copyWith(
             fontWeight: FontWeight.w500,
             color: isMe ? AppColors.white : AppColors.textDark,
             height: 1.4,
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ImageBubble extends StatelessWidget {
-  final String path;
-  const _ImageBubble({required this.path});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _openFullScreen(context),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16.r),
-        child: Image.file(
-          File(path),
-          width: 200.w,
-          height: 220.h,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => Container(
-            width: 200.w,
-            height: 220.h,
-            color: AppColors.slate100,
-            child: Icon(Icons.broken_image, color: AppColors.slate300),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _openFullScreen(BuildContext context) {
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        opaque: false,
-        pageBuilder: (_, __, ___) => _FullScreenImageViewer(path: path),
-      ),
-    );
-  }
-}
-
-class _FullScreenImageViewer extends StatelessWidget {
-  final String path;
-  const _FullScreenImageViewer({required this.path});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.pop(context),
-      child: Scaffold(
-        backgroundColor: AppColors.black.withOpacity(0.92),
-        body: SafeArea(
-          child: Stack(
-            children: [
-              Center(
-                child: InteractiveViewer(
-                  child: Image.file(File(path), fit: BoxFit.contain),
-                ),
-              ),
-              Positioned(
-                top: 10.h,
-                right: 15.w,
-                child: GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: AppColors.white.withOpacity(0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.all(10.w),
-                      child: Icon(Icons.close, color: AppColors.white, size: 22.sp),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FileBubble extends StatelessWidget {
-  final String name;
-  final int sizeBytes;
-  final bool isMe;
-  const _FileBubble({required this.name, required this.sizeBytes, required this.isMe});
-
-  String get _sizeLabel {
-    final kb = sizeBytes / 1024;
-    if (kb < 1024) return '${kb.toStringAsFixed(0)} KB';
-    return '${(kb / 1024).toStringAsFixed(1)} MB';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: isMe ? AppColors.primary : AppColors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.r),
-          topRight: Radius.circular(20.r),
-          bottomLeft: Radius.circular(isMe ? 4.r : 20.r),
-          bottomRight: Radius.circular(isMe ? 20.r : 4.r),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: isMe ? AppColors.greenDark.withOpacity(0.2) : AppColors.black.withOpacity(0.02),
-            blurRadius: isMe ? 10 : 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(12.w),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: isMe ? AppColors.white.withOpacity(0.15) : AppColors.background,
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-              child: SizedBox(
-                width: 38.w,
-                height: 38.w,
-                child: Center(
-                  child: FaIcon(
-                    FontAwesomeIcons.filePdf,
-                    size: 16.sp,
-                    color: isMe ? AppColors.white : AppColors.primaryLight,
-                  ),
-                ),
-              ),
-            ),
-            10.w.sizedWidth,
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    name,
-                    style: AppTextTheme.bodyXSmall(context).copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: isMe ? AppColors.white : AppColors.textDark,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  2.h.sizedHeight,
-                  Text(
-                    _sizeLabel,
-                    style: AppTextTheme.bodyXXSmall(context).copyWith(
-                      color: isMe ? AppColors.white.withOpacity(0.7) : AppColors.textMuted,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -623,18 +583,6 @@ class _ChatInputBarState extends State<_ChatInputBar> {
     _controller.clear();
   }
 
-  void _showAttachmentSheet(BuildContext context) {
-    final cubit = context.read<PartnerChatCubit>();
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (_) => BlocProvider.value(
-        value: cubit,
-        child: const _AttachmentSheet(),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
@@ -652,31 +600,8 @@ class _ChatInputBarState extends State<_ChatInputBar> {
         top: false,
         child: Padding(
           padding: EdgeInsets.fromLTRB(15.w, 10.h, 15.w, 12.h),
-          child: BlocBuilder<PartnerChatCubit, PartnerChatState>(
-            buildWhen: (p, c) => p.isPickingAttachment != c.isPickingAttachment,
-            builder: (context, state) {
-              return Row(
+          child: Row(
                 children: [
-                  GestureDetector(
-                    onTap: state.isPickingAttachment ? null : () => _showAttachmentSheet(context),
-                    child: DecoratedBox(
-                      decoration: const BoxDecoration(color: AppColors.slate100, shape: BoxShape.circle),
-                      child: SizedBox(
-                        width: 40.w,
-                        height: 40.w,
-                        child: Center(
-                          child: state.isPickingAttachment
-                              ? SizedBox(
-                            width: 16.w,
-                            height: 16.w,
-                            child: const CircularProgressIndicator(strokeWidth: 2),
-                          )
-                              : FaIcon(FontAwesomeIcons.plus, size: 16.sp, color: AppColors.textMuted),
-                        ),
-                      ),
-                    ),
-                  ),
-                  10.w.sizedWidth,
                   Expanded(
                     child: DecoratedBox(
                       decoration: BoxDecoration(
@@ -685,6 +610,7 @@ class _ChatInputBarState extends State<_ChatInputBar> {
                       ),
                       child: TextFormField(
                         controller: _controller,
+                        onChanged: context.read<PartnerChatCubit>().onTextChanged,
                         onTapOutside: (_) => FocusScope.of(context).unfocus(),
                         textInputAction: TextInputAction.send,
                         onFieldSubmitted: (_) => _handleSend(context),
@@ -723,115 +649,8 @@ class _ChatInputBarState extends State<_ChatInputBar> {
                     ),
                   ),
                 ],
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─── ATTACHMENT BOTTOM SHEET ─────────────────────────────────────────────────
-class _AttachmentSheet extends StatelessWidget {
-  const _AttachmentSheet();
-
-  @override
-  Widget build(BuildContext context) {
-    final cubit = context.read<PartnerChatCubit>();
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 30.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.slate200,
-                borderRadius: BorderRadius.circular(3.r),
               ),
-              child: SizedBox(width: 40.w, height: 4.h),
-            ),
-            20.h.sizedHeight,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _AttachmentOption(
-                  icon: FontAwesomeIcons.camera,
-                  color: AppColors.primary,
-                  labelKey: LocaleKeys.partnerChatCamera,
-                  onTap: () {
-                    Navigator.pop(context);
-                    cubit.pickImageFromCamera();
-                  },
-                ),
-                _AttachmentOption(
-                  icon: FontAwesomeIcons.image,
-                  color: AppColors.blue500,
-                  labelKey: LocaleKeys.partnerChatGallery,
-                  onTap: () {
-                    Navigator.pop(context);
-                    cubit.pickImageFromGallery();
-                  },
-                ),
-                _AttachmentOption(
-                  icon: FontAwesomeIcons.filePdf,
-                  color: AppColors.warning600,
-                  labelKey: LocaleKeys.partnerChatDocument,
-                  onTap: () {
-                    Navigator.pop(context);
-                    cubit.pickDocumentFile();
-                  },
-                ),
-              ],
-            ),
-          ],
         ),
-      ),
-    );
-  }
-}
-
-class _AttachmentOption extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final String labelKey;
-  final VoidCallback onTap;
-
-  const _AttachmentOption({
-    required this.icon,
-    required this.color,
-    required this.labelKey,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          DecoratedBox(
-            decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
-            child: SizedBox(
-              width: 58.w,
-              height: 58.w,
-              child: Center(child: FaIcon(icon, size: 22.sp, color: color)),
-            ),
-          ),
-          8.h.sizedHeight,
-          Text(
-            labelKey.tr(),
-            style: AppTextTheme.bodyXSmall(context).copyWith(
-              fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
-            ),
-          ),
-        ],
       ),
     );
   }

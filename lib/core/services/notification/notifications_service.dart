@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:dawri/core/router/app_router.dart';
+import 'package:dawri/core/services/firebase/firebase_user_sync_service.dart';
 import 'package:dawri/core/utils/extensions/result_extension.dart';
 import 'package:async/async.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -25,6 +26,18 @@ class RemoteMessageKeys {
   static get image => "image";
 
   static get body => "body";
+}
+
+/// Values for the `type` field in a push payload.
+///
+/// Low numbers belong to the backend's notification types; chat starts at 100 to
+/// leave that range free, since chat pushes are sent by a Cloud Function that
+/// knows nothing about the backend's numbering.
+class RemoteMessageTypes {
+  const RemoteMessageTypes._();
+
+  /// New chat message. `recordId` carries the sender's user id.
+  static const int chatMessage = 100;
 }
 
 @singleton
@@ -149,8 +162,22 @@ class NotificationService {
     FirebaseMessaging.onMessage.listen((message) {
       log('++++++++++ onMessage ++++++++++');
       if (message.notification == null) return;
+      if (_isFromActiveChat(message)) return;
       showNotification(message);
     });
+  }
+
+  /// The chat screen the user is currently looking at, as a peer user id.
+  ///
+  /// Set by [PartnerChatCubit] while a conversation is open so incoming messages
+  /// don't raise a notification for a chat that's already on screen.
+  String? activeChatPeerId;
+
+  bool _isFromActiveChat(RemoteMessage message) {
+    final type = int.tryParse(message.data[RemoteMessageKeys.type] ?? '');
+    if (type != RemoteMessageTypes.chatMessage) return false;
+    final senderId = message.data[RemoteMessageKeys.recordId] ?? '';
+    return senderId.isNotEmpty && senderId == activeChatPeerId;
   }
 
   Future<NotificationDetails> _setLocalNotificationDetails(
@@ -209,6 +236,15 @@ class NotificationService {
       res = await notificationsRepository.addFcmTokenToServer(fcmToken: token);
     }
 
+    // Mirror the same token into Firestore. The chat push Cloud Function reads
+    // `users/{id}.fcmTokens` and can't see the backend's own token store.
+    final userSync = getIt<FirebaseUserSyncService>();
+    if (isLogout) {
+      await userSync.removeFcmToken(token);
+    } else {
+      await userSync.registerFcmToken(token);
+    }
+
     res.fold(
       (data) {
         log('Update Fcm Token To Server:: Success');
@@ -242,11 +278,16 @@ class NotificationService {
     log('+++++ Message-Type: $type');
     log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
 
-    // switch (type) {
-    //   case 1: //Package
-    //     getIt<AppRouter>().push(AcademyDetailsRoute(academyId: recordId, tabIndex: 1));
-    //     break;
-    // }
+    // Chat pushes come from a Cloud Function, not the backend's notification
+    // table, so they carry no notification id to mark read — hence the early
+    // return. `recordId` is the sender's user id, which is all
+    // PartnerChatRoute needs to open the conversation.
+    if (type == RemoteMessageTypes.chatMessage) {
+      if (recordId.isNotEmpty) {
+        getIt<AppRouter>().push(PartnerChatRoute(peerId: recordId));
+      }
+      return;
+    }
 
     await notificationsRepository.markNotificationRead(notificationId: id);
   }

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:dawri/core/interfaces/i_local_preference.dart';
 import 'package:dawri/core/services/dialogs/message_service.dart';
+import 'package:dawri/core/services/firebase/firebase_user_sync_service.dart';
 import 'package:dawri/core/services/session/session_service.dart';
 import 'package:dawri/core/utils/helper/picked_image_helper.dart';
 import 'package:dawri/features/common/data/local/models/app_user.dart';
@@ -286,6 +287,13 @@ class UpdateProfileCubit extends Cubit<UpdateProfileState> {
         haveTeam: current?.haveTeam,
       ),
     );
+
+    // Push the new name/avatar into the chat mirror so peers see the edit in
+    // their chat list and in existing conversations. Deliberately not awaited:
+    // the profile save has already succeeded, and a Firestore hiccup must not
+    // turn that into a visible failure. The service logs and swallows its own
+    // errors, so there is nothing to catch here.
+    getIt<FirebaseUserSyncService>().syncProfileEverywhere();
 
     final profile = updated.profile;
     if (profile == null) return;

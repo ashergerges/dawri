@@ -19,6 +19,8 @@ import 'core/interfaces/i_token_repository.dart' as _i892;
 import 'core/router/app_router.dart' as _i110;
 import 'core/services/alice/alice_service.dart' as _i854;
 import 'core/services/dialogs/message_service.dart' as _i392;
+import 'core/services/firebase/firebase_auth_service.dart' as _i106;
+import 'core/services/firebase/firebase_user_sync_service.dart' as _i950;
 import 'core/services/network/connection_service.dart' as _i943;
 import 'core/services/network/interceptors/auth_interceptor.dart' as _i202;
 import 'core/services/network/network_service.dart' as _i969;
@@ -114,6 +116,10 @@ import 'features/notifications/data/repositories/remote/notifications_repository
     as _i192;
 import 'features/notifications/data/repositories/remote/user_notifications_repository.dart'
     as _i753;
+import 'features/partner_chat/data/repositories/interfaces/i_chat_repository.dart'
+    as _i474;
+import 'features/partner_chat/data/repositories/remote/chat_repository.dart'
+    as _i924;
 import 'features/partner_details/data/repositories/interfaces/i_partner_details_repository.dart'
     as _i327;
 import 'features/partner_details/data/repositories/remote/partner_details_repository.dart'
@@ -185,6 +191,9 @@ _i174.GetIt $initGetIt(
   gh.singleton<_i785.ErrorHandler>(() => _i785.ErrorHandler());
   gh.singleton<_i865.ILocalPreference>(() => _i656.LocalPreferenceImpl());
   gh.singleton<_i952.IConnectionService>(() => _i943.ConnectionService());
+  gh.factory<_i474.IChatRepository>(
+    () => _i924.ChatRepository(preference: gh<_i865.ILocalPreference>()),
+  );
   gh.singleton<_i735.ITokenLocalRepository>(
     () => _i784.TokenLocalRepository(
       localPreference: gh<_i865.ILocalPreference>(),
@@ -286,6 +295,12 @@ _i174.GetIt $initGetIt(
       networkService: gh<_i969.NetworkService>(),
     ),
   );
+  gh.singleton<_i106.FirebaseAuthService>(
+    () => _i106.FirebaseAuthService(
+      networkService: gh<_i969.NetworkService>(),
+      preference: gh<_i865.ILocalPreference>(),
+    ),
+  );
   gh.factory<_i97.INotificationsRepository>(
     () => _i192.NotificationsRepository(
       networkService: gh<_i969.NetworkService>(),
@@ -355,6 +370,12 @@ _i174.GetIt $initGetIt(
   );
   gh.factory<_i568.IContractsRepository>(
     () => _i144.ContractsRepository(networkService: gh<_i969.NetworkService>()),
+  );
+  gh.singleton<_i950.FirebaseUserSyncService>(
+    () => _i950.FirebaseUserSyncService(
+      preference: gh<_i865.ILocalPreference>(),
+      authService: gh<_i106.FirebaseAuthService>(),
+    ),
   );
   gh.singleton<_i402.NotificationService>(
     () => _i402.NotificationService(

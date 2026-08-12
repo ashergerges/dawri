@@ -157,6 +157,11 @@ class Endpoints {
   String get contractDetailsUrl => r'api/app/contracts/details';
   String get contractStatusUrl => r'api/app/contracts/status';
 
+  /// Exchanges the app's bearer token for a Firebase custom token whose `uid`
+  /// is the backend user id, so Firestore rules can verify chat identity.
+  /// See lib/core/services/firebase/firebase_auth_service.dart
+  String get firebaseTokenUrl => r'api/app/user/firebase-token';
+
   String get challengeLevelsUrl  => r'api/app/challenge-levels';
   String get createChallengeUrl  => r'api/app/challenges';
   String get challengesUrl  => r'api/app/challenges';

@@ -1,0 +1,107 @@
+rules_version = '2';
+
+// Chat security rules for the `dawry-cf974` project.
+//
+// ┌───────────────────────────────────────────────────────────────────────────┐
+// │ THIS FILE IS CURRENTLY IN INTERIM MODE.                                   │
+// │                                                                          │
+// │ It is safe to deploy right now and the app will work. But it CANNOT       │
+// │ verify identity, because the app signs in to Firebase anonymously         │
+// │ (FirebaseAuthService.kUseAnonymousFirebaseAuth == true) and an anonymous  │
+// │ uid is a random string unrelated to the backend user id.                  │
+// │                                                                          │
+// │ Consequence: any signed-in client can read any conversation. chatIds are  │
+// │ derived from user ids (`12_45`) and those are sequential integers, so     │
+// │ they are trivially guessable. Do not ship this to production.             │
+// │                                                                          │
+// │ TO CLOSE THE HOLE: once the backend serves                               │
+// │ `POST api/app/user/firebase-token` (a Firebase custom token whose uid is  │
+// │ AppUser.id as a string), set kUseAnonymousFirebaseAuth = false, then      │
+// │ switch the two functions marked `INTERIM` below to their `STRICT`         │
+// │ versions and redeploy. Nothing else changes.                             │
+// └───────────────────────────────────────────────────────────────────────────┘
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // The mirror of the backend's user record: name, avatar, FCM tokens, presence.
+    match /users/{userId} {
+      // Any signed-in user may read a peer's presence and display details.
+      allow read: if isSignedIn();
+
+      // INTERIM: an anonymous uid never equals userId, so ownership can't be
+      // checked and any client could overwrite anyone's record.
+      allow write: if isSignedIn();
+      // STRICT: allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /chats/{chatId} {
+
+      // INTERIM: membership is unverifiable without a real uid.
+      function isMember() {
+        return isSignedIn();
+      }
+      // STRICT:
+      // function isMember() {
+      //   return isSignedIn() && request.auth.uid in resource.data.members;
+      // }
+
+      // On create there is no `resource` yet, so the incoming document is what
+      // gets validated. The size check holds in both modes — it keeps a chat
+      // from being created with more than two participants.
+      function isValidNewChat() {
+        return isSignedIn()
+          && request.resource.data.members.size() == 2;
+        // STRICT: add
+        //   && request.auth.uid in request.resource.data.members
+      }
+
+      allow read: if isMember();
+      allow create: if isValidNewChat();
+      // Updates cover lastMessage / unread / typing / memberInfo, all of which a
+      // member legitimately writes. `members` itself must never change, or a
+      // participant could be added or ejected. This holds in both modes.
+      allow update: if isMember()
+        && request.resource.data.members == resource.data.members;
+      // Conversations are never deleted from the app.
+      allow delete: if false;
+
+      match /messages/{messageId} {
+
+        // Subcollections do not inherit the parent's rules, so membership has to
+        // be re-checked here by reading the parent chat document.
+        function isChatMember() {
+          return isSignedIn();
+          // STRICT:
+          // return isSignedIn() && request.auth.uid in
+          //   get(/databases/$(database)/documents/chats/$(chatId)).data.members;
+        }
+
+        allow read: if isChatMember();
+
+        // INTERIM: senderId can't be tied to the caller, so a client could
+        // forge a message as someone else.
+        allow create: if isChatMember();
+        // STRICT: allow create: if isChatMember()
+        //   && request.resource.data.senderId == request.auth.uid;
+
+        // The only legitimate update is a reader adding themselves to `readBy`;
+        // message content is immutable once sent. Holds in both modes.
+        allow update: if isChatMember()
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['readBy']);
+        allow delete: if false;
+      }
+    }
+
+    // Redundant — Firestore already denies anything no rule allows, and because
+    // rules are OR-ed this cannot override the grants above. Kept only to state
+    // the deny-by-default posture explicitly for anyone reading the file.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
