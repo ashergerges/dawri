@@ -98,7 +98,8 @@ class ChatRepository implements IChatRepository {
       batch.set(
         _chatDoc(chatId),
         {
-          FirestoreKeys.members: [myId, peerId],
+          // Sorted, not [myId, peerId] — see FirestoreKeys.membersFor.
+          FirestoreKeys.members: FirestoreKeys.membersFor(myId, peerId),
           FirestoreKeys.memberInfo: _selfMemberInfo(myId),
           FirestoreKeys.lastMessage: {
             FirestoreKeys.senderId: myId,
@@ -140,31 +141,42 @@ class ChatRepository implements IChatRepository {
 
   @override
   Future<void> markRead({required String chatId, required String myId}) async {
+    // Separate from the message batch below: `update` on a chat that doesn't
+    // exist yet throws not-found, and that must not take the readBy writes with
+    // it. `update` rather than `set(merge)` because a merge-set on a missing doc
+    // is a *create*, and a create carrying only `unread` has no `members` for the
+    // rules to validate — so it would be denied rather than silently ignored.
     try {
-      final batch = _db.batch();
+      await _chatDoc(chatId).update({
+        FieldPath([FirestoreKeys.unread, myId]): 0,
+      });
+    } catch (e) {
+      log(name: 'chat::read', 'unread reset failed: $e');
+    }
 
-      batch.set(
-        _chatDoc(chatId),
-        {FirestoreKeys.unread: {myId: 0}},
-        SetOptions(merge: true),
-      );
-
+    try {
       // Only messages *from the peer* can be unread by us, and only the recent
       // page is visible, so this stays a bounded write rather than a full scan.
-      final unread = await _messagesOf(chatId)
+      final recent = await _messagesOf(chatId)
           .orderBy(FirestoreKeys.createdAt, descending: true)
           .limit(50)
           .get();
 
-      for (final doc in unread.docs) {
+      final batch = _db.batch();
+      var pending = 0;
+
+      for (final doc in recent.docs) {
         final readBy = (doc.data()[FirestoreKeys.readBy] as List?)?.cast<String>() ?? const [];
         if (readBy.contains(myId)) continue;
         batch.update(doc.reference, {
           FirestoreKeys.readBy: FieldValue.arrayUnion([myId]),
         });
+        pending++;
       }
 
-      await batch.commit();
+      // Committing an empty batch is a wasted round trip; every message already
+      // being read is the common case once a conversation is open.
+      if (pending > 0) await batch.commit();
     } catch (e) {
       log(name: 'chat::read', 'markRead failed: $e');
     }
@@ -177,10 +189,12 @@ class ChatRepository implements IChatRepository {
     required bool isTyping,
   }) async {
     try {
-      await _chatDoc(chatId).set(
-        {FirestoreKeys.typing: {myId: isTyping}},
-        SetOptions(merge: true),
-      );
+      // `update`, not `set(merge)` — see the note in [markRead]. A typing event
+      // must never be what creates a conversation, so before the first message
+      // this legitimately does nothing.
+      await _chatDoc(chatId).update({
+        FieldPath([FirestoreKeys.typing, myId]): isTyping,
+      });
     } catch (e) {
       // Typing is cosmetic; never surface a failure for it.
       log(name: 'chat::typing', 'setTyping failed: $e');

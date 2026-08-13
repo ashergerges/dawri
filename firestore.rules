@@ -61,11 +61,20 @@ service cloud.firestore {
 
       allow read: if isMember();
       allow create: if isValidNewChat();
+
       // Updates cover lastMessage / unread / typing / memberInfo, all of which a
-      // member legitimately writes. `members` itself must never change, or a
+      // member legitimately writes. The membership itself must not change, or a
       // participant could be added or ejected. This holds in both modes.
+      //
+      // Compared as an unordered set rather than with `==`: Firestore array
+      // equality is order-sensitive, so `['1','10']` and `['10','1']` are
+      // different values even though they describe the same two people. A plain
+      // `==` here denied every write from whichever participant did not create
+      // the chat. Same size plus hasAll in one direction is enough to pin the
+      // membership, because a swap would change one of the two.
       allow update: if isMember()
-        && request.resource.data.members == resource.data.members;
+        && request.resource.data.members.size() == resource.data.members.size()
+        && request.resource.data.members.hasAll(resource.data.members);
       // Conversations are never deleted from the app.
       allow delete: if false;
 

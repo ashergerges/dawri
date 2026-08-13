@@ -12,6 +12,15 @@ abstract class ILocalPreference {
 
   void initialize();
 
+  /// Completes once [initialize] has finished and [appUser], [support] and
+  /// [notificationCount] are safe to touch.
+  ///
+  /// [initialize] is kicked off from the constructor and is asynchronous, so
+  /// anything reading [appUser] during app start races it — and because the
+  /// notifiers are `late final`, losing that race throws
+  /// `LateInitializationError` rather than returning null. Await this first.
+  Future<void> get ready;
+
   void saveAppUser(AppUser? newAppUser);
 
   void saveNotificationCount(int count);

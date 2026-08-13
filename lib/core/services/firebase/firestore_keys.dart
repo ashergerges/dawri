@@ -40,8 +40,15 @@ class FirestoreKeys {
   ///
   /// Being derivable means opening a conversation needs no lookup or query —
   /// the doc is created lazily on the first send.
-  static String chatIdFor(String a, String b) {
-    final ids = [a, b]..sort();
-    return '${ids.first}_${ids.last}';
-  }
+  static String chatIdFor(String a, String b) => membersFor(a, b).join('_');
+
+  /// The `members` array for a 1-to-1 chat, **sorted**.
+  ///
+  /// Sorting is not cosmetic. Firestore array equality is order-sensitive, and
+  /// the rules assert `request.resource.data.members == resource.data.members`
+  /// to stop participants being swapped. Writing `[me, peer]` in call order
+  /// meant the two sides produced `['1','10']` and `['10','1']`, so whoever did
+  /// not create the chat had every write denied. Sharing one sorted list here
+  /// keeps the id and the array from ever disagreeing.
+  static List<String> membersFor(String a, String b) => [a, b]..sort();
 }

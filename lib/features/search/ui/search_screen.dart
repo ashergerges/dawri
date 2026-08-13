@@ -451,12 +451,26 @@ class _KindBadge extends StatelessWidget {
     return AppColors.primaryLight;
   }
 
-  @override
-  Widget build(BuildContext context) {
+  /// Label shown in the badge.
+  ///
+  /// For participants the API's `result_type_label` is always "لاعب", because
+  /// `result_type: 2` covers every participant kind — a referee comes back as
+  /// `{result_type_label: "لاعب", role: {name: "حكم"}}`. Showing the type label
+  /// there would mislabel referees and coaches as players, so `role` wins when
+  /// the API sends one, and the type label stays as the fallback.
+  String _label(BuildContext context) {
+    if (result.isPlayer && (result.role ?? '').trim().isNotEmpty) {
+      return result.role!.trim();
+    }
     // The API already localises this; the key is only a fallback.
-    final label = (result.resultTypeLabel?.isNotEmpty ?? false)
+    return (result.resultTypeLabel?.isNotEmpty ?? false)
         ? result.resultTypeLabel!
         : result.fallbackLabelKey.tr();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final label = _label(context);
 
     return DecoratedBox(
       decoration: BoxDecoration(

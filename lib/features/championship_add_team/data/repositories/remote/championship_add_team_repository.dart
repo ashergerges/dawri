@@ -16,7 +16,7 @@ class ChampionshipAddTeamRepository implements IChampionshipAddTeamRepository {
     final response = await networkService.getAsync(url: AppStrings.urls.teamsUrl);
     if (response.isError) return Result.error(response.asError!.error);
 
-    dynamic raw = response.asValue?.value.data['data'] ?? response.asValue?.value.data;
+    dynamic raw = response.asValue?.value.data['data']['items'] ?? response.asValue?.value.data;
     if (raw is List && raw.isNotEmpty && raw.first is List) {
       raw = raw.first;
     }

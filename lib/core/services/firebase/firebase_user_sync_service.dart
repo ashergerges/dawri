@@ -37,7 +37,16 @@ class FirebaseUserSyncService {
 
   FirebaseFirestore get _db => FirebaseFirestore.instance;
 
-  String? get _myId => preference.appUser.value?.id.toString();
+  /// Null when there is no session — or when preferences haven't finished
+  /// loading, since `appUser` is `late` and throws until then. Several callers
+  /// read this outside their try/catch, so it must not throw.
+  String? get _myId {
+    try {
+      return preference.appUser.value?.id.toString();
+    } catch (_) {
+      return null;
+    }
+  }
 
   DocumentReference<Map<String, dynamic>>? _userDoc([String? id]) {
     final userId = id ?? _myId;

@@ -538,6 +538,8 @@ abstract class  LocaleKeys {
   static const partnerDetailsStatRating = 'partnerDetailsStatRating';
   static const partnerDetailsStatMatches = 'partnerDetailsStatMatches';
   static const partnerDetailsStatGoals = 'partnerDetailsStatGoals';
+  static const partnerDetailsChatTitle = 'partnerDetailsChatTitle';
+  static const partnerDetailsChatSubtitle = 'partnerDetailsChatSubtitle';
   static const partnerDetailsAboutTitle = 'partnerDetailsAboutTitle';
   static const partnerDetailsBio = 'partnerDetailsBio';
   static const partnerDetailsReelsTitle = 'partnerDetailsReelsTitle';

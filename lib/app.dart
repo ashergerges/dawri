@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'package:dawri/core/services/firebase/firebase_auth_service.dart';
 import 'package:dawri/core/services/firebase/firebase_user_sync_service.dart';
@@ -19,6 +20,19 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   late final AppLifecycleListener _lifecycleListener;
+
+  /// Refreshes `lastSeen` while the app is in the foreground.
+  ///
+  /// Presence is read as "online AND lastSeen is recent" (see
+  /// [UserPresence.isOnline]) because Firestore has no `onDisconnect` and a
+  /// force-killed app would otherwise look online forever. That freshness check
+  /// needs something to keep the timestamp fresh, or a user who simply sits in
+  /// the app drops to "offline" once the window lapses.
+  Timer? _presenceHeartbeat;
+
+  /// Comfortably shorter than the staleness window presence is judged against,
+  /// so a peer never flickers offline between beats.
+  static const Duration _heartbeatInterval = Duration(seconds: 45);
 
   @override
   void initState() {
@@ -46,11 +60,22 @@ class _AppState extends State<App> {
   /// Fire-and-forget: presence is best-effort, and the service logs its own
   /// failures. A force-kill can't run this at all, which is why readers also
   /// require a recent `lastSeen` before showing someone as online.
-  Future<void> _setOnline(bool isOnline) =>
-      getIt<FirebaseUserSyncService>().setOnline(isOnline);
+  Future<void> _setOnline(bool isOnline) {
+    // Only beat while foregrounded — a background timer would keep the user
+    // looking online after they'd left, defeating the staleness check.
+    _presenceHeartbeat?.cancel();
+    if (isOnline) {
+      _presenceHeartbeat = Timer.periodic(
+        _heartbeatInterval,
+        (_) => getIt<FirebaseUserSyncService>().setOnline(true),
+      );
+    }
+    return getIt<FirebaseUserSyncService>().setOnline(isOnline);
+  }
 
   @override
   void dispose() {
+    _presenceHeartbeat?.cancel();
     _lifecycleListener.dispose();
     super.dispose();
   }

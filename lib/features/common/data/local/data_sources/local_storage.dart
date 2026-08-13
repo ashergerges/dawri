@@ -12,8 +12,14 @@ import '../models/app_user.dart';
 class LocalPreferenceImpl extends ILocalPreference {
   SharedPreferences? sharedPreferences;
 
+  /// Held so callers can await the constructor's fire-and-forget [initialize].
+  late final Future<void> _ready;
+
+  @override
+  Future<void> get ready => _ready;
+
   LocalPreferenceImpl() {
-    initialize();
+    _ready = initialize();
   }
 
   @override

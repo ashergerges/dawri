@@ -1,4 +1,6 @@
 // lib/features/partner_details/ui/partner_details_screen.dart
+import 'dart:ui' as ui;
+
 import 'package:auto_route/auto_route.dart';
 import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/utils/common_widgets/custom_network_image.dart';
@@ -95,6 +97,16 @@ class _PartnerDetailsView extends StatelessWidget {
                         _RetryState(onRetry: cubit.loadDetails)
                       else if (partner != null) ...[
                         _StatsGrid(partner: partner),
+                        // Placed in the body rather than left to the bottom bar,
+                        // which only renders when `canOfferContract` is true —
+                        // without this, anyone not open to contracts had no way
+                        // to reach the chat at all.
+                        15.h.sizedHeight,
+                        _ChatCard(
+                          userId: userId,
+                          name: partner.name ?? name,
+                          avatar: partner.avatar ?? avatar,
+                        ),
                         if ((partner.bio ?? '').trim().isNotEmpty) ...[
                           25.h.sizedHeight,
                           _SectionHeader(title: LocaleKeys.partnerDetailsAboutTitle.tr()),
@@ -506,6 +518,102 @@ class _SectionHeader extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+// ─── CHAT CARD ───────────────────────────────────────────────────────────────
+/// Entry point into the 1-to-1 chat with this participant.
+///
+/// The chat document id is derived from the two user ids, so [userId] is all
+/// that's strictly required; name and avatar are passed only so the chat header
+/// paints immediately instead of waiting on Firestore.
+class _ChatCard extends StatelessWidget {
+  const _ChatCard({required this.userId, required this.name, this.avatar});
+
+  final int userId;
+  final String name;
+  final String? avatar;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: OnTap(
+        onTap: () => PartnerChatRoute(
+          peerId: userId.toString(),
+          peerName: name,
+          peerAvatar: avatar,
+        ).push(context),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(color: AppColors.slate200),
+          ),
+          child: Padding(
+            padding: 15.w.padAll,
+            child: Row(
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: SizedBox(
+                    width: 44.w,
+                    height: 44.w,
+                    child: Center(
+                      child: FaIcon(
+                        FontAwesomeIcons.commentDots,
+                        size: 18.sp,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                ),
+                12.w.sizedWidth,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        LocaleKeys.partnerDetailsChatTitle.tr(),
+                        style: AppTextTheme.bodySmall(context).copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                      4.h.sizedHeight,
+                      Text(
+                        LocaleKeys.partnerDetailsChatSubtitle.tr(args: [name]),
+                        style: AppTextTheme.bodyXSmall(context)
+                            .copyWith(color: AppColors.textMuted),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                8.w.sizedWidth,
+                // Flipped explicitly: FaIcon has no RTL-aware variant, so a
+                // hardcoded chevron would point backwards in English.
+                //
+                // `ui.` prefix is required — easy_localization re-exports intl,
+                // whose own TextDirection class shadows the dart:ui enum here.
+                FaIcon(
+                  Directionality.of(context) == ui.TextDirection.rtl
+                      ? FontAwesomeIcons.chevronLeft
+                      : FontAwesomeIcons.chevronRight,
+                  size: 13.sp,
+                  color: AppColors.slate300,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

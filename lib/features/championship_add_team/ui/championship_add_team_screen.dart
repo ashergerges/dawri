@@ -312,22 +312,22 @@ class _TeamSelectSection extends StatelessWidget {
         children: [
           _SectionHeader(
             titleKey: LocaleKeys.addTeamParticipatingTeam,
-            action: GestureDetector(
-              onTap: () {},
-              child: Row(
-                children: [
-                  FaIcon(FontAwesomeIcons.plus, size: 11.sp, color: AppColors.primaryLight),
-                  6.w.sizedWidth,
-                  Text(
-                    LocaleKeys.addTeamNewTeam.tr(),
-                    style: AppTextTheme.bodyXSmall(context).copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // action: GestureDetector(
+            //   onTap: () {},
+            //   child: Row(
+            //     children: [
+            //       FaIcon(FontAwesomeIcons.plus, size: 11.sp, color: AppColors.primaryLight),
+            //       6.w.sizedWidth,
+            //       Text(
+            //         LocaleKeys.addTeamNewTeam.tr(),
+            //         style: AppTextTheme.bodyXSmall(context).copyWith(
+            //           fontWeight: FontWeight.w800,
+            //           color: AppColors.primaryLight,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
           ),
           BlocBuilder<ChampionshipAddTeamCubit, ChampionshipAddTeamState>(
             buildWhen: (p, c) =>

@@ -540,6 +540,8 @@
   "partnerDetailsStatRating": "Overall Rating",
   "partnerDetailsStatMatches": "Matches Played",
   "partnerDetailsStatGoals": "Goals Scored",
+  "partnerDetailsChatTitle": "Direct chat",
+  "partnerDetailsChatSubtitle": "Send a message to {}",
   "partnerDetailsAboutTitle": "About the Player",
   "partnerDetailsBio": "An ambitious football player who has participated in numerous neighborhood leagues, showing high skill in finishing and dribbling. Looking for opportunities to play in organized tournaments or sign with sports academies.",
   "partnerDetailsReelsTitle": "Reels & Skills",

@@ -38,14 +38,23 @@ class FirebaseAuthService {
 
   /// The uid chat documents are keyed by. Always the backend id, so it stays
   /// stable even under the anonymous fallback.
-  String? get currentUserId => preference.appUser.value?.id.toString();
+  ///
+  /// Null-safe against preferences still loading: `appUser` is `late` and throws
+  /// until [ILocalPreference.ready] completes.
+  String? get currentUserId {
+    try {
+      return preference.appUser.value?.id.toString();
+    } catch (_) {
+      return null;
+    }
+  }
 
   /// Signs in if needed. Safe to call repeatedly — a live session is a no-op.
   ///
   /// Never throws: chat features degrade to unavailable rather than blocking
   /// login or app start.
   Future<void> ensureSignedIn() async {
-    if (preference.appUser.value == null) return;
+    if (currentUserId == null) return;
     if (_auth.currentUser != null) return;
 
     try {

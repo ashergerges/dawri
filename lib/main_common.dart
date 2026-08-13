@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dawri/core/cubit/bloc_observer.dart';
+import 'package:dawri/core/interfaces/i_local_preference.dart';
 import 'package:dawri/firebase_options.dart';
 import 'package:dawri/core/utils/constants/constants.dart';
 import 'package:dawri/features/common/cubit/main_cubit/main_cubit.dart';
@@ -95,6 +96,13 @@ Future<Widget> initMain(Widget child) async {
   await EasyLocalization.ensureInitialized();
 
   configureDependencies();
+
+  // Preferences load asynchronously from the constructor, and the cached
+  // `AppUser` they expose is a `late final` field. Anything reading it before
+  // that finishes throws LateInitializationError rather than seeing null —
+  // which silently skipped Firebase sign-in and presence for returning users.
+  await getIt<ILocalPreference>().ready;
+
   await getIt<NotificationService>().initNotifications();
   await DownloadService.downloadFilesInit();
   log("downloadFilesInit");
