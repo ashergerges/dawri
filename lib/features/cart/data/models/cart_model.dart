@@ -100,3 +100,32 @@ class CartCouponModel {
   factory CartCouponModel.fromJson(Map<String, dynamic> json) => _$CartCouponModelFromJson(json);
   Map<String, dynamic> toJson() => _$CartCouponModelToJson(this);
 }
+/// What `POST api/app/cart/checkout` gives back.
+///
+/// Hand-written (not json_serializable) because the endpoint currently returns
+/// only `message` — `order_id` / `order_number` are a pending backend ask, see
+/// `docs/orders_api.md`. Both are read defensively so the app keeps working
+/// either way.
+class CheckoutResultModel {
+  final String message;
+  final int? orderId;
+  final String? orderNumber;
+
+  const CheckoutResultModel({
+    this.message = '',
+    this.orderId,
+    this.orderNumber,
+  });
+
+  factory CheckoutResultModel.fromResponse(Map<String, dynamic> body) {
+    final data = body['data'];
+    final map = data is Map ? data : const {};
+    return CheckoutResultModel(
+      message: '${body['message'] ?? ''}',
+      orderId: map['order_id'] is int
+          ? map['order_id'] as int
+          : int.tryParse('${map['order_id'] ?? ''}'),
+      orderNumber: map['order_number']?.toString(),
+    );
+  }
+}

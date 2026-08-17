@@ -1,6 +1,8 @@
 // lib/features/cart/cubit/cart_cubit.dart
 import 'package:bloc/bloc.dart';
+import 'package:dawri/core/services/dialogs/message_service.dart';
 import 'package:dawri/features/cart/data/repositories/interfaces/i_cart_repository.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:dawri/features/cart/data/models/cart_model.dart';
@@ -163,7 +165,26 @@ class CartCubit extends Cubit<CartState> {
   Future<void> checkout() async {
     if (state.items.isEmpty) return;
     emit(state.copyWith(isCheckoutLoading: true));
+
     final result = await _cartRepo.checkout();
-    emit(state.copyWith(isCheckoutLoading: false, isCheckoutSuccess: true));
+
+    if (result.isError) {
+      emit(state.copyWith(isCheckoutLoading: false));
+      MessageService.showToast(
+        msg: result.asError?.error.toString() ?? LocaleKeys.errorGeneric.tr(),
+        state: ToastStates.error,
+      );
+      return;
+    }
+
+    final checkout = result.asValue!.value;
+    emit(state.copyWith(
+      isCheckoutLoading: false,
+      isCheckoutSuccess: true,
+      // Both stay null until the backend returns them from checkout
+      // (docs/orders_api.md §4); the success modal degrades gracefully.
+      lastOrderId: checkout.orderId,
+      lastOrderNumber: checkout.orderNumber,
+    ));
   }
 }

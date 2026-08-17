@@ -75,11 +75,10 @@ class MyChallengesRepository implements IMyChallengesRepository {
     required int challengeId,
     required int scoreA,
     required int scoreB,
-    required String winner,
   }) async {
     final response = await networkService.postAsync(
       url: '${AppStrings.urls.challengeBaseUrl}/$challengeId/result',
-      body: {'score_a': scoreA, 'score_b': scoreB, 'winner': winner},
+      body: {'score_a': scoreA, 'score_b': scoreB,},
     );
     if (response.isError) return Result.error(response.asError!.error);
 

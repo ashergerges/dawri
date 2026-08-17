@@ -65,6 +65,24 @@ class AccountMockData {
   }
     ),
     MenuItemModel(
+      icon: FontAwesomeIcons.bagShopping,
+      iconColor: AppColors.success,
+      iconBg: AppColors.positiveLight,
+      labelKey: LocaleKeys.myOrdersTitle,
+  onTap: (_){
+    getIt<AppRouter>().push(const MyOrdersRoute());
+  }
+    ),
+    MenuItemModel(
+      icon: FontAwesomeIcons.solidHeart,
+      iconColor: AppColors.error,
+      iconBg: AppColors.negativeLight,
+      labelKey: LocaleKeys.favoritesTitle,
+  onTap: (_){
+    getIt<AppRouter>().push(const FavoritesRoute());
+  }
+    ),
+    MenuItemModel(
       icon: FontAwesomeIcons.receipt,
       iconColor: AppColors.primaryLight,
       iconBg: AppColors.secondary50,

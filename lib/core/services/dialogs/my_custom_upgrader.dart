@@ -60,7 +60,7 @@ class CustomUpgradeAlertState extends UpgradeAlertState {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Assets.animations.splash.lottie(fit: BoxFit.cover, alignment: Alignment.center),
+                  Assets.animations.upgrader.lottie(fit: BoxFit.cover, alignment: Alignment.center),
                   Text(
                     widget.upgrader.releaseNotes ??
                         LocaleKeys.thisVersionComesWithPowerfulEnhancementsAndPerformanceBoosts

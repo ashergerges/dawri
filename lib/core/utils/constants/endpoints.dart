@@ -69,6 +69,10 @@ class Endpoints {
   String get cartCheckoutUrl => r'api/app/cart/checkout';
   String get couponsApplyUrl => r'api/app/coupons/apply';
 
+  // orders — status 1 current, 2 delivered, 3 cancelled (see docs/orders_api.md)
+  String get myOrdersUrl => r'api/app/orders';
+  String get orderBaseUrl => r'api/app/orders'; // /{id}, /{id}/cancel
+
   //product details
   String get productDetailsUrl  => r'api/app/products/details';
   String get productFavToggleUrl => r'api/app/product/favorite';

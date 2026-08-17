@@ -1,4 +1,5 @@
 // lib/features/challenges/ui/widgets/challenge_card.dart
+import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
 import 'package:dawri/core/utils/constants/app_colors.dart';
 import 'package:dawri/core/utils/constants/app_text_them.dart';
@@ -230,7 +231,15 @@ class ChallengeCard extends StatelessWidget {
                 10.w.sizedWidth,
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      final organizerId = challenge.organizer?.id;
+                      if (organizerId == null) return;
+                      PartnerChatRoute(
+                        peerId: organizerId.toString(),
+                        peerName: challenge.organizerName,
+                        peerAvatar: challenge.organizerAvatar,
+                      ).push(context);
+                    },
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         color: AppColors.slate100,

@@ -7,7 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:dotted_line/dotted_line.dart';
+import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/utils/common_widgets/custom_network_image.dart';
+import 'package:dawri/main_common.dart' show getIt;
 import 'package:dawri/core/utils/constants/app_colors.dart';
 import 'package:dawri/core/utils/constants/app_text_them.dart';
 import 'package:dawri/core/utils/extensions/padding_extensions.dart';
@@ -42,7 +44,10 @@ class _CartView extends StatelessWidget {
             showDialog(
               context: context,
               barrierDismissible: false,
-              builder: (_) => const _SuccessModal(),
+              builder: (_) => _SuccessModal(
+                orderId: state.lastOrderId,
+                orderNumber: state.lastOrderNumber,
+              ),
             );
           }
         },
@@ -863,7 +868,12 @@ class _CheckoutBottomBar extends StatelessWidget {
 
 // ─── SUCCESS MODAL ──────────────────────────────────────────────────────────
 class _SuccessModal extends StatelessWidget {
-  const _SuccessModal();
+  /// Null until the backend returns an id from checkout — see
+  /// `docs/orders_api.md`. Tracking then falls back to the orders list.
+  final int? orderId;
+  final String? orderNumber;
+
+  const _SuccessModal({this.orderId, this.orderNumber});
 
   @override
   Widget build(BuildContext context) {
@@ -902,7 +912,11 @@ class _SuccessModal extends StatelessWidget {
             ),
             10.h.sizedHeight,
             Text(
-              LocaleKeys.cartSuccessDesc.tr(),
+              // The order number is only shown once the backend returns it.
+              (orderNumber ?? '').isEmpty
+                  ? LocaleKeys.cartSuccessDescNoNumber.tr()
+                  : LocaleKeys.cartSuccessDesc
+                      .tr(namedArgs: {'number': orderNumber!}),
               style: AppTextTheme.bodySmall(context).copyWith(
                 color: AppColors.textMuted,
                 fontWeight: FontWeight.w600,
@@ -911,7 +925,19 @@ class _SuccessModal extends StatelessWidget {
             ),
             25.h.sizedHeight,
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                // Dismiss the modal and leave the cart behind, so back from
+                // tracking returns to the store rather than an emptied cart.
+                final id = orderId;
+                Navigator.pop(context);
+                Navigator.pop(context);
+                // Routed through the global router: this context is gone by now.
+                getIt<AppRouter>().push(
+                  id == null
+                      ? const MyOrdersRoute()
+                      : MyOrderDetailsRoute(orderId: id),
+                );
+              },
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: AppColors.primary,

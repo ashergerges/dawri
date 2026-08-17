@@ -44,12 +44,16 @@ class CartRepository implements ICartRepository {
     return Result.value(response.asValue?.value.data['message']);
   }
   @override
-  Future<Result<String>> checkout() async {
+  Future<Result<CheckoutResultModel>> checkout() async {
     final response = await networkService.postAsync(
       url: AppStrings.urls.cartCheckoutUrl,
     );
     if (response.isError) return Result.error(response.asError!.error);
-    return Result.value(response.asValue?.value.data['message']);
+    return Result.value(
+      CheckoutResultModel.fromResponse(
+        Map<String, dynamic>.from(response.asValue?.value.data ?? const {}),
+      ),
+    );
   }
 
   @override

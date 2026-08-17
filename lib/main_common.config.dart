@@ -94,6 +94,10 @@ import 'features/create_team/data/repositories/interfaces/i_create_team_reposito
     as _i369;
 import 'features/create_team/data/repositories/remote/create_team_repository.dart'
     as _i334;
+import 'features/favorites/data/repositories/interfaces/i_favorites_repository.dart'
+    as _i370;
+import 'features/favorites/data/repositories/remote/favorites_repository.dart'
+    as _i348;
 import 'features/help_center/data/repositories/interfaces/i_help_center_repository.dart'
     as _i305;
 import 'features/help_center/data/repositories/remote/help_center_repository.dart'
@@ -116,6 +120,10 @@ import 'features/my_championships/data/repositories/interfaces/i_my_championship
     as _i735;
 import 'features/my_championships/data/repositories/remote/my_championships_repository.dart'
     as _i730;
+import 'features/my_orders/data/repositories/interfaces/i_my_orders_repository.dart'
+    as _i20;
+import 'features/my_orders/data/repositories/remote/my_orders_repository.dart'
+    as _i988;
 import 'features/notifications/data/repositories/interfaces/i_notifications_repository.dart'
     as _i97;
 import 'features/notifications/data/repositories/interfaces/i_user_notifications_repository.dart'
@@ -240,6 +248,9 @@ _i174.GetIt $initGetIt(
   gh.factory<_i775.ICartRepository>(
     () => _i48.CartRepository(networkService: gh<_i969.NetworkService>()),
   );
+  gh.factory<_i370.IFavoritesRepository>(
+    () => _i348.FavoritesRepository(networkService: gh<_i969.NetworkService>()),
+  );
   gh.factory<_i1005.IUserNotificationsRepository>(
     () => _i753.UserNotificationsRepository(
       networkService: gh<_i969.NetworkService>(),
@@ -361,6 +372,9 @@ _i174.GetIt $initGetIt(
   gh.factory<_i305.IHelpCenterRepository>(
     () =>
         _i221.HelpCenterRepository(networkService: gh<_i969.NetworkService>()),
+  );
+  gh.factory<_i20.IMyOrdersRepository>(
+    () => _i988.MyOrdersRepository(networkService: gh<_i969.NetworkService>()),
   );
   gh.factory<_i967.IMainRepository>(
     () => _i210.MainRepository(networkService: gh<_i969.NetworkService>()),

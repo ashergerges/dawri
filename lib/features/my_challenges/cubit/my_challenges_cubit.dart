@@ -171,7 +171,6 @@ class MyChallengesCubit extends Cubit<MyChallengesState> {
     required int challengeId,
     required int scoreA,
     required int scoreB,
-    required String winner,
   }) async {
     if (state.isSubmittingResult) return false;
     emit(state.copyWith(isSubmittingResult: true));
@@ -180,7 +179,6 @@ class MyChallengesCubit extends Cubit<MyChallengesState> {
       challengeId: challengeId,
       scoreA: scoreA,
       scoreB: scoreB,
-      winner: winner,
     );
 
     if (result.isError) {

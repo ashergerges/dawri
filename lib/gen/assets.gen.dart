@@ -30,8 +30,17 @@ class $AssetsAnimationsGen {
   LottieGenImage get splash =>
       const LottieGenImage('assets/animations/splash.json');
 
+  /// File path: assets/animations/upgrader.json
+  LottieGenImage get upgrader =>
+      const LottieGenImage('assets/animations/upgrader.json');
+
   /// List of all assets
-  List<LottieGenImage> get values => [noInternet, pullRefresh, splash];
+  List<LottieGenImage> get values => [
+    noInternet,
+    pullRefresh,
+    splash,
+    upgrader,
+  ];
 }
 
 class $AssetsFontsGen {

@@ -606,6 +606,22 @@ class EmptyMyTeamRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [FavoritesScreen]
+class FavoritesRoute extends PageRouteInfo<void> {
+  const FavoritesRoute({List<PageRouteInfo>? children})
+    : super(FavoritesRoute.name, initialChildren: children);
+
+  static const String name = 'FavoritesRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const FavoritesScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [HelpCenterScreen]
 class HelpCenterRoute extends PageRouteInfo<void> {
   const HelpCenterRoute({List<PageRouteInfo>? children})
@@ -893,6 +909,69 @@ class MyChampionshipsRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const MyChampionshipsScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [MyOrderDetailsScreen]
+class MyOrderDetailsRoute extends PageRouteInfo<MyOrderDetailsRouteArgs> {
+  MyOrderDetailsRoute({
+    Key? key,
+    required int orderId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         MyOrderDetailsRoute.name,
+         args: MyOrderDetailsRouteArgs(key: key, orderId: orderId),
+         initialChildren: children,
+       );
+
+  static const String name = 'MyOrderDetailsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<MyOrderDetailsRouteArgs>();
+      return MyOrderDetailsScreen(key: args.key, orderId: args.orderId);
+    },
+  );
+}
+
+class MyOrderDetailsRouteArgs {
+  const MyOrderDetailsRouteArgs({this.key, required this.orderId});
+
+  final Key? key;
+
+  final int orderId;
+
+  @override
+  String toString() {
+    return 'MyOrderDetailsRouteArgs{key: $key, orderId: $orderId}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MyOrderDetailsRouteArgs) return false;
+    return key == other.key && orderId == other.orderId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ orderId.hashCode;
+}
+
+/// generated route for
+/// [MyOrdersScreen]
+class MyOrdersRoute extends PageRouteInfo<void> {
+  const MyOrdersRoute({List<PageRouteInfo>? children})
+    : super(MyOrdersRoute.name, initialChildren: children);
+
+  static const String name = 'MyOrdersRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const MyOrdersScreen();
     },
   );
 }

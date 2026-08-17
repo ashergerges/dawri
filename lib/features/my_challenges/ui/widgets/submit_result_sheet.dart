@@ -41,7 +41,6 @@ class _SubmitResultSheet extends StatefulWidget {
 class _SubmitResultSheetState extends State<_SubmitResultSheet> {
   final _scoreA = TextEditingController(text: '0');
   final _scoreB = TextEditingController(text: '0');
-  String _winner = ChallengeWinner.teamA;
 
   @override
   void dispose() {
@@ -56,7 +55,6 @@ class _SubmitResultSheetState extends State<_SubmitResultSheet> {
       challengeId: widget.challengeId,
       scoreA: int.tryParse(_scoreA.text.trim()) ?? 0,
       scoreB: int.tryParse(_scoreB.text.trim()) ?? 0,
-      winner: _winner,
     );
     if (ok && mounted) Navigator.of(context).pop();
   }
@@ -125,54 +123,6 @@ class _SubmitResultSheetState extends State<_SubmitResultSheet> {
                     controller: _scoreB,
                   ),
                 ],
-              ),
-              22.h.sizedHeight,
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: Text(
-                  LocaleKeys.myChallengesResultWinner.tr(),
-                  style: AppTextTheme.bodyXSmall(context).copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textMuted,
-                  ),
-                ),
-              ),
-              6.h.sizedHeight,
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 14.w),
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: AppColors.slate200, width: 1.5),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: _winner,
-                    isExpanded: true,
-                    borderRadius: BorderRadius.circular(12.r),
-                    style: AppTextTheme.bodyMediumSemiBold(context).copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textDark,
-                    ),
-                    items: [
-                      DropdownMenuItem(
-                        value: ChallengeWinner.teamA,
-                        child: Text(LocaleKeys.myChallengesResultTeamA.tr()),
-                      ),
-                      DropdownMenuItem(
-                        value: ChallengeWinner.teamB,
-                        child: Text(LocaleKeys.myChallengesResultTeamB.tr()),
-                      ),
-                      DropdownMenuItem(
-                        value: ChallengeWinner.draw,
-                        child: Text(LocaleKeys.myChallengesResultDraw.tr()),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      if (value != null) setState(() => _winner = value);
-                    },
-                  ),
-                ),
               ),
               24.h.sizedHeight,
               BlocBuilder<MyChallengesCubit, MyChallengesState>(

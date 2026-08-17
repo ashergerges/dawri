@@ -22,6 +22,5 @@ abstract class IMyChallengesRepository {
     required int challengeId,
     required int scoreA,
     required int scoreB,
-    required String winner,
   });
 }

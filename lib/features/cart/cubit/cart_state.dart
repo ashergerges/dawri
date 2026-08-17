@@ -12,6 +12,10 @@ abstract class CartState with _$CartState {
     @Default(false) bool isCheckoutLoading,
     @Default(false) bool isCheckoutSuccess,
 
+    // ── Set on a successful checkout so "تتبع الطلب" can deep-link ──
+    @Default(null) int? lastOrderId,
+    @Default(null) String? lastOrderNumber,
+
     // ── Coupon ──
     @Default(false) bool isCouponLoading,
     @Default(false) bool isCouponApplied,

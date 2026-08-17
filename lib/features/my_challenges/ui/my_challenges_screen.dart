@@ -258,7 +258,9 @@ class _ListArea extends StatelessWidget {
               ? ListView(
                   children: [
                     SizedBox(height: 80.h),
-                    _EmptyState(tab: state.selectedTab),
+                    _EmptyState(tab: state.selectedTab,onRefresh: (){
+                      cubit.getChallenges();
+                    },),
                   ],
                 )
               : ListView.builder(
@@ -296,7 +298,8 @@ class _ListArea extends StatelessWidget {
 // ─── الحالات ────────────────────────────────────────────────────────────────
 class _EmptyState extends StatelessWidget {
   final MyChallengeTab tab;
-  const _EmptyState({required this.tab});
+  final Function() onRefresh;
+  const _EmptyState({required this.tab, required this.onRefresh});
 
   @override
   Widget build(BuildContext context) {
@@ -345,7 +348,11 @@ class _EmptyState extends StatelessWidget {
           if (tab == MyChallengeTab.pending) ...[
             20.h.sizedHeight,
             OnTap(
-              onTap: () => const CreateChallengeRoute().push(context),
+              onTap: () {
+                return  CreateChallengeRoute().push(context).then((value){
+                return  onRefresh();
+                });
+              },
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 22.w, vertical: 11.h),
                 decoration: BoxDecoration(

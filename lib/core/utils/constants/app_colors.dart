@@ -185,4 +185,10 @@ class AppColors {
     Color(0xFF0F2A3A),
     Color(0xFF1A3A4A),
   ];
+
+  // ─── Splash ───────────────────────────────────────────────────────────────
+  /// The gold used in the logo lockup (`assets/svg/logo_name.svg`).
+  static const Color brandGold = Color(0xFFCBA563);
+  static const Color splashGradientTop = Color(0xFF004028);
+  static const Color splashGradientBottom = Color(0xFF005735);
 }

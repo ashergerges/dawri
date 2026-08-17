@@ -14,7 +14,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CartState {
 
- CartStateStatus get currState; List<CartItemModel> get items; bool get isCheckoutLoading; bool get isCheckoutSuccess;// ── Coupon ──
+ CartStateStatus get currState; List<CartItemModel> get items; bool get isCheckoutLoading; bool get isCheckoutSuccess;// ── Set on a successful checkout so "تتبع الطلب" can deep-link ──
+ int? get lastOrderId; String? get lastOrderNumber;// ── Coupon ──
  bool get isCouponLoading; bool get isCouponApplied; String? get appliedCouponCode; String? get couponPercentage; num get discountAmount; num? get apiCartTotal; num? get apiFinalTotal; String? get couponErrorKey;
 /// Create a copy of CartState
 /// with the given fields replaced by the non-null parameter values.
@@ -26,16 +27,16 @@ $CartStateCopyWith<CartState> get copyWith => _$CartStateCopyWithImpl<CartState>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CartState&&(identical(other.currState, currState) || other.currState == currState)&&const DeepCollectionEquality().equals(other.items, items)&&(identical(other.isCheckoutLoading, isCheckoutLoading) || other.isCheckoutLoading == isCheckoutLoading)&&(identical(other.isCheckoutSuccess, isCheckoutSuccess) || other.isCheckoutSuccess == isCheckoutSuccess)&&(identical(other.isCouponLoading, isCouponLoading) || other.isCouponLoading == isCouponLoading)&&(identical(other.isCouponApplied, isCouponApplied) || other.isCouponApplied == isCouponApplied)&&(identical(other.appliedCouponCode, appliedCouponCode) || other.appliedCouponCode == appliedCouponCode)&&(identical(other.couponPercentage, couponPercentage) || other.couponPercentage == couponPercentage)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.apiCartTotal, apiCartTotal) || other.apiCartTotal == apiCartTotal)&&(identical(other.apiFinalTotal, apiFinalTotal) || other.apiFinalTotal == apiFinalTotal)&&(identical(other.couponErrorKey, couponErrorKey) || other.couponErrorKey == couponErrorKey));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CartState&&(identical(other.currState, currState) || other.currState == currState)&&const DeepCollectionEquality().equals(other.items, items)&&(identical(other.isCheckoutLoading, isCheckoutLoading) || other.isCheckoutLoading == isCheckoutLoading)&&(identical(other.isCheckoutSuccess, isCheckoutSuccess) || other.isCheckoutSuccess == isCheckoutSuccess)&&(identical(other.lastOrderId, lastOrderId) || other.lastOrderId == lastOrderId)&&(identical(other.lastOrderNumber, lastOrderNumber) || other.lastOrderNumber == lastOrderNumber)&&(identical(other.isCouponLoading, isCouponLoading) || other.isCouponLoading == isCouponLoading)&&(identical(other.isCouponApplied, isCouponApplied) || other.isCouponApplied == isCouponApplied)&&(identical(other.appliedCouponCode, appliedCouponCode) || other.appliedCouponCode == appliedCouponCode)&&(identical(other.couponPercentage, couponPercentage) || other.couponPercentage == couponPercentage)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.apiCartTotal, apiCartTotal) || other.apiCartTotal == apiCartTotal)&&(identical(other.apiFinalTotal, apiFinalTotal) || other.apiFinalTotal == apiFinalTotal)&&(identical(other.couponErrorKey, couponErrorKey) || other.couponErrorKey == couponErrorKey));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,currState,const DeepCollectionEquality().hash(items),isCheckoutLoading,isCheckoutSuccess,isCouponLoading,isCouponApplied,appliedCouponCode,couponPercentage,discountAmount,apiCartTotal,apiFinalTotal,couponErrorKey);
+int get hashCode => Object.hash(runtimeType,currState,const DeepCollectionEquality().hash(items),isCheckoutLoading,isCheckoutSuccess,lastOrderId,lastOrderNumber,isCouponLoading,isCouponApplied,appliedCouponCode,couponPercentage,discountAmount,apiCartTotal,apiFinalTotal,couponErrorKey);
 
 @override
 String toString() {
-  return 'CartState(currState: $currState, items: $items, isCheckoutLoading: $isCheckoutLoading, isCheckoutSuccess: $isCheckoutSuccess, isCouponLoading: $isCouponLoading, isCouponApplied: $isCouponApplied, appliedCouponCode: $appliedCouponCode, couponPercentage: $couponPercentage, discountAmount: $discountAmount, apiCartTotal: $apiCartTotal, apiFinalTotal: $apiFinalTotal, couponErrorKey: $couponErrorKey)';
+  return 'CartState(currState: $currState, items: $items, isCheckoutLoading: $isCheckoutLoading, isCheckoutSuccess: $isCheckoutSuccess, lastOrderId: $lastOrderId, lastOrderNumber: $lastOrderNumber, isCouponLoading: $isCouponLoading, isCouponApplied: $isCouponApplied, appliedCouponCode: $appliedCouponCode, couponPercentage: $couponPercentage, discountAmount: $discountAmount, apiCartTotal: $apiCartTotal, apiFinalTotal: $apiFinalTotal, couponErrorKey: $couponErrorKey)';
 }
 
 
@@ -46,7 +47,7 @@ abstract mixin class $CartStateCopyWith<$Res>  {
   factory $CartStateCopyWith(CartState value, $Res Function(CartState) _then) = _$CartStateCopyWithImpl;
 @useResult
 $Res call({
- CartStateStatus currState, List<CartItemModel> items, bool isCheckoutLoading, bool isCheckoutSuccess, bool isCouponLoading, bool isCouponApplied, String? appliedCouponCode, String? couponPercentage, num discountAmount, num? apiCartTotal, num? apiFinalTotal, String? couponErrorKey
+ CartStateStatus currState, List<CartItemModel> items, bool isCheckoutLoading, bool isCheckoutSuccess, int? lastOrderId, String? lastOrderNumber, bool isCouponLoading, bool isCouponApplied, String? appliedCouponCode, String? couponPercentage, num discountAmount, num? apiCartTotal, num? apiFinalTotal, String? couponErrorKey
 });
 
 
@@ -63,13 +64,15 @@ class _$CartStateCopyWithImpl<$Res>
 
 /// Create a copy of CartState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? currState = null,Object? items = null,Object? isCheckoutLoading = null,Object? isCheckoutSuccess = null,Object? isCouponLoading = null,Object? isCouponApplied = null,Object? appliedCouponCode = freezed,Object? couponPercentage = freezed,Object? discountAmount = null,Object? apiCartTotal = freezed,Object? apiFinalTotal = freezed,Object? couponErrorKey = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? currState = null,Object? items = null,Object? isCheckoutLoading = null,Object? isCheckoutSuccess = null,Object? lastOrderId = freezed,Object? lastOrderNumber = freezed,Object? isCouponLoading = null,Object? isCouponApplied = null,Object? appliedCouponCode = freezed,Object? couponPercentage = freezed,Object? discountAmount = null,Object? apiCartTotal = freezed,Object? apiFinalTotal = freezed,Object? couponErrorKey = freezed,}) {
   return _then(_self.copyWith(
 currState: null == currState ? _self.currState : currState // ignore: cast_nullable_to_non_nullable
 as CartStateStatus,items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
 as List<CartItemModel>,isCheckoutLoading: null == isCheckoutLoading ? _self.isCheckoutLoading : isCheckoutLoading // ignore: cast_nullable_to_non_nullable
 as bool,isCheckoutSuccess: null == isCheckoutSuccess ? _self.isCheckoutSuccess : isCheckoutSuccess // ignore: cast_nullable_to_non_nullable
-as bool,isCouponLoading: null == isCouponLoading ? _self.isCouponLoading : isCouponLoading // ignore: cast_nullable_to_non_nullable
+as bool,lastOrderId: freezed == lastOrderId ? _self.lastOrderId : lastOrderId // ignore: cast_nullable_to_non_nullable
+as int?,lastOrderNumber: freezed == lastOrderNumber ? _self.lastOrderNumber : lastOrderNumber // ignore: cast_nullable_to_non_nullable
+as String?,isCouponLoading: null == isCouponLoading ? _self.isCouponLoading : isCouponLoading // ignore: cast_nullable_to_non_nullable
 as bool,isCouponApplied: null == isCouponApplied ? _self.isCouponApplied : isCouponApplied // ignore: cast_nullable_to_non_nullable
 as bool,appliedCouponCode: freezed == appliedCouponCode ? _self.appliedCouponCode : appliedCouponCode // ignore: cast_nullable_to_non_nullable
 as String?,couponPercentage: freezed == couponPercentage ? _self.couponPercentage : couponPercentage // ignore: cast_nullable_to_non_nullable
@@ -171,10 +174,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CartStateStatus currState,  List<CartItemModel> items,  bool isCheckoutLoading,  bool isCheckoutSuccess,  bool isCouponLoading,  bool isCouponApplied,  String? appliedCouponCode,  String? couponPercentage,  num discountAmount,  num? apiCartTotal,  num? apiFinalTotal,  String? couponErrorKey)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CartStateStatus currState,  List<CartItemModel> items,  bool isCheckoutLoading,  bool isCheckoutSuccess,  int? lastOrderId,  String? lastOrderNumber,  bool isCouponLoading,  bool isCouponApplied,  String? appliedCouponCode,  String? couponPercentage,  num discountAmount,  num? apiCartTotal,  num? apiFinalTotal,  String? couponErrorKey)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CartState() when $default != null:
-return $default(_that.currState,_that.items,_that.isCheckoutLoading,_that.isCheckoutSuccess,_that.isCouponLoading,_that.isCouponApplied,_that.appliedCouponCode,_that.couponPercentage,_that.discountAmount,_that.apiCartTotal,_that.apiFinalTotal,_that.couponErrorKey);case _:
+return $default(_that.currState,_that.items,_that.isCheckoutLoading,_that.isCheckoutSuccess,_that.lastOrderId,_that.lastOrderNumber,_that.isCouponLoading,_that.isCouponApplied,_that.appliedCouponCode,_that.couponPercentage,_that.discountAmount,_that.apiCartTotal,_that.apiFinalTotal,_that.couponErrorKey);case _:
   return orElse();
 
 }
@@ -192,10 +195,10 @@ return $default(_that.currState,_that.items,_that.isCheckoutLoading,_that.isChec
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CartStateStatus currState,  List<CartItemModel> items,  bool isCheckoutLoading,  bool isCheckoutSuccess,  bool isCouponLoading,  bool isCouponApplied,  String? appliedCouponCode,  String? couponPercentage,  num discountAmount,  num? apiCartTotal,  num? apiFinalTotal,  String? couponErrorKey)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CartStateStatus currState,  List<CartItemModel> items,  bool isCheckoutLoading,  bool isCheckoutSuccess,  int? lastOrderId,  String? lastOrderNumber,  bool isCouponLoading,  bool isCouponApplied,  String? appliedCouponCode,  String? couponPercentage,  num discountAmount,  num? apiCartTotal,  num? apiFinalTotal,  String? couponErrorKey)  $default,) {final _that = this;
 switch (_that) {
 case _CartState():
-return $default(_that.currState,_that.items,_that.isCheckoutLoading,_that.isCheckoutSuccess,_that.isCouponLoading,_that.isCouponApplied,_that.appliedCouponCode,_that.couponPercentage,_that.discountAmount,_that.apiCartTotal,_that.apiFinalTotal,_that.couponErrorKey);case _:
+return $default(_that.currState,_that.items,_that.isCheckoutLoading,_that.isCheckoutSuccess,_that.lastOrderId,_that.lastOrderNumber,_that.isCouponLoading,_that.isCouponApplied,_that.appliedCouponCode,_that.couponPercentage,_that.discountAmount,_that.apiCartTotal,_that.apiFinalTotal,_that.couponErrorKey);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -212,10 +215,10 @@ return $default(_that.currState,_that.items,_that.isCheckoutLoading,_that.isChec
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CartStateStatus currState,  List<CartItemModel> items,  bool isCheckoutLoading,  bool isCheckoutSuccess,  bool isCouponLoading,  bool isCouponApplied,  String? appliedCouponCode,  String? couponPercentage,  num discountAmount,  num? apiCartTotal,  num? apiFinalTotal,  String? couponErrorKey)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CartStateStatus currState,  List<CartItemModel> items,  bool isCheckoutLoading,  bool isCheckoutSuccess,  int? lastOrderId,  String? lastOrderNumber,  bool isCouponLoading,  bool isCouponApplied,  String? appliedCouponCode,  String? couponPercentage,  num discountAmount,  num? apiCartTotal,  num? apiFinalTotal,  String? couponErrorKey)?  $default,) {final _that = this;
 switch (_that) {
 case _CartState() when $default != null:
-return $default(_that.currState,_that.items,_that.isCheckoutLoading,_that.isCheckoutSuccess,_that.isCouponLoading,_that.isCouponApplied,_that.appliedCouponCode,_that.couponPercentage,_that.discountAmount,_that.apiCartTotal,_that.apiFinalTotal,_that.couponErrorKey);case _:
+return $default(_that.currState,_that.items,_that.isCheckoutLoading,_that.isCheckoutSuccess,_that.lastOrderId,_that.lastOrderNumber,_that.isCouponLoading,_that.isCouponApplied,_that.appliedCouponCode,_that.couponPercentage,_that.discountAmount,_that.apiCartTotal,_that.apiFinalTotal,_that.couponErrorKey);case _:
   return null;
 
 }
@@ -227,7 +230,7 @@ return $default(_that.currState,_that.items,_that.isCheckoutLoading,_that.isChec
 
 
 class _CartState implements CartState {
-  const _CartState({this.currState = const CartStateStatus.initial(), final  List<CartItemModel> items = const [], this.isCheckoutLoading = false, this.isCheckoutSuccess = false, this.isCouponLoading = false, this.isCouponApplied = false, this.appliedCouponCode = null, this.couponPercentage = null, this.discountAmount = 0, this.apiCartTotal = null, this.apiFinalTotal = null, this.couponErrorKey = null}): _items = items;
+  const _CartState({this.currState = const CartStateStatus.initial(), final  List<CartItemModel> items = const [], this.isCheckoutLoading = false, this.isCheckoutSuccess = false, this.lastOrderId = null, this.lastOrderNumber = null, this.isCouponLoading = false, this.isCouponApplied = false, this.appliedCouponCode = null, this.couponPercentage = null, this.discountAmount = 0, this.apiCartTotal = null, this.apiFinalTotal = null, this.couponErrorKey = null}): _items = items;
   
 
 @override@JsonKey() final  CartStateStatus currState;
@@ -240,6 +243,9 @@ class _CartState implements CartState {
 
 @override@JsonKey() final  bool isCheckoutLoading;
 @override@JsonKey() final  bool isCheckoutSuccess;
+// ── Set on a successful checkout so "تتبع الطلب" can deep-link ──
+@override@JsonKey() final  int? lastOrderId;
+@override@JsonKey() final  String? lastOrderNumber;
 // ── Coupon ──
 @override@JsonKey() final  bool isCouponLoading;
 @override@JsonKey() final  bool isCouponApplied;
@@ -260,16 +266,16 @@ _$CartStateCopyWith<_CartState> get copyWith => __$CartStateCopyWithImpl<_CartSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CartState&&(identical(other.currState, currState) || other.currState == currState)&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.isCheckoutLoading, isCheckoutLoading) || other.isCheckoutLoading == isCheckoutLoading)&&(identical(other.isCheckoutSuccess, isCheckoutSuccess) || other.isCheckoutSuccess == isCheckoutSuccess)&&(identical(other.isCouponLoading, isCouponLoading) || other.isCouponLoading == isCouponLoading)&&(identical(other.isCouponApplied, isCouponApplied) || other.isCouponApplied == isCouponApplied)&&(identical(other.appliedCouponCode, appliedCouponCode) || other.appliedCouponCode == appliedCouponCode)&&(identical(other.couponPercentage, couponPercentage) || other.couponPercentage == couponPercentage)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.apiCartTotal, apiCartTotal) || other.apiCartTotal == apiCartTotal)&&(identical(other.apiFinalTotal, apiFinalTotal) || other.apiFinalTotal == apiFinalTotal)&&(identical(other.couponErrorKey, couponErrorKey) || other.couponErrorKey == couponErrorKey));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CartState&&(identical(other.currState, currState) || other.currState == currState)&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.isCheckoutLoading, isCheckoutLoading) || other.isCheckoutLoading == isCheckoutLoading)&&(identical(other.isCheckoutSuccess, isCheckoutSuccess) || other.isCheckoutSuccess == isCheckoutSuccess)&&(identical(other.lastOrderId, lastOrderId) || other.lastOrderId == lastOrderId)&&(identical(other.lastOrderNumber, lastOrderNumber) || other.lastOrderNumber == lastOrderNumber)&&(identical(other.isCouponLoading, isCouponLoading) || other.isCouponLoading == isCouponLoading)&&(identical(other.isCouponApplied, isCouponApplied) || other.isCouponApplied == isCouponApplied)&&(identical(other.appliedCouponCode, appliedCouponCode) || other.appliedCouponCode == appliedCouponCode)&&(identical(other.couponPercentage, couponPercentage) || other.couponPercentage == couponPercentage)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.apiCartTotal, apiCartTotal) || other.apiCartTotal == apiCartTotal)&&(identical(other.apiFinalTotal, apiFinalTotal) || other.apiFinalTotal == apiFinalTotal)&&(identical(other.couponErrorKey, couponErrorKey) || other.couponErrorKey == couponErrorKey));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,currState,const DeepCollectionEquality().hash(_items),isCheckoutLoading,isCheckoutSuccess,isCouponLoading,isCouponApplied,appliedCouponCode,couponPercentage,discountAmount,apiCartTotal,apiFinalTotal,couponErrorKey);
+int get hashCode => Object.hash(runtimeType,currState,const DeepCollectionEquality().hash(_items),isCheckoutLoading,isCheckoutSuccess,lastOrderId,lastOrderNumber,isCouponLoading,isCouponApplied,appliedCouponCode,couponPercentage,discountAmount,apiCartTotal,apiFinalTotal,couponErrorKey);
 
 @override
 String toString() {
-  return 'CartState(currState: $currState, items: $items, isCheckoutLoading: $isCheckoutLoading, isCheckoutSuccess: $isCheckoutSuccess, isCouponLoading: $isCouponLoading, isCouponApplied: $isCouponApplied, appliedCouponCode: $appliedCouponCode, couponPercentage: $couponPercentage, discountAmount: $discountAmount, apiCartTotal: $apiCartTotal, apiFinalTotal: $apiFinalTotal, couponErrorKey: $couponErrorKey)';
+  return 'CartState(currState: $currState, items: $items, isCheckoutLoading: $isCheckoutLoading, isCheckoutSuccess: $isCheckoutSuccess, lastOrderId: $lastOrderId, lastOrderNumber: $lastOrderNumber, isCouponLoading: $isCouponLoading, isCouponApplied: $isCouponApplied, appliedCouponCode: $appliedCouponCode, couponPercentage: $couponPercentage, discountAmount: $discountAmount, apiCartTotal: $apiCartTotal, apiFinalTotal: $apiFinalTotal, couponErrorKey: $couponErrorKey)';
 }
 
 
@@ -280,7 +286,7 @@ abstract mixin class _$CartStateCopyWith<$Res> implements $CartStateCopyWith<$Re
   factory _$CartStateCopyWith(_CartState value, $Res Function(_CartState) _then) = __$CartStateCopyWithImpl;
 @override @useResult
 $Res call({
- CartStateStatus currState, List<CartItemModel> items, bool isCheckoutLoading, bool isCheckoutSuccess, bool isCouponLoading, bool isCouponApplied, String? appliedCouponCode, String? couponPercentage, num discountAmount, num? apiCartTotal, num? apiFinalTotal, String? couponErrorKey
+ CartStateStatus currState, List<CartItemModel> items, bool isCheckoutLoading, bool isCheckoutSuccess, int? lastOrderId, String? lastOrderNumber, bool isCouponLoading, bool isCouponApplied, String? appliedCouponCode, String? couponPercentage, num discountAmount, num? apiCartTotal, num? apiFinalTotal, String? couponErrorKey
 });
 
 
@@ -297,13 +303,15 @@ class __$CartStateCopyWithImpl<$Res>
 
 /// Create a copy of CartState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? currState = null,Object? items = null,Object? isCheckoutLoading = null,Object? isCheckoutSuccess = null,Object? isCouponLoading = null,Object? isCouponApplied = null,Object? appliedCouponCode = freezed,Object? couponPercentage = freezed,Object? discountAmount = null,Object? apiCartTotal = freezed,Object? apiFinalTotal = freezed,Object? couponErrorKey = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? currState = null,Object? items = null,Object? isCheckoutLoading = null,Object? isCheckoutSuccess = null,Object? lastOrderId = freezed,Object? lastOrderNumber = freezed,Object? isCouponLoading = null,Object? isCouponApplied = null,Object? appliedCouponCode = freezed,Object? couponPercentage = freezed,Object? discountAmount = null,Object? apiCartTotal = freezed,Object? apiFinalTotal = freezed,Object? couponErrorKey = freezed,}) {
   return _then(_CartState(
 currState: null == currState ? _self.currState : currState // ignore: cast_nullable_to_non_nullable
 as CartStateStatus,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
 as List<CartItemModel>,isCheckoutLoading: null == isCheckoutLoading ? _self.isCheckoutLoading : isCheckoutLoading // ignore: cast_nullable_to_non_nullable
 as bool,isCheckoutSuccess: null == isCheckoutSuccess ? _self.isCheckoutSuccess : isCheckoutSuccess // ignore: cast_nullable_to_non_nullable
-as bool,isCouponLoading: null == isCouponLoading ? _self.isCouponLoading : isCouponLoading // ignore: cast_nullable_to_non_nullable
+as bool,lastOrderId: freezed == lastOrderId ? _self.lastOrderId : lastOrderId // ignore: cast_nullable_to_non_nullable
+as int?,lastOrderNumber: freezed == lastOrderNumber ? _self.lastOrderNumber : lastOrderNumber // ignore: cast_nullable_to_non_nullable
+as String?,isCouponLoading: null == isCouponLoading ? _self.isCouponLoading : isCouponLoading // ignore: cast_nullable_to_non_nullable
 as bool,isCouponApplied: null == isCouponApplied ? _self.isCouponApplied : isCouponApplied // ignore: cast_nullable_to_non_nullable
 as bool,appliedCouponCode: freezed == appliedCouponCode ? _self.appliedCouponCode : appliedCouponCode // ignore: cast_nullable_to_non_nullable
 as String?,couponPercentage: freezed == couponPercentage ? _self.couponPercentage : couponPercentage // ignore: cast_nullable_to_non_nullable
