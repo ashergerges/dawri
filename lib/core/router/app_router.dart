@@ -5,6 +5,8 @@ import 'package:dawri/features/account/ui/language_screen.dart';
 import 'package:dawri/features/booking_history/ui/booking_history_screen.dart';
 import 'package:dawri/features/cart/ui/cart_screen.dart';
 import 'package:dawri/features/challenges/ui/challenges_screen.dart';
+import 'package:dawri/features/my_challenges/ui/my_challenge_details_screen.dart';
+import 'package:dawri/features/my_challenges/ui/my_challenges_screen.dart';
 import 'package:dawri/features/champ_profile/ui/champ_profile_screen.dart';
 import 'package:dawri/features/championship_add_team/ui/championship_add_team_screen.dart';
 import 'package:dawri/features/championship_control/ui/championship_control_screen.dart';
@@ -111,6 +113,8 @@ class AppRouter extends RootStackRouter {
     AutoRoute( page: RegisterRoute.page),
     AutoRoute( page: TeamProfileRoute.page),
     AutoRoute( page: BookingHistoryRoute.page),
+    AutoRoute( page: MyChallengesRoute.page),
+    AutoRoute( page: MyChallengeDetailsRoute.page),
     AutoRoute(path: '*', page: NotFoundRoute.page), // this must be last route
 
   ];

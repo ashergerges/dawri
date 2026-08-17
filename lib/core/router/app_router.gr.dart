@@ -815,6 +815,73 @@ class ManageTeamRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [MyChallengeDetailsScreen]
+class MyChallengeDetailsRoute
+    extends PageRouteInfo<MyChallengeDetailsRouteArgs> {
+  MyChallengeDetailsRoute({
+    Key? key,
+    required int challengeId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         MyChallengeDetailsRoute.name,
+         args: MyChallengeDetailsRouteArgs(key: key, challengeId: challengeId),
+         initialChildren: children,
+       );
+
+  static const String name = 'MyChallengeDetailsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<MyChallengeDetailsRouteArgs>();
+      return MyChallengeDetailsScreen(
+        key: args.key,
+        challengeId: args.challengeId,
+      );
+    },
+  );
+}
+
+class MyChallengeDetailsRouteArgs {
+  const MyChallengeDetailsRouteArgs({this.key, required this.challengeId});
+
+  final Key? key;
+
+  final int challengeId;
+
+  @override
+  String toString() {
+    return 'MyChallengeDetailsRouteArgs{key: $key, challengeId: $challengeId}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MyChallengeDetailsRouteArgs) return false;
+    return key == other.key && challengeId == other.challengeId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ challengeId.hashCode;
+}
+
+/// generated route for
+/// [MyChallengesScreen]
+class MyChallengesRoute extends PageRouteInfo<void> {
+  const MyChallengesRoute({List<PageRouteInfo>? children})
+    : super(MyChallengesRoute.name, initialChildren: children);
+
+  static const String name = 'MyChallengesRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const MyChallengesScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [MyChampionshipsScreen]
 class MyChampionshipsRoute extends PageRouteInfo<void> {
   const MyChampionshipsRoute({List<PageRouteInfo>? children})

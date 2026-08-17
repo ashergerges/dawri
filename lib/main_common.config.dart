@@ -94,6 +94,10 @@ import 'features/create_team/data/repositories/interfaces/i_create_team_reposito
     as _i369;
 import 'features/create_team/data/repositories/remote/create_team_repository.dart'
     as _i334;
+import 'features/help_center/data/repositories/interfaces/i_help_center_repository.dart'
+    as _i305;
+import 'features/help_center/data/repositories/remote/help_center_repository.dart'
+    as _i221;
 import 'features/home/data/repositories/interfaces/i_home_repository.dart'
     as _i185;
 import 'features/home/data/repositories/remote/home_repository.dart' as _i975;
@@ -104,6 +108,10 @@ import 'features/manage_team/data/repositories/interfaces/i_manage_team_reposito
     as _i778;
 import 'features/manage_team/data/repositories/remote/manage_team_repository.dart'
     as _i57;
+import 'features/my_challenges/data/repositories/interfaces/i_my_challenges_repository.dart'
+    as _i655;
+import 'features/my_challenges/data/repositories/remote/my_challenges_repository.dart'
+    as _i339;
 import 'features/my_championships/data/repositories/interfaces/i_my_championships_repository.dart'
     as _i735;
 import 'features/my_championships/data/repositories/remote/my_championships_repository.dart'
@@ -321,6 +329,11 @@ _i174.GetIt $initGetIt(
       networkService: gh<_i969.NetworkService>(),
     ),
   );
+  gh.factory<_i655.IMyChallengesRepository>(
+    () => _i339.MyChallengesRepository(
+      networkService: gh<_i969.NetworkService>(),
+    ),
+  );
   gh.factory<_i651.IChampionshipsRepository>(
     () => _i419.ChampionshipsRepository(
       networkService: gh<_i969.NetworkService>(),
@@ -344,6 +357,10 @@ _i174.GetIt $initGetIt(
   );
   gh.factory<_i817.IReserveRepository>(
     () => _i124.ReserveRepository(networkService: gh<_i969.NetworkService>()),
+  );
+  gh.factory<_i305.IHelpCenterRepository>(
+    () =>
+        _i221.HelpCenterRepository(networkService: gh<_i969.NetworkService>()),
   );
   gh.factory<_i967.IMainRepository>(
     () => _i210.MainRepository(networkService: gh<_i969.NetworkService>()),

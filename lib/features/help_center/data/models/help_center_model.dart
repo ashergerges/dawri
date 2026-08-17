@@ -1,58 +1,145 @@
-// lib/features/help_center/data/help_center_model.dart
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// lib/features/help_center/data/models/help_center_model.dart
 import 'package:dawri/core/utils/constants/app_colors.dart';
 import 'package:dawri/gen/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-class CategoryData {
-  final IconData icon;
-  final Color iconColor;
-  final String titleKey;
-  final String subtitleKey;
+part 'help_center_model.g.dart';
 
-  const CategoryData({required this.icon, required this.iconColor, required this.titleKey, required this.subtitleKey});
+// ─── CATEGORY ───────────────────────────────────────────────────────────────
+@JsonSerializable(createToJson: false)
+class FaqCategoryModel {
+  final int? id;
+  final String? title;
+  final String? subtitle;
+
+  /// Stable machine name used to pick the icon locally, so adding a category
+  /// server-side never ships a broken glyph. See [icon].
+  final String? slug;
+
+  @JsonKey(name: 'faqs_count')
+  final int? faqsCount;
+
+  const FaqCategoryModel({
+    this.id,
+    this.title,
+    this.subtitle,
+    this.slug,
+    this.faqsCount,
+  });
+
+  factory FaqCategoryModel.fromJson(Map<String, dynamic> json) =>
+      _$FaqCategoryModelFromJson(json);
+
+  String get titleText => title ?? '';
+  String get subtitleText => subtitle ?? '';
+
+  IconData get icon => switch (slug) {
+        'bookings' => FontAwesomeIcons.calendarCheck,
+        'wallet' || 'payments' => FontAwesomeIcons.wallet,
+        'tournaments' || 'championships' => FontAwesomeIcons.trophy,
+        'account' || 'profile' => FontAwesomeIcons.user,
+        'challenges' => FontAwesomeIcons.bolt,
+        'teams' => FontAwesomeIcons.shieldHalved,
+        _ => FontAwesomeIcons.circleQuestion,
+      };
+
+  Color get iconColor => AppColors.primaryLight;
 }
 
-class FaqData {
-  final String id;
-  final String questionKey;
-  final String answerKey;
+// ─── FAQ ────────────────────────────────────────────────────────────────────
+@JsonSerializable(createToJson: false)
+class FaqModel {
+  final int? id;
+  final String? question;
+  final String? answer;
 
-  const FaqData({required this.id, required this.questionKey, required this.answerKey});
+  @JsonKey(name: 'category_id')
+  final int? categoryId;
+
+  const FaqModel({this.id, this.question, this.answer, this.categoryId});
+
+  factory FaqModel.fromJson(Map<String, dynamic> json) =>
+      _$FaqModelFromJson(json);
+
+  String get questionText => question ?? '';
+  String get answerText => answer ?? '';
+
+  /// Key for the accordion's open/closed state.
+  String get key => 'faq_${id ?? questionText.hashCode}';
+
+  bool matches(String query) {
+    if (query.trim().isEmpty) return true;
+    final q = query.toLowerCase();
+    return questionText.toLowerCase().contains(q) ||
+        answerText.toLowerCase().contains(q);
+  }
 }
 
-class HelpCenterMockData {
-  static const categories = [
-    CategoryData(
-      icon: FontAwesomeIcons.calendarCheck,
-      iconColor: AppColors.primaryLight,
-      titleKey: LocaleKeys.helpCatBookingsTitle,
-      subtitleKey: LocaleKeys.helpCatBookingsSubtitle,
-    ),
-    CategoryData(
-      icon: FontAwesomeIcons.wallet,
-      iconColor: AppColors.primaryLight,
-      titleKey: LocaleKeys.helpCatWalletTitle,
-      subtitleKey: LocaleKeys.helpCatWalletSubtitle,
-    ),
-    CategoryData(
-      icon: FontAwesomeIcons.trophy,
-      iconColor: AppColors.primaryLight,
-      titleKey: LocaleKeys.helpCatTourTitle,
-      subtitleKey: LocaleKeys.helpCatTourSubtitle,
-    ),
-    CategoryData(
-      icon: FontAwesomeIcons.user,
-      iconColor: AppColors.primaryLight,
-      titleKey: LocaleKeys.helpCatAccountTitle,
-      subtitleKey: LocaleKeys.helpCatAccountSubtitle,
-    ),
-  ];
+/// Bundled copy of the help content, shown when the API is unreachable so the
+/// screen is never blank offline. Built from the existing translation keys.
+class HelpCenterFallbackData {
+  const HelpCenterFallbackData._();
 
-  static const faqs = [
-    FaqData(id: 'faq1', questionKey: LocaleKeys.helpFaq1Q, answerKey: LocaleKeys.helpFaq1A),
-    FaqData(id: 'faq2', questionKey: LocaleKeys.helpFaq2Q, answerKey: LocaleKeys.helpFaq2A),
-    FaqData(id: 'faq3', questionKey: LocaleKeys.helpFaq3Q, answerKey: LocaleKeys.helpFaq3A),
-    FaqData(id: 'faq4', questionKey: LocaleKeys.helpFaq4Q, answerKey: LocaleKeys.helpFaq4A),
-  ];
+  // Negative ids so they can never collide with server ids.
+  static const int _catBookings = -1;
+  static const int _catWallet = -2;
+  static const int _catTournaments = -3;
+  static const int _catAccount = -4;
+
+  static List<FaqCategoryModel> categories() => [
+        FaqCategoryModel(
+          id: _catBookings,
+          slug: 'bookings',
+          title: LocaleKeys.helpCatBookingsTitle.tr(),
+          subtitle: LocaleKeys.helpCatBookingsSubtitle.tr(),
+        ),
+        FaqCategoryModel(
+          id: _catWallet,
+          slug: 'wallet',
+          title: LocaleKeys.helpCatWalletTitle.tr(),
+          subtitle: LocaleKeys.helpCatWalletSubtitle.tr(),
+        ),
+        FaqCategoryModel(
+          id: _catTournaments,
+          slug: 'tournaments',
+          title: LocaleKeys.helpCatTourTitle.tr(),
+          subtitle: LocaleKeys.helpCatTourSubtitle.tr(),
+        ),
+        FaqCategoryModel(
+          id: _catAccount,
+          slug: 'account',
+          title: LocaleKeys.helpCatAccountTitle.tr(),
+          subtitle: LocaleKeys.helpCatAccountSubtitle.tr(),
+        ),
+      ];
+
+  static List<FaqModel> faqs() => [
+        FaqModel(
+          id: -1,
+          categoryId: _catBookings,
+          question: LocaleKeys.helpFaq1Q.tr(),
+          answer: LocaleKeys.helpFaq1A.tr(),
+        ),
+        FaqModel(
+          id: -2,
+          categoryId: _catWallet,
+          question: LocaleKeys.helpFaq2Q.tr(),
+          answer: LocaleKeys.helpFaq2A.tr(),
+        ),
+        FaqModel(
+          id: -3,
+          categoryId: _catTournaments,
+          question: LocaleKeys.helpFaq3Q.tr(),
+          answer: LocaleKeys.helpFaq3A.tr(),
+        ),
+        FaqModel(
+          id: -4,
+          categoryId: _catWallet,
+          question: LocaleKeys.helpFaq4Q.tr(),
+          answer: LocaleKeys.helpFaq4A.tr(),
+        ),
+      ];
 }

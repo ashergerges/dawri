@@ -56,6 +56,15 @@ class AccountMockData {
   }
     ),
     MenuItemModel(
+      icon: FontAwesomeIcons.bolt,
+      iconColor: AppColors.ratingAmber,
+      iconBg: AppColors.ratingAmberBg,
+      labelKey: LocaleKeys.myChallengesTitle,
+  onTap: (_){
+    getIt<AppRouter>().push(const MyChallengesRoute());
+  }
+    ),
+    MenuItemModel(
       icon: FontAwesomeIcons.receipt,
       iconColor: AppColors.primaryLight,
       iconBg: AppColors.secondary50,

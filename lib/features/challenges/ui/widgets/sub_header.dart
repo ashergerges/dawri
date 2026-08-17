@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:dawri/core/router/app_router.dart';
 import 'package:dawri/core/utils/common_widgets/on_tap.dart';
 import 'package:dawri/core/utils/constants/app_colors.dart';
 import 'package:dawri/core/utils/constants/app_text_them.dart';
@@ -43,8 +44,14 @@ class SubHeader extends StatelessWidget {
               color: AppColors.textDark,
             ),
           ),
-          SizedBox(width: 40.w, height: 40.w),
-
+          OnTap(
+            onTap: () => const MyChallengesRoute().push(context),
+            child: CircleAvatar(
+              radius: 20.r,
+              backgroundColor: AppColors.slate100,
+              child: FaIcon(FontAwesomeIcons.bolt, size: 16.sp, color: AppColors.primary),
+            ),
+          ),
         ],
       ),
     );

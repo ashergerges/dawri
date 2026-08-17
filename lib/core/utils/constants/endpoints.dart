@@ -56,8 +56,10 @@ class Endpoints {
   String get getInvitationByBookingUrl => r'api/app/invitation/get';
   String get addGuestsUrl => r'api/app/invitation/add_guests';
 
-  // support
+  // support / help center
   String get supportUrl => r'api/app/support-data';
+  String get faqCategoriesUrl => r'api/app/faq-categories';
+  String get faqsUrl => r'api/app/faqs';
 
   //cart
   String get addedToCartUrl => r'api/app/cart/add';
@@ -166,6 +168,11 @@ class Endpoints {
   String get createChallengeUrl  => r'api/app/challenges';
   String get challengesUrl  => r'api/app/challenges';
   String get acceptChallengeUrl  => r'api/app/challenges/join';
+
+  //my challenges (status: 1 = pending, 2 = upcoming, 3 = ended)
+  //details/cancel/result are built as '<base>/$id[/cancel|/result]'
+  String get myChallengesUrl     => r'api/app/challenges/my';
+  String get challengeBaseUrl    => r'api/app/challenges';
 
 
 

@@ -342,7 +342,9 @@ class _MenuCard extends StatelessWidget {
           final item = items[i];
           return Column(
             children: [
-              GestureDetector(
+              // OnTap (InkWell) hit-tests across the whole row, so the empty gap
+              // between the label and the chevron is tappable too.
+              OnTap(
                 onTap: item.type == MenuItemType.toggle ? null : () => item.onTap(i),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
