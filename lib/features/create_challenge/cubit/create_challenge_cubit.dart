@@ -33,7 +33,6 @@ class CreateChallengeCubit extends Cubit<CreateChallengeState> {
       _repository.getSports(),
       _repository.getCities(),
       _repository.getLevels(),
-      _repository.getStadiums(),
     ]);
 
     if (results.any((r) => r.isError)) {
@@ -50,24 +49,63 @@ class CreateChallengeCubit extends Cubit<CreateChallengeState> {
     final sports = (results[0] as Result<List<SportModel>>).asValue!.value;
     final cities = (results[1] as Result<List<CityModel>>).asValue!.value;
     final levels = (results[2] as Result<List<LevelModel>>).asValue!.value;
-    final stadiums = (results[3] as Result<List<StadiumModel>>).asValue!.value;
+
+    final firstCityId = cities.isNotEmpty ? cities.first.id : null;
 
     emit(state.copyWith(
       status: const CreateChallengeStatusSuccess(),
       sports: sports,
       cities: cities,
       levels: levels,
-      stadiums: stadiums,
+      stadiums: [],
       selectedSportId: sports.isNotEmpty ? sports.first.id : null,
-      selectedCityId: cities.isNotEmpty ? cities.first.id : null,
+      selectedCityId: firstCityId,
       selectedLevelId: levels.isNotEmpty ? levels.first.id : null,
+      selectedStadiumId: null,
+    ));
+
+    if (firstCityId != null) await loadStadiums(firstCityId);
+  }
+
+  /// Stadiums depend on the selected city: `api/app/stadiums?city_id=X&paginate=0`.
+  Future<void> loadStadiums(int cityId) async {
+    emit(state.copyWith(isLoadingStadiums: true));
+
+    final result = await _repository.getStadiums(cityId: cityId);
+
+    // Ignore a late response for a city the user already moved away from.
+    if (state.selectedCityId != cityId) return;
+
+    if (result.isError) {
+      emit(state.copyWith(
+        isLoadingStadiums: false,
+        stadiums: [],
+        selectedStadiumId: null,
+      ));
+      return;
+    }
+
+    final stadiums = result.asValue!.value;
+    emit(state.copyWith(
+      isLoadingStadiums: false,
+      stadiums: stadiums,
       selectedStadiumId: stadiums.isNotEmpty ? stadiums.first.id : null,
     ));
   }
 
   // Setters
   void setSport(int id) => emit(state.copyWith(selectedSportId: id));
-  void setCity(int id) => emit(state.copyWith(selectedCityId: id));
+
+  void setCity(int id) {
+    if (state.selectedCityId == id) return;
+    emit(state.copyWith(
+      selectedCityId: id,
+      stadiums: [],
+      selectedStadiumId: null,
+    ));
+    loadStadiums(id);
+  }
+
   void setStadium(int id) => emit(state.copyWith(selectedStadiumId: id));
   void setLevel(int id) => emit(state.copyWith(selectedLevelId: id));
   void setPlayers(int players) => emit(state.copyWith(playersPerTeam: players.clamp(1, 22)));

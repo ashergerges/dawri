@@ -48,13 +48,18 @@ class ChallengeRepository implements IChallengeRepository {
   }
 
   @override
-  Future<Result<List<StadiumModel>>> getStadiums() async {
-    // Assuming we have an endpoint that returns all stadiums without filters.
-    final response = await networkService.getAsync(url: AppStrings.urls.stadiumsUrl);
+  Future<Result<List<StadiumModel>>> getStadiums({int? cityId, int paginate = 0}) async {
+    final response = await networkService.getAsync(
+      url: AppStrings.urls.stadiumsUrl,
+      queryParameters: {
+        if (cityId != null) 'city_id': cityId,
+        'paginate': paginate,
+      },
+    );
     if (response.isError) return Result.error(response.asError!.error);
 
     final data = response.asValue!.value.data['data'];
-    final list = (data is Map ? data['stadiums'] : data) as List? ?? [];
+    final list = (data is Map ? (data['stadiums'] ?? data['data']) : data) as List? ?? [];
     return Result.value(
       list.map((e) => StadiumModel.fromJson(e)).toList(),
     );

@@ -215,7 +215,7 @@ class MyOrderCard extends StatelessWidget {
                   ),
                   8.w.sizedWidth,
                 ],
-                Expanded(
+               if(order.status!=3) Expanded(
                   child: _CardAction(
                     icon: FontAwesomeIcons.truckFast,
                     label: LocaleKeys.myOrdersTracking.tr(),

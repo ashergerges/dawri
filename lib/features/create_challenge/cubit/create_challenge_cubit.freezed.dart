@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CreateChallengeState {
 
- List<SportModel> get sports; List<CityModel> get cities; List<LevelModel> get levels; List<StadiumModel> get stadiums; int? get selectedSportId; int? get selectedCityId; int? get selectedStadiumId; int? get selectedLevelId; int get playersPerTeam; String get description; DateTime? get date; TimeOfDay? get time; CreateChallengeStatus get status; bool get isSubmitting; bool get showSuccessModal;
+ List<SportModel> get sports; List<CityModel> get cities; List<LevelModel> get levels; List<StadiumModel> get stadiums; int? get selectedSportId; int? get selectedCityId; int? get selectedStadiumId; int? get selectedLevelId; int get playersPerTeam; String get description; DateTime? get date; TimeOfDay? get time; CreateChallengeStatus get status; bool get isLoadingStadiums; bool get isSubmitting; bool get showSuccessModal;
 /// Create a copy of CreateChallengeState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $CreateChallengeStateCopyWith<CreateChallengeState> get copyWith => _$CreateChal
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateChallengeState&&const DeepCollectionEquality().equals(other.sports, sports)&&const DeepCollectionEquality().equals(other.cities, cities)&&const DeepCollectionEquality().equals(other.levels, levels)&&const DeepCollectionEquality().equals(other.stadiums, stadiums)&&(identical(other.selectedSportId, selectedSportId) || other.selectedSportId == selectedSportId)&&(identical(other.selectedCityId, selectedCityId) || other.selectedCityId == selectedCityId)&&(identical(other.selectedStadiumId, selectedStadiumId) || other.selectedStadiumId == selectedStadiumId)&&(identical(other.selectedLevelId, selectedLevelId) || other.selectedLevelId == selectedLevelId)&&(identical(other.playersPerTeam, playersPerTeam) || other.playersPerTeam == playersPerTeam)&&(identical(other.description, description) || other.description == description)&&(identical(other.date, date) || other.date == date)&&(identical(other.time, time) || other.time == time)&&(identical(other.status, status) || other.status == status)&&(identical(other.isSubmitting, isSubmitting) || other.isSubmitting == isSubmitting)&&(identical(other.showSuccessModal, showSuccessModal) || other.showSuccessModal == showSuccessModal));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateChallengeState&&const DeepCollectionEquality().equals(other.sports, sports)&&const DeepCollectionEquality().equals(other.cities, cities)&&const DeepCollectionEquality().equals(other.levels, levels)&&const DeepCollectionEquality().equals(other.stadiums, stadiums)&&(identical(other.selectedSportId, selectedSportId) || other.selectedSportId == selectedSportId)&&(identical(other.selectedCityId, selectedCityId) || other.selectedCityId == selectedCityId)&&(identical(other.selectedStadiumId, selectedStadiumId) || other.selectedStadiumId == selectedStadiumId)&&(identical(other.selectedLevelId, selectedLevelId) || other.selectedLevelId == selectedLevelId)&&(identical(other.playersPerTeam, playersPerTeam) || other.playersPerTeam == playersPerTeam)&&(identical(other.description, description) || other.description == description)&&(identical(other.date, date) || other.date == date)&&(identical(other.time, time) || other.time == time)&&(identical(other.status, status) || other.status == status)&&(identical(other.isLoadingStadiums, isLoadingStadiums) || other.isLoadingStadiums == isLoadingStadiums)&&(identical(other.isSubmitting, isSubmitting) || other.isSubmitting == isSubmitting)&&(identical(other.showSuccessModal, showSuccessModal) || other.showSuccessModal == showSuccessModal));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(sports),const DeepCollectionEquality().hash(cities),const DeepCollectionEquality().hash(levels),const DeepCollectionEquality().hash(stadiums),selectedSportId,selectedCityId,selectedStadiumId,selectedLevelId,playersPerTeam,description,date,time,status,isSubmitting,showSuccessModal);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(sports),const DeepCollectionEquality().hash(cities),const DeepCollectionEquality().hash(levels),const DeepCollectionEquality().hash(stadiums),selectedSportId,selectedCityId,selectedStadiumId,selectedLevelId,playersPerTeam,description,date,time,status,isLoadingStadiums,isSubmitting,showSuccessModal);
 
 @override
 String toString() {
-  return 'CreateChallengeState(sports: $sports, cities: $cities, levels: $levels, stadiums: $stadiums, selectedSportId: $selectedSportId, selectedCityId: $selectedCityId, selectedStadiumId: $selectedStadiumId, selectedLevelId: $selectedLevelId, playersPerTeam: $playersPerTeam, description: $description, date: $date, time: $time, status: $status, isSubmitting: $isSubmitting, showSuccessModal: $showSuccessModal)';
+  return 'CreateChallengeState(sports: $sports, cities: $cities, levels: $levels, stadiums: $stadiums, selectedSportId: $selectedSportId, selectedCityId: $selectedCityId, selectedStadiumId: $selectedStadiumId, selectedLevelId: $selectedLevelId, playersPerTeam: $playersPerTeam, description: $description, date: $date, time: $time, status: $status, isLoadingStadiums: $isLoadingStadiums, isSubmitting: $isSubmitting, showSuccessModal: $showSuccessModal)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $CreateChallengeStateCopyWith<$Res>  {
   factory $CreateChallengeStateCopyWith(CreateChallengeState value, $Res Function(CreateChallengeState) _then) = _$CreateChallengeStateCopyWithImpl;
 @useResult
 $Res call({
- List<SportModel> sports, List<CityModel> cities, List<LevelModel> levels, List<StadiumModel> stadiums, int? selectedSportId, int? selectedCityId, int? selectedStadiumId, int? selectedLevelId, int playersPerTeam, String description, DateTime? date, TimeOfDay? time, CreateChallengeStatus status, bool isSubmitting, bool showSuccessModal
+ List<SportModel> sports, List<CityModel> cities, List<LevelModel> levels, List<StadiumModel> stadiums, int? selectedSportId, int? selectedCityId, int? selectedStadiumId, int? selectedLevelId, int playersPerTeam, String description, DateTime? date, TimeOfDay? time, CreateChallengeStatus status, bool isLoadingStadiums, bool isSubmitting, bool showSuccessModal
 });
 
 
@@ -62,7 +62,7 @@ class _$CreateChallengeStateCopyWithImpl<$Res>
 
 /// Create a copy of CreateChallengeState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? sports = null,Object? cities = null,Object? levels = null,Object? stadiums = null,Object? selectedSportId = freezed,Object? selectedCityId = freezed,Object? selectedStadiumId = freezed,Object? selectedLevelId = freezed,Object? playersPerTeam = null,Object? description = null,Object? date = freezed,Object? time = freezed,Object? status = null,Object? isSubmitting = null,Object? showSuccessModal = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? sports = null,Object? cities = null,Object? levels = null,Object? stadiums = null,Object? selectedSportId = freezed,Object? selectedCityId = freezed,Object? selectedStadiumId = freezed,Object? selectedLevelId = freezed,Object? playersPerTeam = null,Object? description = null,Object? date = freezed,Object? time = freezed,Object? status = null,Object? isLoadingStadiums = null,Object? isSubmitting = null,Object? showSuccessModal = null,}) {
   return _then(_self.copyWith(
 sports: null == sports ? _self.sports : sports // ignore: cast_nullable_to_non_nullable
 as List<SportModel>,cities: null == cities ? _self.cities : cities // ignore: cast_nullable_to_non_nullable
@@ -77,7 +77,8 @@ as int,description: null == description ? _self.description : description // ign
 as String,date: freezed == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
 as DateTime?,time: freezed == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
 as TimeOfDay?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as CreateChallengeStatus,isSubmitting: null == isSubmitting ? _self.isSubmitting : isSubmitting // ignore: cast_nullable_to_non_nullable
+as CreateChallengeStatus,isLoadingStadiums: null == isLoadingStadiums ? _self.isLoadingStadiums : isLoadingStadiums // ignore: cast_nullable_to_non_nullable
+as bool,isSubmitting: null == isSubmitting ? _self.isSubmitting : isSubmitting // ignore: cast_nullable_to_non_nullable
 as bool,showSuccessModal: null == showSuccessModal ? _self.showSuccessModal : showSuccessModal // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
@@ -173,10 +174,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<SportModel> sports,  List<CityModel> cities,  List<LevelModel> levels,  List<StadiumModel> stadiums,  int? selectedSportId,  int? selectedCityId,  int? selectedStadiumId,  int? selectedLevelId,  int playersPerTeam,  String description,  DateTime? date,  TimeOfDay? time,  CreateChallengeStatus status,  bool isSubmitting,  bool showSuccessModal)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<SportModel> sports,  List<CityModel> cities,  List<LevelModel> levels,  List<StadiumModel> stadiums,  int? selectedSportId,  int? selectedCityId,  int? selectedStadiumId,  int? selectedLevelId,  int playersPerTeam,  String description,  DateTime? date,  TimeOfDay? time,  CreateChallengeStatus status,  bool isLoadingStadiums,  bool isSubmitting,  bool showSuccessModal)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CreateChallengeState() when $default != null:
-return $default(_that.sports,_that.cities,_that.levels,_that.stadiums,_that.selectedSportId,_that.selectedCityId,_that.selectedStadiumId,_that.selectedLevelId,_that.playersPerTeam,_that.description,_that.date,_that.time,_that.status,_that.isSubmitting,_that.showSuccessModal);case _:
+return $default(_that.sports,_that.cities,_that.levels,_that.stadiums,_that.selectedSportId,_that.selectedCityId,_that.selectedStadiumId,_that.selectedLevelId,_that.playersPerTeam,_that.description,_that.date,_that.time,_that.status,_that.isLoadingStadiums,_that.isSubmitting,_that.showSuccessModal);case _:
   return orElse();
 
 }
@@ -194,10 +195,10 @@ return $default(_that.sports,_that.cities,_that.levels,_that.stadiums,_that.sele
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<SportModel> sports,  List<CityModel> cities,  List<LevelModel> levels,  List<StadiumModel> stadiums,  int? selectedSportId,  int? selectedCityId,  int? selectedStadiumId,  int? selectedLevelId,  int playersPerTeam,  String description,  DateTime? date,  TimeOfDay? time,  CreateChallengeStatus status,  bool isSubmitting,  bool showSuccessModal)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<SportModel> sports,  List<CityModel> cities,  List<LevelModel> levels,  List<StadiumModel> stadiums,  int? selectedSportId,  int? selectedCityId,  int? selectedStadiumId,  int? selectedLevelId,  int playersPerTeam,  String description,  DateTime? date,  TimeOfDay? time,  CreateChallengeStatus status,  bool isLoadingStadiums,  bool isSubmitting,  bool showSuccessModal)  $default,) {final _that = this;
 switch (_that) {
 case _CreateChallengeState():
-return $default(_that.sports,_that.cities,_that.levels,_that.stadiums,_that.selectedSportId,_that.selectedCityId,_that.selectedStadiumId,_that.selectedLevelId,_that.playersPerTeam,_that.description,_that.date,_that.time,_that.status,_that.isSubmitting,_that.showSuccessModal);case _:
+return $default(_that.sports,_that.cities,_that.levels,_that.stadiums,_that.selectedSportId,_that.selectedCityId,_that.selectedStadiumId,_that.selectedLevelId,_that.playersPerTeam,_that.description,_that.date,_that.time,_that.status,_that.isLoadingStadiums,_that.isSubmitting,_that.showSuccessModal);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -214,10 +215,10 @@ return $default(_that.sports,_that.cities,_that.levels,_that.stadiums,_that.sele
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<SportModel> sports,  List<CityModel> cities,  List<LevelModel> levels,  List<StadiumModel> stadiums,  int? selectedSportId,  int? selectedCityId,  int? selectedStadiumId,  int? selectedLevelId,  int playersPerTeam,  String description,  DateTime? date,  TimeOfDay? time,  CreateChallengeStatus status,  bool isSubmitting,  bool showSuccessModal)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<SportModel> sports,  List<CityModel> cities,  List<LevelModel> levels,  List<StadiumModel> stadiums,  int? selectedSportId,  int? selectedCityId,  int? selectedStadiumId,  int? selectedLevelId,  int playersPerTeam,  String description,  DateTime? date,  TimeOfDay? time,  CreateChallengeStatus status,  bool isLoadingStadiums,  bool isSubmitting,  bool showSuccessModal)?  $default,) {final _that = this;
 switch (_that) {
 case _CreateChallengeState() when $default != null:
-return $default(_that.sports,_that.cities,_that.levels,_that.stadiums,_that.selectedSportId,_that.selectedCityId,_that.selectedStadiumId,_that.selectedLevelId,_that.playersPerTeam,_that.description,_that.date,_that.time,_that.status,_that.isSubmitting,_that.showSuccessModal);case _:
+return $default(_that.sports,_that.cities,_that.levels,_that.stadiums,_that.selectedSportId,_that.selectedCityId,_that.selectedStadiumId,_that.selectedLevelId,_that.playersPerTeam,_that.description,_that.date,_that.time,_that.status,_that.isLoadingStadiums,_that.isSubmitting,_that.showSuccessModal);case _:
   return null;
 
 }
@@ -229,7 +230,7 @@ return $default(_that.sports,_that.cities,_that.levels,_that.stadiums,_that.sele
 
 
 class _CreateChallengeState implements CreateChallengeState {
-  const _CreateChallengeState({final  List<SportModel> sports = const [], final  List<CityModel> cities = const [], final  List<LevelModel> levels = const [], final  List<StadiumModel> stadiums = const [], this.selectedSportId, this.selectedCityId, this.selectedStadiumId, this.selectedLevelId, this.playersPerTeam = 1, this.description = '', this.date, this.time, this.status = const CreateChallengeStatus.initial(), this.isSubmitting = false, this.showSuccessModal = false}): _sports = sports,_cities = cities,_levels = levels,_stadiums = stadiums;
+  const _CreateChallengeState({final  List<SportModel> sports = const [], final  List<CityModel> cities = const [], final  List<LevelModel> levels = const [], final  List<StadiumModel> stadiums = const [], this.selectedSportId, this.selectedCityId, this.selectedStadiumId, this.selectedLevelId, this.playersPerTeam = 1, this.description = '', this.date, this.time, this.status = const CreateChallengeStatus.initial(), this.isLoadingStadiums = false, this.isSubmitting = false, this.showSuccessModal = false}): _sports = sports,_cities = cities,_levels = levels,_stadiums = stadiums;
   
 
  final  List<SportModel> _sports;
@@ -269,6 +270,7 @@ class _CreateChallengeState implements CreateChallengeState {
 @override final  DateTime? date;
 @override final  TimeOfDay? time;
 @override@JsonKey() final  CreateChallengeStatus status;
+@override@JsonKey() final  bool isLoadingStadiums;
 @override@JsonKey() final  bool isSubmitting;
 @override@JsonKey() final  bool showSuccessModal;
 
@@ -282,16 +284,16 @@ _$CreateChallengeStateCopyWith<_CreateChallengeState> get copyWith => __$CreateC
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateChallengeState&&const DeepCollectionEquality().equals(other._sports, _sports)&&const DeepCollectionEquality().equals(other._cities, _cities)&&const DeepCollectionEquality().equals(other._levels, _levels)&&const DeepCollectionEquality().equals(other._stadiums, _stadiums)&&(identical(other.selectedSportId, selectedSportId) || other.selectedSportId == selectedSportId)&&(identical(other.selectedCityId, selectedCityId) || other.selectedCityId == selectedCityId)&&(identical(other.selectedStadiumId, selectedStadiumId) || other.selectedStadiumId == selectedStadiumId)&&(identical(other.selectedLevelId, selectedLevelId) || other.selectedLevelId == selectedLevelId)&&(identical(other.playersPerTeam, playersPerTeam) || other.playersPerTeam == playersPerTeam)&&(identical(other.description, description) || other.description == description)&&(identical(other.date, date) || other.date == date)&&(identical(other.time, time) || other.time == time)&&(identical(other.status, status) || other.status == status)&&(identical(other.isSubmitting, isSubmitting) || other.isSubmitting == isSubmitting)&&(identical(other.showSuccessModal, showSuccessModal) || other.showSuccessModal == showSuccessModal));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateChallengeState&&const DeepCollectionEquality().equals(other._sports, _sports)&&const DeepCollectionEquality().equals(other._cities, _cities)&&const DeepCollectionEquality().equals(other._levels, _levels)&&const DeepCollectionEquality().equals(other._stadiums, _stadiums)&&(identical(other.selectedSportId, selectedSportId) || other.selectedSportId == selectedSportId)&&(identical(other.selectedCityId, selectedCityId) || other.selectedCityId == selectedCityId)&&(identical(other.selectedStadiumId, selectedStadiumId) || other.selectedStadiumId == selectedStadiumId)&&(identical(other.selectedLevelId, selectedLevelId) || other.selectedLevelId == selectedLevelId)&&(identical(other.playersPerTeam, playersPerTeam) || other.playersPerTeam == playersPerTeam)&&(identical(other.description, description) || other.description == description)&&(identical(other.date, date) || other.date == date)&&(identical(other.time, time) || other.time == time)&&(identical(other.status, status) || other.status == status)&&(identical(other.isLoadingStadiums, isLoadingStadiums) || other.isLoadingStadiums == isLoadingStadiums)&&(identical(other.isSubmitting, isSubmitting) || other.isSubmitting == isSubmitting)&&(identical(other.showSuccessModal, showSuccessModal) || other.showSuccessModal == showSuccessModal));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_sports),const DeepCollectionEquality().hash(_cities),const DeepCollectionEquality().hash(_levels),const DeepCollectionEquality().hash(_stadiums),selectedSportId,selectedCityId,selectedStadiumId,selectedLevelId,playersPerTeam,description,date,time,status,isSubmitting,showSuccessModal);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_sports),const DeepCollectionEquality().hash(_cities),const DeepCollectionEquality().hash(_levels),const DeepCollectionEquality().hash(_stadiums),selectedSportId,selectedCityId,selectedStadiumId,selectedLevelId,playersPerTeam,description,date,time,status,isLoadingStadiums,isSubmitting,showSuccessModal);
 
 @override
 String toString() {
-  return 'CreateChallengeState(sports: $sports, cities: $cities, levels: $levels, stadiums: $stadiums, selectedSportId: $selectedSportId, selectedCityId: $selectedCityId, selectedStadiumId: $selectedStadiumId, selectedLevelId: $selectedLevelId, playersPerTeam: $playersPerTeam, description: $description, date: $date, time: $time, status: $status, isSubmitting: $isSubmitting, showSuccessModal: $showSuccessModal)';
+  return 'CreateChallengeState(sports: $sports, cities: $cities, levels: $levels, stadiums: $stadiums, selectedSportId: $selectedSportId, selectedCityId: $selectedCityId, selectedStadiumId: $selectedStadiumId, selectedLevelId: $selectedLevelId, playersPerTeam: $playersPerTeam, description: $description, date: $date, time: $time, status: $status, isLoadingStadiums: $isLoadingStadiums, isSubmitting: $isSubmitting, showSuccessModal: $showSuccessModal)';
 }
 
 
@@ -302,7 +304,7 @@ abstract mixin class _$CreateChallengeStateCopyWith<$Res> implements $CreateChal
   factory _$CreateChallengeStateCopyWith(_CreateChallengeState value, $Res Function(_CreateChallengeState) _then) = __$CreateChallengeStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<SportModel> sports, List<CityModel> cities, List<LevelModel> levels, List<StadiumModel> stadiums, int? selectedSportId, int? selectedCityId, int? selectedStadiumId, int? selectedLevelId, int playersPerTeam, String description, DateTime? date, TimeOfDay? time, CreateChallengeStatus status, bool isSubmitting, bool showSuccessModal
+ List<SportModel> sports, List<CityModel> cities, List<LevelModel> levels, List<StadiumModel> stadiums, int? selectedSportId, int? selectedCityId, int? selectedStadiumId, int? selectedLevelId, int playersPerTeam, String description, DateTime? date, TimeOfDay? time, CreateChallengeStatus status, bool isLoadingStadiums, bool isSubmitting, bool showSuccessModal
 });
 
 
@@ -319,7 +321,7 @@ class __$CreateChallengeStateCopyWithImpl<$Res>
 
 /// Create a copy of CreateChallengeState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? sports = null,Object? cities = null,Object? levels = null,Object? stadiums = null,Object? selectedSportId = freezed,Object? selectedCityId = freezed,Object? selectedStadiumId = freezed,Object? selectedLevelId = freezed,Object? playersPerTeam = null,Object? description = null,Object? date = freezed,Object? time = freezed,Object? status = null,Object? isSubmitting = null,Object? showSuccessModal = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? sports = null,Object? cities = null,Object? levels = null,Object? stadiums = null,Object? selectedSportId = freezed,Object? selectedCityId = freezed,Object? selectedStadiumId = freezed,Object? selectedLevelId = freezed,Object? playersPerTeam = null,Object? description = null,Object? date = freezed,Object? time = freezed,Object? status = null,Object? isLoadingStadiums = null,Object? isSubmitting = null,Object? showSuccessModal = null,}) {
   return _then(_CreateChallengeState(
 sports: null == sports ? _self._sports : sports // ignore: cast_nullable_to_non_nullable
 as List<SportModel>,cities: null == cities ? _self._cities : cities // ignore: cast_nullable_to_non_nullable
@@ -334,7 +336,8 @@ as int,description: null == description ? _self.description : description // ign
 as String,date: freezed == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
 as DateTime?,time: freezed == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
 as TimeOfDay?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as CreateChallengeStatus,isSubmitting: null == isSubmitting ? _self.isSubmitting : isSubmitting // ignore: cast_nullable_to_non_nullable
+as CreateChallengeStatus,isLoadingStadiums: null == isLoadingStadiums ? _self.isLoadingStadiums : isLoadingStadiums // ignore: cast_nullable_to_non_nullable
+as bool,isSubmitting: null == isSubmitting ? _self.isSubmitting : isSubmitting // ignore: cast_nullable_to_non_nullable
 as bool,showSuccessModal: null == showSuccessModal ? _self.showSuccessModal : showSuccessModal // ignore: cast_nullable_to_non_nullable
 as bool,
   ));

@@ -446,30 +446,30 @@ class _ProductCard extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
                   ),
-                  // if (product.hasDiscount)
-                  Positioned(
-                    top: 8.h,
-                    right: 8.w,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: AppColors.danger,
-                        borderRadius: BorderRadius.circular(6.r),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8.w,
-                          vertical: 3.h,
-                        ),
-                        child: Text(
-                          LocaleKeys.storeDiscount.tr(),
-                          style: AppTextTheme.bodyXXSmall(context).copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  //  if (product.hasDiscount)
+                  // Positioned(
+                  //   top: 8.h,
+                  //   right: 8.w,
+                  //   child: DecoratedBox(
+                  //     decoration: BoxDecoration(
+                  //       color: AppColors.danger,
+                  //       borderRadius: BorderRadius.circular(6.r),
+                  //     ),
+                  //     child: Padding(
+                  //       padding: EdgeInsets.symmetric(
+                  //         horizontal: 8.w,
+                  //         vertical: 3.h,
+                  //       ),
+                  //       child: Text(
+                  //         LocaleKeys.storeDiscount.tr(),
+                  //         style: AppTextTheme.bodyXXSmall(context).copyWith(
+                  //           fontWeight: FontWeight.w800,
+                  //           color: AppColors.white,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
               10.h.sizedHeight,

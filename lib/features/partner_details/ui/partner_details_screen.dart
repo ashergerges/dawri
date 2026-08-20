@@ -107,6 +107,13 @@ class _PartnerDetailsView extends StatelessWidget {
                           name: partner.name ?? name,
                           avatar: partner.avatar ?? avatar,
                         ),
+                        // Only participants who belong to a team get this block.
+                        if (_TeamCard.hasTeam(partner.team)) ...[
+                          25.h.sizedHeight,
+                          _SectionHeader(
+                              title: LocaleKeys.partnerDetailsTeamTitle.tr()),
+                          _TeamCard(team: partner.team!),
+                        ],
                         if ((partner.bio ?? '').trim().isNotEmpty) ...[
                           25.h.sizedHeight,
                           _SectionHeader(title: LocaleKeys.partnerDetailsAboutTitle.tr()),
@@ -641,6 +648,248 @@ class _BioCard extends StatelessWidget {
             bio,
             style: AppTextTheme.bodySmall(context).copyWith(color: AppColors.textMuted, height: 1.7),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── TEAM CARD ───────────────────────────────────────────────────────────────
+/// The team this participant plays for. The details payload carries no logo, so
+/// the crest is built from the team's initials over the app gradient — a blank
+/// image placeholder would read as a loading failure.
+class _TeamCard extends StatelessWidget {
+  const _TeamCard({required this.team});
+
+  final PartnerTeamMiniModel team;
+
+  /// A team block with neither a name nor an id is nothing to show.
+  static bool hasTeam(PartnerTeamMiniModel? team) =>
+      team != null && ((team.name ?? '').trim().isNotEmpty || team.id != null);
+
+  /// Up to two initials — "Falcons Club" → "FC", "الصقور" → "ا".
+  String get _initials {
+    final words = (team.name ?? '')
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .take(2);
+    return words.map((w) => w.characters.first).join();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bio = (team.bio ?? '').trim();
+    final teamId = team.id;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: OnTap(
+        // Without an id there is no profile to open — the card stays a static
+        // summary rather than a tap that goes nowhere.
+        onTap: teamId == null
+            ? null
+            : () => TeamProfileRoute(teamId: teamId).push(context),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(18.r),
+            border: Border.all(color: AppColors.slate200),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.black.withOpacity(0.03),
+                blurRadius: 15,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: 15.w.padAll,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    _TeamCrest(initials: _initials),
+                    12.w.sizedWidth,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            team.name ?? '',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextTheme.bodyMediumMediumWeight(context)
+                                .copyWith(
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.textDark,
+                            ),
+                          ),
+                          6.h.sizedHeight,
+                          Row(
+                            children: [
+                              _TeamRatingChip(rating: team.rating),
+                              if (team.canJoin == true) ...[
+                                6.w.sizedWidth,
+                                Flexible(
+                                  child: _TeamBadge(
+                                    icon: FontAwesomeIcons.userPlus,
+                                    label: LocaleKeys
+                                        .partnerDetailsTeamOpenToJoin
+                                        .tr(),
+                                    color: AppColors.success,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (teamId != null) ...[
+                      8.w.sizedWidth,
+                      // See _ChatCard: FaIcon has no RTL-aware chevron.
+                      FaIcon(
+                        Directionality.of(context) == ui.TextDirection.rtl
+                            ? FontAwesomeIcons.chevronLeft
+                            : FontAwesomeIcons.chevronRight,
+                        size: 13.sp,
+                        color: AppColors.slate300,
+                      ),
+                    ],
+                  ],
+                ),
+                if (bio.isNotEmpty) ...[
+                  12.h.sizedHeight,
+                  Text(
+                    bio,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextTheme.bodyXSmall(context).copyWith(
+                      color: AppColors.textMuted,
+                      height: 1.6,
+                    ),
+                  ),
+                ],
+                if (teamId != null) ...[
+                  12.h.sizedHeight,
+                  Row(
+                    children: [
+                      FaIcon(FontAwesomeIcons.shieldHalved,
+                          size: 11.sp, color: AppColors.primaryLight),
+                      6.w.sizedWidth,
+                      Text(
+                        LocaleKeys.partnerDetailsTeamViewProfile.tr(),
+                        style: AppTextTheme.bodyXXSmall(context).copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primaryLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TeamCrest extends StatelessWidget {
+  const _TeamCrest({required this.initials});
+
+  final String initials;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: AppColors.headerGradient,
+        ),
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: SizedBox(
+        width: 56.w,
+        height: 56.w,
+        child: Center(
+          child: initials.isEmpty
+              ? FaIcon(FontAwesomeIcons.shieldHalved,
+                  size: 20.sp, color: AppColors.white)
+              : Text(
+                  initials,
+                  style: AppTextTheme.bodyLargeSemiBold(context).copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.white,
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TeamRatingChip extends StatelessWidget {
+  const _TeamRatingChip({required this.rating});
+
+  final num? rating;
+
+  @override
+  Widget build(BuildContext context) {
+    return _TeamBadge(
+      icon: FontAwesomeIcons.solidStar,
+      label: '${rating ?? 0}',
+      color: AppColors.ratingAmber,
+    );
+  }
+}
+
+class _TeamBadge extends StatelessWidget {
+  const _TeamBadge({required this.icon, required this.label, required this.color});
+
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FaIcon(icon, size: 10.sp, color: color),
+            5.w.sizedWidth,
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextTheme.bodyXXSmall(context).copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: color,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

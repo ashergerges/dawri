@@ -59,6 +59,18 @@ class ChallengeFormCard extends StatelessWidget {
             label: LocaleKeys.createChallengeStadium.tr(),
             child: BlocBuilder<CreateChallengeCubit, CreateChallengeState>(
               builder: (context, state) {
+                if (state.isLoadingStadiums) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                  );
+                }
                 if (state.stadiums.isEmpty) return const SizedBox.shrink();
                 return DropdownButtonFormField<int>(
                   isExpanded: true,

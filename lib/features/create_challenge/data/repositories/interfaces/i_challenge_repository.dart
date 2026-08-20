@@ -7,6 +7,7 @@ abstract class IChallengeRepository {
   Future<Result<List<SportModel>>> getSports();
   Future<Result<List<CityModel>>> getCities();
   Future<Result<List<LevelModel>>> getLevels();
-  Future<Result<List<StadiumModel>>> getStadiums();
+  /// [paginate] = 1 -> server returns a paginated payload, 0 -> plain list.
+  Future<Result<List<StadiumModel>>> getStadiums({int? cityId, int paginate = 0});
   Future<Result<void>> createChallenge(Map<String, dynamic> data);
 }

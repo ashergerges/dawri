@@ -87,6 +87,7 @@ class StoreCubit extends Cubit<StoreState> {
     emit(state.copyWith(
       isProductsLoading: false,
       products: data?.products ?? [],
+      cartCount: data?.productsCount ?? state.cartCount,
       currentPage: 1,
       hasMore: (pagination?.currentPage ?? 1) < (pagination?.totalPages ?? 1),
     ));
@@ -119,6 +120,7 @@ class StoreCubit extends Cubit<StoreState> {
 
     emit(state.copyWith(
       products: [...state.products, ...?data?.products],
+      cartCount: data?.productsCount ?? state.cartCount,
       currentPage: nextPage,
       hasMore: (pagination?.currentPage ?? nextPage) < (pagination?.totalPages ?? nextPage),
     ));

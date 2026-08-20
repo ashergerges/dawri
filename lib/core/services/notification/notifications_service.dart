@@ -10,6 +10,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:injectable/injectable.dart';
+import 'package:dawri/features/notifications/data/models/notification_navigator.dart';
+import 'package:dawri/features/notifications/data/models/notifications_model.dart';
 import 'package:dawri/features/notifications/data/repositories/interfaces/i_notifications_repository.dart';
 import 'package:dawri/main_common.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -26,6 +28,19 @@ class RemoteMessageKeys {
   static get image => "image";
 
   static get body => "body";
+
+  /// Entity family the push points at — same keys as the notifications list's
+  /// `reference_type`. Sent snake_case by the backend; the camelCase spelling is
+  /// accepted too so either convention works.
+  static const List<String> referenceType = ["reference_type", "referenceType"];
+
+  /// Id of the referenced record. Falls back to [recordId], which older pushes
+  /// use for the same purpose.
+  static const List<String> referenceId = [
+    "reference_id",
+    "referenceId",
+    "recordId",
+  ];
 }
 
 /// Values for the `type` field in a push payload.
@@ -267,8 +282,15 @@ class NotificationService {
     final String id = message.data[RemoteMessageKeys.id] ?? '';
     final String recordId = message.data[RemoteMessageKeys.recordId] ?? '';
     final String body = message.data[RemoteMessageKeys.body] ?? '';
-    final int type = int.parse(message.data[RemoteMessageKeys.type] ?? '0');
+    final int type = int.tryParse(message.data[RemoteMessageKeys.type] ?? '') ?? 0;
     final String image = message.data[RemoteMessageKeys.image] ?? '';
+    final String? referenceType = _firstValue(
+      message.data,
+      RemoteMessageKeys.referenceType,
+    );
+    final int? referenceId = int.tryParse(
+      _firstValue(message.data, RemoteMessageKeys.referenceId) ?? '',
+    );
 
     log('+++++++++++++++++ Notification Content +++++++++++++++++');
     log('+++++ Message-id: $id');
@@ -276,6 +298,8 @@ class NotificationService {
     log('+++++ Message-RecordId: $recordId');
     log('+++++ Message-Image: $image');
     log('+++++ Message-Type: $type');
+    log('+++++ Message-ReferenceType: $referenceType');
+    log('+++++ Message-ReferenceId: $referenceId');
     log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
 
     // Chat pushes come from a Cloud Function, not the backend's notification
@@ -290,6 +314,28 @@ class NotificationService {
     }
 
     await notificationsRepository.markNotificationRead(notificationId: id);
+
+    // Same reference_type → screen mapping the notifications list uses. When the
+    // push carries no usable reference we open the list itself, so a tap always
+    // leads somewhere.
+    final target = notificationRouteFor(
+      NotificationModel(
+        type: type,
+        referenceType: referenceType,
+        referenceId: referenceId,
+      ),
+    );
+    await getIt<AppRouter>().push(target ?? const NotificationsRoute());
+  }
+
+  /// First non-empty value among [keys] — lets one payload field be spelled
+  /// several ways without duplicating lookups at each call site.
+  String? _firstValue(Map<String, dynamic> data, List<String> keys) {
+    for (final key in keys) {
+      final value = data[key]?.toString() ?? '';
+      if (value.isNotEmpty) return value;
+    }
+    return null;
   }
 
   void showNotification(RemoteMessage message) async {

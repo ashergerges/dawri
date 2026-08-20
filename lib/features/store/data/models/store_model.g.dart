@@ -13,7 +13,7 @@ CategoryModel _$CategoryModelFromJson(Map<String, dynamic> json) =>
       nameAr: json['name_ar'] as String?,
       nameEn: json['name_en'] as String?,
       image: json['image'] as String?,
-      status: json['status'] as bool?,
+      status: (json['status'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$CategoryModelToJson(CategoryModel instance) =>
@@ -137,6 +137,7 @@ ProductsResponseModel _$ProductsResponseModelFromJson(
   products: (json['products'] as List<dynamic>?)
       ?.map((e) => ProductModel.fromJson(e as Map<String, dynamic>))
       .toList(),
+  productsCount: (json['products_count'] as num?)?.toInt(),
   pagination: json['pagination'] == null
       ? null
       : PaginationModel.fromJson(json['pagination'] as Map<String, dynamic>),
@@ -146,5 +147,6 @@ Map<String, dynamic> _$ProductsResponseModelToJson(
   ProductsResponseModel instance,
 ) => <String, dynamic>{
   'products': instance.products,
+  'products_count': instance.productsCount,
   'pagination': instance.pagination,
 };

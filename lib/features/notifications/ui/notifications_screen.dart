@@ -14,6 +14,7 @@ import 'package:dawri/gen/locale_keys.g.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../cubit/notifications_cubit.dart';
+import '../data/models/notification_navigator.dart';
 import '../data/models/notifications_model.dart';
 
 @RoutePage()
@@ -260,7 +261,7 @@ class _NotificationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<NotificationsCubit>();
     final isUnread = notification.isUnread;
-    final style = notificationStyleFor(notification.type);
+    final style = notificationStyle(notification);
 
     // Swipe-to-delete (no slidable package in the project — Dismissible does it).
     return Dismissible(
@@ -274,7 +275,8 @@ class _NotificationCard extends StatelessWidget {
         onTap: () {
           // Already read → no request, only navigation.
           cubit.markAsRead(notification);
-          // TODO: navigate based on notification type/target
+          // Nothing happens for notifications without a reference target.
+          openNotificationTarget(notification);
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),

@@ -549,6 +549,9 @@ abstract class  LocaleKeys {
   static const partnerDetailsReviewer1Name = 'partnerDetailsReviewer1Name';
   static const partnerDetailsReview1Text = 'partnerDetailsReview1Text';
   static const partnerDetailsContractOffer = 'partnerDetailsContractOffer';
+  static const partnerDetailsTeamTitle = 'partnerDetailsTeamTitle';
+  static const partnerDetailsTeamOpenToJoin = 'partnerDetailsTeamOpenToJoin';
+  static const partnerDetailsTeamViewProfile = 'partnerDetailsTeamViewProfile';
   static const partnerVideoOpenExternally = 'partnerVideoOpenExternally';
   static const partnerDetailsNoVideos = 'partnerDetailsNoVideos';
   static const partnerDetailsNoReviews = 'partnerDetailsNoReviews';
@@ -1115,7 +1118,14 @@ abstract class  LocaleKeys {
   static const registerSelectHint = 'registerSelectHint';
   static const registerSportLabel = 'registerSportLabel';
   static const registerSportSubtitle = 'registerSportSubtitle';
+  static const registerSportNoPositions = 'registerSportNoPositions';
   static const registerAvatarHint = 'registerAvatarHint';
+  static const registerHelpTitle = 'registerHelpTitle';
+  static const registerHelpRole = 'registerHelpRole';
+  static const helpRole = 'helpRole';
+  static const registerHelpSports = 'registerHelpSports';
+  static const registerHelpPositions = 'registerHelpPositions';
+  static const registerHelpRequired = 'registerHelpRequired';
   static const registerSubmitButton = 'registerSubmitButton';
   static const registerSuccessAction = 'registerSuccessAction';
   static const registerParticipantRoleLabel = 'registerParticipantRoleLabel';

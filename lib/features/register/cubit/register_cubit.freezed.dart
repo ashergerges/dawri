@@ -14,10 +14,15 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$RegisterState {
 
- String get name; String get bio; String get birthDate; int? get cityId; int? get typeId; int? get sportId; int? get dynamicId;// player position / referee role / coach specialization
+ String get name; String get bio; String get birthDate; int? get cityId; int? get typeId;/// A participant can practise several activities — order follows the taps.
+ List<int> get sportIds;/// Position picked for each selected sport, keyed by sport id. Players only.
+ Map<int, int> get sportPositionIds; int? get dynamicId;// referee role / coach specialization
  XFile? get avatarFile;// ─── Lookups ─────────────────────────────────────────────
- List<ParticipantTypeModel> get types; List<SportModel> get sports; List<CityModel> get cities; List<PlayerPositionModel> get positions; List<RefereeRoleModel> get refereeRoles; List<CoachSpecializationModel> get coachSpecs; RegisterStatus get optionsStatus; RegisterStatus get dynamicStatus;// ─── Validation / submit ─────────────────────────────────
- String? get nameError; String? get bioError; String? get avatarError; String? get birthDateError; String? get cityError; String? get sportError; String? get dynamicError; bool get isSubmitting; bool get isSuccess;
+ List<ParticipantTypeModel> get types; List<SportModel> get sports; List<CityModel> get cities;/// Positions available per sport, keyed by sport id. Cached so re-selecting
+/// a sport doesn't hit the network again.
+ Map<int, List<PlayerPositionModel>> get positionsBySport;/// Sports whose positions are still in flight.
+ List<int> get loadingPositionSportIds; List<RefereeRoleModel> get refereeRoles; List<CoachSpecializationModel> get coachSpecs; RegisterStatus get optionsStatus; RegisterStatus get dynamicStatus;// ─── Validation / submit ─────────────────────────────────
+ String? get nameError; String? get bioError; String? get avatarError; String? get birthDateError; String? get cityError; String? get sportError; String? get sportPositionError; String? get dynamicError; bool get isSubmitting; bool get isSuccess;
 /// Create a copy of RegisterState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +33,16 @@ $RegisterStateCopyWith<RegisterState> get copyWith => _$RegisterStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RegisterState&&(identical(other.name, name) || other.name == name)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.birthDate, birthDate) || other.birthDate == birthDate)&&(identical(other.cityId, cityId) || other.cityId == cityId)&&(identical(other.typeId, typeId) || other.typeId == typeId)&&(identical(other.sportId, sportId) || other.sportId == sportId)&&(identical(other.dynamicId, dynamicId) || other.dynamicId == dynamicId)&&(identical(other.avatarFile, avatarFile) || other.avatarFile == avatarFile)&&const DeepCollectionEquality().equals(other.types, types)&&const DeepCollectionEquality().equals(other.sports, sports)&&const DeepCollectionEquality().equals(other.cities, cities)&&const DeepCollectionEquality().equals(other.positions, positions)&&const DeepCollectionEquality().equals(other.refereeRoles, refereeRoles)&&const DeepCollectionEquality().equals(other.coachSpecs, coachSpecs)&&(identical(other.optionsStatus, optionsStatus) || other.optionsStatus == optionsStatus)&&(identical(other.dynamicStatus, dynamicStatus) || other.dynamicStatus == dynamicStatus)&&(identical(other.nameError, nameError) || other.nameError == nameError)&&(identical(other.bioError, bioError) || other.bioError == bioError)&&(identical(other.avatarError, avatarError) || other.avatarError == avatarError)&&(identical(other.birthDateError, birthDateError) || other.birthDateError == birthDateError)&&(identical(other.cityError, cityError) || other.cityError == cityError)&&(identical(other.sportError, sportError) || other.sportError == sportError)&&(identical(other.dynamicError, dynamicError) || other.dynamicError == dynamicError)&&(identical(other.isSubmitting, isSubmitting) || other.isSubmitting == isSubmitting)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RegisterState&&(identical(other.name, name) || other.name == name)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.birthDate, birthDate) || other.birthDate == birthDate)&&(identical(other.cityId, cityId) || other.cityId == cityId)&&(identical(other.typeId, typeId) || other.typeId == typeId)&&const DeepCollectionEquality().equals(other.sportIds, sportIds)&&const DeepCollectionEquality().equals(other.sportPositionIds, sportPositionIds)&&(identical(other.dynamicId, dynamicId) || other.dynamicId == dynamicId)&&(identical(other.avatarFile, avatarFile) || other.avatarFile == avatarFile)&&const DeepCollectionEquality().equals(other.types, types)&&const DeepCollectionEquality().equals(other.sports, sports)&&const DeepCollectionEquality().equals(other.cities, cities)&&const DeepCollectionEquality().equals(other.positionsBySport, positionsBySport)&&const DeepCollectionEquality().equals(other.loadingPositionSportIds, loadingPositionSportIds)&&const DeepCollectionEquality().equals(other.refereeRoles, refereeRoles)&&const DeepCollectionEquality().equals(other.coachSpecs, coachSpecs)&&(identical(other.optionsStatus, optionsStatus) || other.optionsStatus == optionsStatus)&&(identical(other.dynamicStatus, dynamicStatus) || other.dynamicStatus == dynamicStatus)&&(identical(other.nameError, nameError) || other.nameError == nameError)&&(identical(other.bioError, bioError) || other.bioError == bioError)&&(identical(other.avatarError, avatarError) || other.avatarError == avatarError)&&(identical(other.birthDateError, birthDateError) || other.birthDateError == birthDateError)&&(identical(other.cityError, cityError) || other.cityError == cityError)&&(identical(other.sportError, sportError) || other.sportError == sportError)&&(identical(other.sportPositionError, sportPositionError) || other.sportPositionError == sportPositionError)&&(identical(other.dynamicError, dynamicError) || other.dynamicError == dynamicError)&&(identical(other.isSubmitting, isSubmitting) || other.isSubmitting == isSubmitting)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess));
 }
 
 
 @override
-int get hashCode => Object.hashAll([runtimeType,name,bio,birthDate,cityId,typeId,sportId,dynamicId,avatarFile,const DeepCollectionEquality().hash(types),const DeepCollectionEquality().hash(sports),const DeepCollectionEquality().hash(cities),const DeepCollectionEquality().hash(positions),const DeepCollectionEquality().hash(refereeRoles),const DeepCollectionEquality().hash(coachSpecs),optionsStatus,dynamicStatus,nameError,bioError,avatarError,birthDateError,cityError,sportError,dynamicError,isSubmitting,isSuccess]);
+int get hashCode => Object.hashAll([runtimeType,name,bio,birthDate,cityId,typeId,const DeepCollectionEquality().hash(sportIds),const DeepCollectionEquality().hash(sportPositionIds),dynamicId,avatarFile,const DeepCollectionEquality().hash(types),const DeepCollectionEquality().hash(sports),const DeepCollectionEquality().hash(cities),const DeepCollectionEquality().hash(positionsBySport),const DeepCollectionEquality().hash(loadingPositionSportIds),const DeepCollectionEquality().hash(refereeRoles),const DeepCollectionEquality().hash(coachSpecs),optionsStatus,dynamicStatus,nameError,bioError,avatarError,birthDateError,cityError,sportError,sportPositionError,dynamicError,isSubmitting,isSuccess]);
 
 @override
 String toString() {
-  return 'RegisterState(name: $name, bio: $bio, birthDate: $birthDate, cityId: $cityId, typeId: $typeId, sportId: $sportId, dynamicId: $dynamicId, avatarFile: $avatarFile, types: $types, sports: $sports, cities: $cities, positions: $positions, refereeRoles: $refereeRoles, coachSpecs: $coachSpecs, optionsStatus: $optionsStatus, dynamicStatus: $dynamicStatus, nameError: $nameError, bioError: $bioError, avatarError: $avatarError, birthDateError: $birthDateError, cityError: $cityError, sportError: $sportError, dynamicError: $dynamicError, isSubmitting: $isSubmitting, isSuccess: $isSuccess)';
+  return 'RegisterState(name: $name, bio: $bio, birthDate: $birthDate, cityId: $cityId, typeId: $typeId, sportIds: $sportIds, sportPositionIds: $sportPositionIds, dynamicId: $dynamicId, avatarFile: $avatarFile, types: $types, sports: $sports, cities: $cities, positionsBySport: $positionsBySport, loadingPositionSportIds: $loadingPositionSportIds, refereeRoles: $refereeRoles, coachSpecs: $coachSpecs, optionsStatus: $optionsStatus, dynamicStatus: $dynamicStatus, nameError: $nameError, bioError: $bioError, avatarError: $avatarError, birthDateError: $birthDateError, cityError: $cityError, sportError: $sportError, sportPositionError: $sportPositionError, dynamicError: $dynamicError, isSubmitting: $isSubmitting, isSuccess: $isSuccess)';
 }
 
 
@@ -48,7 +53,7 @@ abstract mixin class $RegisterStateCopyWith<$Res>  {
   factory $RegisterStateCopyWith(RegisterState value, $Res Function(RegisterState) _then) = _$RegisterStateCopyWithImpl;
 @useResult
 $Res call({
- String name, String bio, String birthDate, int? cityId, int? typeId, int? sportId, int? dynamicId, XFile? avatarFile, List<ParticipantTypeModel> types, List<SportModel> sports, List<CityModel> cities, List<PlayerPositionModel> positions, List<RefereeRoleModel> refereeRoles, List<CoachSpecializationModel> coachSpecs, RegisterStatus optionsStatus, RegisterStatus dynamicStatus, String? nameError, String? bioError, String? avatarError, String? birthDateError, String? cityError, String? sportError, String? dynamicError, bool isSubmitting, bool isSuccess
+ String name, String bio, String birthDate, int? cityId, int? typeId, List<int> sportIds, Map<int, int> sportPositionIds, int? dynamicId, XFile? avatarFile, List<ParticipantTypeModel> types, List<SportModel> sports, List<CityModel> cities, Map<int, List<PlayerPositionModel>> positionsBySport, List<int> loadingPositionSportIds, List<RefereeRoleModel> refereeRoles, List<CoachSpecializationModel> coachSpecs, RegisterStatus optionsStatus, RegisterStatus dynamicStatus, String? nameError, String? bioError, String? avatarError, String? birthDateError, String? cityError, String? sportError, String? sportPositionError, String? dynamicError, bool isSubmitting, bool isSuccess
 });
 
 
@@ -65,21 +70,23 @@ class _$RegisterStateCopyWithImpl<$Res>
 
 /// Create a copy of RegisterState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? bio = null,Object? birthDate = null,Object? cityId = freezed,Object? typeId = freezed,Object? sportId = freezed,Object? dynamicId = freezed,Object? avatarFile = freezed,Object? types = null,Object? sports = null,Object? cities = null,Object? positions = null,Object? refereeRoles = null,Object? coachSpecs = null,Object? optionsStatus = null,Object? dynamicStatus = null,Object? nameError = freezed,Object? bioError = freezed,Object? avatarError = freezed,Object? birthDateError = freezed,Object? cityError = freezed,Object? sportError = freezed,Object? dynamicError = freezed,Object? isSubmitting = null,Object? isSuccess = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? bio = null,Object? birthDate = null,Object? cityId = freezed,Object? typeId = freezed,Object? sportIds = null,Object? sportPositionIds = null,Object? dynamicId = freezed,Object? avatarFile = freezed,Object? types = null,Object? sports = null,Object? cities = null,Object? positionsBySport = null,Object? loadingPositionSportIds = null,Object? refereeRoles = null,Object? coachSpecs = null,Object? optionsStatus = null,Object? dynamicStatus = null,Object? nameError = freezed,Object? bioError = freezed,Object? avatarError = freezed,Object? birthDateError = freezed,Object? cityError = freezed,Object? sportError = freezed,Object? sportPositionError = freezed,Object? dynamicError = freezed,Object? isSubmitting = null,Object? isSuccess = null,}) {
   return _then(_self.copyWith(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,bio: null == bio ? _self.bio : bio // ignore: cast_nullable_to_non_nullable
 as String,birthDate: null == birthDate ? _self.birthDate : birthDate // ignore: cast_nullable_to_non_nullable
 as String,cityId: freezed == cityId ? _self.cityId : cityId // ignore: cast_nullable_to_non_nullable
 as int?,typeId: freezed == typeId ? _self.typeId : typeId // ignore: cast_nullable_to_non_nullable
-as int?,sportId: freezed == sportId ? _self.sportId : sportId // ignore: cast_nullable_to_non_nullable
-as int?,dynamicId: freezed == dynamicId ? _self.dynamicId : dynamicId // ignore: cast_nullable_to_non_nullable
+as int?,sportIds: null == sportIds ? _self.sportIds : sportIds // ignore: cast_nullable_to_non_nullable
+as List<int>,sportPositionIds: null == sportPositionIds ? _self.sportPositionIds : sportPositionIds // ignore: cast_nullable_to_non_nullable
+as Map<int, int>,dynamicId: freezed == dynamicId ? _self.dynamicId : dynamicId // ignore: cast_nullable_to_non_nullable
 as int?,avatarFile: freezed == avatarFile ? _self.avatarFile : avatarFile // ignore: cast_nullable_to_non_nullable
 as XFile?,types: null == types ? _self.types : types // ignore: cast_nullable_to_non_nullable
 as List<ParticipantTypeModel>,sports: null == sports ? _self.sports : sports // ignore: cast_nullable_to_non_nullable
 as List<SportModel>,cities: null == cities ? _self.cities : cities // ignore: cast_nullable_to_non_nullable
-as List<CityModel>,positions: null == positions ? _self.positions : positions // ignore: cast_nullable_to_non_nullable
-as List<PlayerPositionModel>,refereeRoles: null == refereeRoles ? _self.refereeRoles : refereeRoles // ignore: cast_nullable_to_non_nullable
+as List<CityModel>,positionsBySport: null == positionsBySport ? _self.positionsBySport : positionsBySport // ignore: cast_nullable_to_non_nullable
+as Map<int, List<PlayerPositionModel>>,loadingPositionSportIds: null == loadingPositionSportIds ? _self.loadingPositionSportIds : loadingPositionSportIds // ignore: cast_nullable_to_non_nullable
+as List<int>,refereeRoles: null == refereeRoles ? _self.refereeRoles : refereeRoles // ignore: cast_nullable_to_non_nullable
 as List<RefereeRoleModel>,coachSpecs: null == coachSpecs ? _self.coachSpecs : coachSpecs // ignore: cast_nullable_to_non_nullable
 as List<CoachSpecializationModel>,optionsStatus: null == optionsStatus ? _self.optionsStatus : optionsStatus // ignore: cast_nullable_to_non_nullable
 as RegisterStatus,dynamicStatus: null == dynamicStatus ? _self.dynamicStatus : dynamicStatus // ignore: cast_nullable_to_non_nullable
@@ -89,6 +96,7 @@ as String?,avatarError: freezed == avatarError ? _self.avatarError : avatarError
 as String?,birthDateError: freezed == birthDateError ? _self.birthDateError : birthDateError // ignore: cast_nullable_to_non_nullable
 as String?,cityError: freezed == cityError ? _self.cityError : cityError // ignore: cast_nullable_to_non_nullable
 as String?,sportError: freezed == sportError ? _self.sportError : sportError // ignore: cast_nullable_to_non_nullable
+as String?,sportPositionError: freezed == sportPositionError ? _self.sportPositionError : sportPositionError // ignore: cast_nullable_to_non_nullable
 as String?,dynamicError: freezed == dynamicError ? _self.dynamicError : dynamicError // ignore: cast_nullable_to_non_nullable
 as String?,isSubmitting: null == isSubmitting ? _self.isSubmitting : isSubmitting // ignore: cast_nullable_to_non_nullable
 as bool,isSuccess: null == isSuccess ? _self.isSuccess : isSuccess // ignore: cast_nullable_to_non_nullable
@@ -195,10 +203,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  String bio,  String birthDate,  int? cityId,  int? typeId,  int? sportId,  int? dynamicId,  XFile? avatarFile,  List<ParticipantTypeModel> types,  List<SportModel> sports,  List<CityModel> cities,  List<PlayerPositionModel> positions,  List<RefereeRoleModel> refereeRoles,  List<CoachSpecializationModel> coachSpecs,  RegisterStatus optionsStatus,  RegisterStatus dynamicStatus,  String? nameError,  String? bioError,  String? avatarError,  String? birthDateError,  String? cityError,  String? sportError,  String? dynamicError,  bool isSubmitting,  bool isSuccess)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  String bio,  String birthDate,  int? cityId,  int? typeId,  List<int> sportIds,  Map<int, int> sportPositionIds,  int? dynamicId,  XFile? avatarFile,  List<ParticipantTypeModel> types,  List<SportModel> sports,  List<CityModel> cities,  Map<int, List<PlayerPositionModel>> positionsBySport,  List<int> loadingPositionSportIds,  List<RefereeRoleModel> refereeRoles,  List<CoachSpecializationModel> coachSpecs,  RegisterStatus optionsStatus,  RegisterStatus dynamicStatus,  String? nameError,  String? bioError,  String? avatarError,  String? birthDateError,  String? cityError,  String? sportError,  String? sportPositionError,  String? dynamicError,  bool isSubmitting,  bool isSuccess)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RegisterState() when $default != null:
-return $default(_that.name,_that.bio,_that.birthDate,_that.cityId,_that.typeId,_that.sportId,_that.dynamicId,_that.avatarFile,_that.types,_that.sports,_that.cities,_that.positions,_that.refereeRoles,_that.coachSpecs,_that.optionsStatus,_that.dynamicStatus,_that.nameError,_that.bioError,_that.avatarError,_that.birthDateError,_that.cityError,_that.sportError,_that.dynamicError,_that.isSubmitting,_that.isSuccess);case _:
+return $default(_that.name,_that.bio,_that.birthDate,_that.cityId,_that.typeId,_that.sportIds,_that.sportPositionIds,_that.dynamicId,_that.avatarFile,_that.types,_that.sports,_that.cities,_that.positionsBySport,_that.loadingPositionSportIds,_that.refereeRoles,_that.coachSpecs,_that.optionsStatus,_that.dynamicStatus,_that.nameError,_that.bioError,_that.avatarError,_that.birthDateError,_that.cityError,_that.sportError,_that.sportPositionError,_that.dynamicError,_that.isSubmitting,_that.isSuccess);case _:
   return orElse();
 
 }
@@ -216,10 +224,10 @@ return $default(_that.name,_that.bio,_that.birthDate,_that.cityId,_that.typeId,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  String bio,  String birthDate,  int? cityId,  int? typeId,  int? sportId,  int? dynamicId,  XFile? avatarFile,  List<ParticipantTypeModel> types,  List<SportModel> sports,  List<CityModel> cities,  List<PlayerPositionModel> positions,  List<RefereeRoleModel> refereeRoles,  List<CoachSpecializationModel> coachSpecs,  RegisterStatus optionsStatus,  RegisterStatus dynamicStatus,  String? nameError,  String? bioError,  String? avatarError,  String? birthDateError,  String? cityError,  String? sportError,  String? dynamicError,  bool isSubmitting,  bool isSuccess)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  String bio,  String birthDate,  int? cityId,  int? typeId,  List<int> sportIds,  Map<int, int> sportPositionIds,  int? dynamicId,  XFile? avatarFile,  List<ParticipantTypeModel> types,  List<SportModel> sports,  List<CityModel> cities,  Map<int, List<PlayerPositionModel>> positionsBySport,  List<int> loadingPositionSportIds,  List<RefereeRoleModel> refereeRoles,  List<CoachSpecializationModel> coachSpecs,  RegisterStatus optionsStatus,  RegisterStatus dynamicStatus,  String? nameError,  String? bioError,  String? avatarError,  String? birthDateError,  String? cityError,  String? sportError,  String? sportPositionError,  String? dynamicError,  bool isSubmitting,  bool isSuccess)  $default,) {final _that = this;
 switch (_that) {
 case _RegisterState():
-return $default(_that.name,_that.bio,_that.birthDate,_that.cityId,_that.typeId,_that.sportId,_that.dynamicId,_that.avatarFile,_that.types,_that.sports,_that.cities,_that.positions,_that.refereeRoles,_that.coachSpecs,_that.optionsStatus,_that.dynamicStatus,_that.nameError,_that.bioError,_that.avatarError,_that.birthDateError,_that.cityError,_that.sportError,_that.dynamicError,_that.isSubmitting,_that.isSuccess);case _:
+return $default(_that.name,_that.bio,_that.birthDate,_that.cityId,_that.typeId,_that.sportIds,_that.sportPositionIds,_that.dynamicId,_that.avatarFile,_that.types,_that.sports,_that.cities,_that.positionsBySport,_that.loadingPositionSportIds,_that.refereeRoles,_that.coachSpecs,_that.optionsStatus,_that.dynamicStatus,_that.nameError,_that.bioError,_that.avatarError,_that.birthDateError,_that.cityError,_that.sportError,_that.sportPositionError,_that.dynamicError,_that.isSubmitting,_that.isSuccess);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -236,10 +244,10 @@ return $default(_that.name,_that.bio,_that.birthDate,_that.cityId,_that.typeId,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  String bio,  String birthDate,  int? cityId,  int? typeId,  int? sportId,  int? dynamicId,  XFile? avatarFile,  List<ParticipantTypeModel> types,  List<SportModel> sports,  List<CityModel> cities,  List<PlayerPositionModel> positions,  List<RefereeRoleModel> refereeRoles,  List<CoachSpecializationModel> coachSpecs,  RegisterStatus optionsStatus,  RegisterStatus dynamicStatus,  String? nameError,  String? bioError,  String? avatarError,  String? birthDateError,  String? cityError,  String? sportError,  String? dynamicError,  bool isSubmitting,  bool isSuccess)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  String bio,  String birthDate,  int? cityId,  int? typeId,  List<int> sportIds,  Map<int, int> sportPositionIds,  int? dynamicId,  XFile? avatarFile,  List<ParticipantTypeModel> types,  List<SportModel> sports,  List<CityModel> cities,  Map<int, List<PlayerPositionModel>> positionsBySport,  List<int> loadingPositionSportIds,  List<RefereeRoleModel> refereeRoles,  List<CoachSpecializationModel> coachSpecs,  RegisterStatus optionsStatus,  RegisterStatus dynamicStatus,  String? nameError,  String? bioError,  String? avatarError,  String? birthDateError,  String? cityError,  String? sportError,  String? sportPositionError,  String? dynamicError,  bool isSubmitting,  bool isSuccess)?  $default,) {final _that = this;
 switch (_that) {
 case _RegisterState() when $default != null:
-return $default(_that.name,_that.bio,_that.birthDate,_that.cityId,_that.typeId,_that.sportId,_that.dynamicId,_that.avatarFile,_that.types,_that.sports,_that.cities,_that.positions,_that.refereeRoles,_that.coachSpecs,_that.optionsStatus,_that.dynamicStatus,_that.nameError,_that.bioError,_that.avatarError,_that.birthDateError,_that.cityError,_that.sportError,_that.dynamicError,_that.isSubmitting,_that.isSuccess);case _:
+return $default(_that.name,_that.bio,_that.birthDate,_that.cityId,_that.typeId,_that.sportIds,_that.sportPositionIds,_that.dynamicId,_that.avatarFile,_that.types,_that.sports,_that.cities,_that.positionsBySport,_that.loadingPositionSportIds,_that.refereeRoles,_that.coachSpecs,_that.optionsStatus,_that.dynamicStatus,_that.nameError,_that.bioError,_that.avatarError,_that.birthDateError,_that.cityError,_that.sportError,_that.sportPositionError,_that.dynamicError,_that.isSubmitting,_that.isSuccess);case _:
   return null;
 
 }
@@ -251,7 +259,7 @@ return $default(_that.name,_that.bio,_that.birthDate,_that.cityId,_that.typeId,_
 
 
 class _RegisterState extends RegisterState {
-  const _RegisterState({this.name = '', this.bio = '', this.birthDate = '', this.cityId, this.typeId, this.sportId, this.dynamicId, this.avatarFile, final  List<ParticipantTypeModel> types = const [], final  List<SportModel> sports = const [], final  List<CityModel> cities = const [], final  List<PlayerPositionModel> positions = const [], final  List<RefereeRoleModel> refereeRoles = const [], final  List<CoachSpecializationModel> coachSpecs = const [], this.optionsStatus = const RegisterStatus.initial(), this.dynamicStatus = const RegisterStatus.initial(), this.nameError, this.bioError, this.avatarError, this.birthDateError, this.cityError, this.sportError, this.dynamicError, this.isSubmitting = false, this.isSuccess = false}): _types = types,_sports = sports,_cities = cities,_positions = positions,_refereeRoles = refereeRoles,_coachSpecs = coachSpecs,super._();
+  const _RegisterState({this.name = '', this.bio = '', this.birthDate = '', this.cityId, this.typeId, final  List<int> sportIds = const <int>[], final  Map<int, int> sportPositionIds = const <int, int>{}, this.dynamicId, this.avatarFile, final  List<ParticipantTypeModel> types = const [], final  List<SportModel> sports = const [], final  List<CityModel> cities = const [], final  Map<int, List<PlayerPositionModel>> positionsBySport = const <int, List<PlayerPositionModel>>{}, final  List<int> loadingPositionSportIds = const <int>[], final  List<RefereeRoleModel> refereeRoles = const [], final  List<CoachSpecializationModel> coachSpecs = const [], this.optionsStatus = const RegisterStatus.initial(), this.dynamicStatus = const RegisterStatus.initial(), this.nameError, this.bioError, this.avatarError, this.birthDateError, this.cityError, this.sportError, this.sportPositionError, this.dynamicError, this.isSubmitting = false, this.isSuccess = false}): _sportIds = sportIds,_sportPositionIds = sportPositionIds,_types = types,_sports = sports,_cities = cities,_positionsBySport = positionsBySport,_loadingPositionSportIds = loadingPositionSportIds,_refereeRoles = refereeRoles,_coachSpecs = coachSpecs,super._();
   
 
 @override@JsonKey() final  String name;
@@ -259,9 +267,26 @@ class _RegisterState extends RegisterState {
 @override@JsonKey() final  String birthDate;
 @override final  int? cityId;
 @override final  int? typeId;
-@override final  int? sportId;
+/// A participant can practise several activities — order follows the taps.
+ final  List<int> _sportIds;
+/// A participant can practise several activities — order follows the taps.
+@override@JsonKey() List<int> get sportIds {
+  if (_sportIds is EqualUnmodifiableListView) return _sportIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_sportIds);
+}
+
+/// Position picked for each selected sport, keyed by sport id. Players only.
+ final  Map<int, int> _sportPositionIds;
+/// Position picked for each selected sport, keyed by sport id. Players only.
+@override@JsonKey() Map<int, int> get sportPositionIds {
+  if (_sportPositionIds is EqualUnmodifiableMapView) return _sportPositionIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_sportPositionIds);
+}
+
 @override final  int? dynamicId;
-// player position / referee role / coach specialization
+// referee role / coach specialization
 @override final  XFile? avatarFile;
 // ─── Lookups ─────────────────────────────────────────────
  final  List<ParticipantTypeModel> _types;
@@ -286,11 +311,24 @@ class _RegisterState extends RegisterState {
   return EqualUnmodifiableListView(_cities);
 }
 
- final  List<PlayerPositionModel> _positions;
-@override@JsonKey() List<PlayerPositionModel> get positions {
-  if (_positions is EqualUnmodifiableListView) return _positions;
+/// Positions available per sport, keyed by sport id. Cached so re-selecting
+/// a sport doesn't hit the network again.
+ final  Map<int, List<PlayerPositionModel>> _positionsBySport;
+/// Positions available per sport, keyed by sport id. Cached so re-selecting
+/// a sport doesn't hit the network again.
+@override@JsonKey() Map<int, List<PlayerPositionModel>> get positionsBySport {
+  if (_positionsBySport is EqualUnmodifiableMapView) return _positionsBySport;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_positions);
+  return EqualUnmodifiableMapView(_positionsBySport);
+}
+
+/// Sports whose positions are still in flight.
+ final  List<int> _loadingPositionSportIds;
+/// Sports whose positions are still in flight.
+@override@JsonKey() List<int> get loadingPositionSportIds {
+  if (_loadingPositionSportIds is EqualUnmodifiableListView) return _loadingPositionSportIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_loadingPositionSportIds);
 }
 
  final  List<RefereeRoleModel> _refereeRoles;
@@ -316,6 +354,7 @@ class _RegisterState extends RegisterState {
 @override final  String? birthDateError;
 @override final  String? cityError;
 @override final  String? sportError;
+@override final  String? sportPositionError;
 @override final  String? dynamicError;
 @override@JsonKey() final  bool isSubmitting;
 @override@JsonKey() final  bool isSuccess;
@@ -330,16 +369,16 @@ _$RegisterStateCopyWith<_RegisterState> get copyWith => __$RegisterStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RegisterState&&(identical(other.name, name) || other.name == name)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.birthDate, birthDate) || other.birthDate == birthDate)&&(identical(other.cityId, cityId) || other.cityId == cityId)&&(identical(other.typeId, typeId) || other.typeId == typeId)&&(identical(other.sportId, sportId) || other.sportId == sportId)&&(identical(other.dynamicId, dynamicId) || other.dynamicId == dynamicId)&&(identical(other.avatarFile, avatarFile) || other.avatarFile == avatarFile)&&const DeepCollectionEquality().equals(other._types, _types)&&const DeepCollectionEquality().equals(other._sports, _sports)&&const DeepCollectionEquality().equals(other._cities, _cities)&&const DeepCollectionEquality().equals(other._positions, _positions)&&const DeepCollectionEquality().equals(other._refereeRoles, _refereeRoles)&&const DeepCollectionEquality().equals(other._coachSpecs, _coachSpecs)&&(identical(other.optionsStatus, optionsStatus) || other.optionsStatus == optionsStatus)&&(identical(other.dynamicStatus, dynamicStatus) || other.dynamicStatus == dynamicStatus)&&(identical(other.nameError, nameError) || other.nameError == nameError)&&(identical(other.bioError, bioError) || other.bioError == bioError)&&(identical(other.avatarError, avatarError) || other.avatarError == avatarError)&&(identical(other.birthDateError, birthDateError) || other.birthDateError == birthDateError)&&(identical(other.cityError, cityError) || other.cityError == cityError)&&(identical(other.sportError, sportError) || other.sportError == sportError)&&(identical(other.dynamicError, dynamicError) || other.dynamicError == dynamicError)&&(identical(other.isSubmitting, isSubmitting) || other.isSubmitting == isSubmitting)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RegisterState&&(identical(other.name, name) || other.name == name)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.birthDate, birthDate) || other.birthDate == birthDate)&&(identical(other.cityId, cityId) || other.cityId == cityId)&&(identical(other.typeId, typeId) || other.typeId == typeId)&&const DeepCollectionEquality().equals(other._sportIds, _sportIds)&&const DeepCollectionEquality().equals(other._sportPositionIds, _sportPositionIds)&&(identical(other.dynamicId, dynamicId) || other.dynamicId == dynamicId)&&(identical(other.avatarFile, avatarFile) || other.avatarFile == avatarFile)&&const DeepCollectionEquality().equals(other._types, _types)&&const DeepCollectionEquality().equals(other._sports, _sports)&&const DeepCollectionEquality().equals(other._cities, _cities)&&const DeepCollectionEquality().equals(other._positionsBySport, _positionsBySport)&&const DeepCollectionEquality().equals(other._loadingPositionSportIds, _loadingPositionSportIds)&&const DeepCollectionEquality().equals(other._refereeRoles, _refereeRoles)&&const DeepCollectionEquality().equals(other._coachSpecs, _coachSpecs)&&(identical(other.optionsStatus, optionsStatus) || other.optionsStatus == optionsStatus)&&(identical(other.dynamicStatus, dynamicStatus) || other.dynamicStatus == dynamicStatus)&&(identical(other.nameError, nameError) || other.nameError == nameError)&&(identical(other.bioError, bioError) || other.bioError == bioError)&&(identical(other.avatarError, avatarError) || other.avatarError == avatarError)&&(identical(other.birthDateError, birthDateError) || other.birthDateError == birthDateError)&&(identical(other.cityError, cityError) || other.cityError == cityError)&&(identical(other.sportError, sportError) || other.sportError == sportError)&&(identical(other.sportPositionError, sportPositionError) || other.sportPositionError == sportPositionError)&&(identical(other.dynamicError, dynamicError) || other.dynamicError == dynamicError)&&(identical(other.isSubmitting, isSubmitting) || other.isSubmitting == isSubmitting)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess));
 }
 
 
 @override
-int get hashCode => Object.hashAll([runtimeType,name,bio,birthDate,cityId,typeId,sportId,dynamicId,avatarFile,const DeepCollectionEquality().hash(_types),const DeepCollectionEquality().hash(_sports),const DeepCollectionEquality().hash(_cities),const DeepCollectionEquality().hash(_positions),const DeepCollectionEquality().hash(_refereeRoles),const DeepCollectionEquality().hash(_coachSpecs),optionsStatus,dynamicStatus,nameError,bioError,avatarError,birthDateError,cityError,sportError,dynamicError,isSubmitting,isSuccess]);
+int get hashCode => Object.hashAll([runtimeType,name,bio,birthDate,cityId,typeId,const DeepCollectionEquality().hash(_sportIds),const DeepCollectionEquality().hash(_sportPositionIds),dynamicId,avatarFile,const DeepCollectionEquality().hash(_types),const DeepCollectionEquality().hash(_sports),const DeepCollectionEquality().hash(_cities),const DeepCollectionEquality().hash(_positionsBySport),const DeepCollectionEquality().hash(_loadingPositionSportIds),const DeepCollectionEquality().hash(_refereeRoles),const DeepCollectionEquality().hash(_coachSpecs),optionsStatus,dynamicStatus,nameError,bioError,avatarError,birthDateError,cityError,sportError,sportPositionError,dynamicError,isSubmitting,isSuccess]);
 
 @override
 String toString() {
-  return 'RegisterState(name: $name, bio: $bio, birthDate: $birthDate, cityId: $cityId, typeId: $typeId, sportId: $sportId, dynamicId: $dynamicId, avatarFile: $avatarFile, types: $types, sports: $sports, cities: $cities, positions: $positions, refereeRoles: $refereeRoles, coachSpecs: $coachSpecs, optionsStatus: $optionsStatus, dynamicStatus: $dynamicStatus, nameError: $nameError, bioError: $bioError, avatarError: $avatarError, birthDateError: $birthDateError, cityError: $cityError, sportError: $sportError, dynamicError: $dynamicError, isSubmitting: $isSubmitting, isSuccess: $isSuccess)';
+  return 'RegisterState(name: $name, bio: $bio, birthDate: $birthDate, cityId: $cityId, typeId: $typeId, sportIds: $sportIds, sportPositionIds: $sportPositionIds, dynamicId: $dynamicId, avatarFile: $avatarFile, types: $types, sports: $sports, cities: $cities, positionsBySport: $positionsBySport, loadingPositionSportIds: $loadingPositionSportIds, refereeRoles: $refereeRoles, coachSpecs: $coachSpecs, optionsStatus: $optionsStatus, dynamicStatus: $dynamicStatus, nameError: $nameError, bioError: $bioError, avatarError: $avatarError, birthDateError: $birthDateError, cityError: $cityError, sportError: $sportError, sportPositionError: $sportPositionError, dynamicError: $dynamicError, isSubmitting: $isSubmitting, isSuccess: $isSuccess)';
 }
 
 
@@ -350,7 +389,7 @@ abstract mixin class _$RegisterStateCopyWith<$Res> implements $RegisterStateCopy
   factory _$RegisterStateCopyWith(_RegisterState value, $Res Function(_RegisterState) _then) = __$RegisterStateCopyWithImpl;
 @override @useResult
 $Res call({
- String name, String bio, String birthDate, int? cityId, int? typeId, int? sportId, int? dynamicId, XFile? avatarFile, List<ParticipantTypeModel> types, List<SportModel> sports, List<CityModel> cities, List<PlayerPositionModel> positions, List<RefereeRoleModel> refereeRoles, List<CoachSpecializationModel> coachSpecs, RegisterStatus optionsStatus, RegisterStatus dynamicStatus, String? nameError, String? bioError, String? avatarError, String? birthDateError, String? cityError, String? sportError, String? dynamicError, bool isSubmitting, bool isSuccess
+ String name, String bio, String birthDate, int? cityId, int? typeId, List<int> sportIds, Map<int, int> sportPositionIds, int? dynamicId, XFile? avatarFile, List<ParticipantTypeModel> types, List<SportModel> sports, List<CityModel> cities, Map<int, List<PlayerPositionModel>> positionsBySport, List<int> loadingPositionSportIds, List<RefereeRoleModel> refereeRoles, List<CoachSpecializationModel> coachSpecs, RegisterStatus optionsStatus, RegisterStatus dynamicStatus, String? nameError, String? bioError, String? avatarError, String? birthDateError, String? cityError, String? sportError, String? sportPositionError, String? dynamicError, bool isSubmitting, bool isSuccess
 });
 
 
@@ -367,21 +406,23 @@ class __$RegisterStateCopyWithImpl<$Res>
 
 /// Create a copy of RegisterState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? bio = null,Object? birthDate = null,Object? cityId = freezed,Object? typeId = freezed,Object? sportId = freezed,Object? dynamicId = freezed,Object? avatarFile = freezed,Object? types = null,Object? sports = null,Object? cities = null,Object? positions = null,Object? refereeRoles = null,Object? coachSpecs = null,Object? optionsStatus = null,Object? dynamicStatus = null,Object? nameError = freezed,Object? bioError = freezed,Object? avatarError = freezed,Object? birthDateError = freezed,Object? cityError = freezed,Object? sportError = freezed,Object? dynamicError = freezed,Object? isSubmitting = null,Object? isSuccess = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? bio = null,Object? birthDate = null,Object? cityId = freezed,Object? typeId = freezed,Object? sportIds = null,Object? sportPositionIds = null,Object? dynamicId = freezed,Object? avatarFile = freezed,Object? types = null,Object? sports = null,Object? cities = null,Object? positionsBySport = null,Object? loadingPositionSportIds = null,Object? refereeRoles = null,Object? coachSpecs = null,Object? optionsStatus = null,Object? dynamicStatus = null,Object? nameError = freezed,Object? bioError = freezed,Object? avatarError = freezed,Object? birthDateError = freezed,Object? cityError = freezed,Object? sportError = freezed,Object? sportPositionError = freezed,Object? dynamicError = freezed,Object? isSubmitting = null,Object? isSuccess = null,}) {
   return _then(_RegisterState(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,bio: null == bio ? _self.bio : bio // ignore: cast_nullable_to_non_nullable
 as String,birthDate: null == birthDate ? _self.birthDate : birthDate // ignore: cast_nullable_to_non_nullable
 as String,cityId: freezed == cityId ? _self.cityId : cityId // ignore: cast_nullable_to_non_nullable
 as int?,typeId: freezed == typeId ? _self.typeId : typeId // ignore: cast_nullable_to_non_nullable
-as int?,sportId: freezed == sportId ? _self.sportId : sportId // ignore: cast_nullable_to_non_nullable
-as int?,dynamicId: freezed == dynamicId ? _self.dynamicId : dynamicId // ignore: cast_nullable_to_non_nullable
+as int?,sportIds: null == sportIds ? _self._sportIds : sportIds // ignore: cast_nullable_to_non_nullable
+as List<int>,sportPositionIds: null == sportPositionIds ? _self._sportPositionIds : sportPositionIds // ignore: cast_nullable_to_non_nullable
+as Map<int, int>,dynamicId: freezed == dynamicId ? _self.dynamicId : dynamicId // ignore: cast_nullable_to_non_nullable
 as int?,avatarFile: freezed == avatarFile ? _self.avatarFile : avatarFile // ignore: cast_nullable_to_non_nullable
 as XFile?,types: null == types ? _self._types : types // ignore: cast_nullable_to_non_nullable
 as List<ParticipantTypeModel>,sports: null == sports ? _self._sports : sports // ignore: cast_nullable_to_non_nullable
 as List<SportModel>,cities: null == cities ? _self._cities : cities // ignore: cast_nullable_to_non_nullable
-as List<CityModel>,positions: null == positions ? _self._positions : positions // ignore: cast_nullable_to_non_nullable
-as List<PlayerPositionModel>,refereeRoles: null == refereeRoles ? _self._refereeRoles : refereeRoles // ignore: cast_nullable_to_non_nullable
+as List<CityModel>,positionsBySport: null == positionsBySport ? _self._positionsBySport : positionsBySport // ignore: cast_nullable_to_non_nullable
+as Map<int, List<PlayerPositionModel>>,loadingPositionSportIds: null == loadingPositionSportIds ? _self._loadingPositionSportIds : loadingPositionSportIds // ignore: cast_nullable_to_non_nullable
+as List<int>,refereeRoles: null == refereeRoles ? _self._refereeRoles : refereeRoles // ignore: cast_nullable_to_non_nullable
 as List<RefereeRoleModel>,coachSpecs: null == coachSpecs ? _self._coachSpecs : coachSpecs // ignore: cast_nullable_to_non_nullable
 as List<CoachSpecializationModel>,optionsStatus: null == optionsStatus ? _self.optionsStatus : optionsStatus // ignore: cast_nullable_to_non_nullable
 as RegisterStatus,dynamicStatus: null == dynamicStatus ? _self.dynamicStatus : dynamicStatus // ignore: cast_nullable_to_non_nullable
@@ -391,6 +432,7 @@ as String?,avatarError: freezed == avatarError ? _self.avatarError : avatarError
 as String?,birthDateError: freezed == birthDateError ? _self.birthDateError : birthDateError // ignore: cast_nullable_to_non_nullable
 as String?,cityError: freezed == cityError ? _self.cityError : cityError // ignore: cast_nullable_to_non_nullable
 as String?,sportError: freezed == sportError ? _self.sportError : sportError // ignore: cast_nullable_to_non_nullable
+as String?,sportPositionError: freezed == sportPositionError ? _self.sportPositionError : sportPositionError // ignore: cast_nullable_to_non_nullable
 as String?,dynamicError: freezed == dynamicError ? _self.dynamicError : dynamicError // ignore: cast_nullable_to_non_nullable
 as String?,isSubmitting: null == isSubmitting ? _self.isSubmitting : isSubmitting // ignore: cast_nullable_to_non_nullable
 as bool,isSuccess: null == isSuccess ? _self.isSuccess : isSuccess // ignore: cast_nullable_to_non_nullable

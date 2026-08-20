@@ -71,8 +71,10 @@ class _RegisterForm extends StatelessWidget {
             state.bio.trim().isNotEmpty &&
             state.birthDate.isNotEmpty &&
             state.cityId != null &&
-            state.sportId != null &&
-            state.dynamicId != null &&
+            state.sportIds.isNotEmpty &&
+            (state.hasDynamicField
+                ? state.dynamicId != null
+                : state.allPositionsPicked) &&
             !state.isSubmitting;
 
         return Stack(
@@ -96,7 +98,10 @@ class _RegisterForm extends StatelessWidget {
                   _TypeSection(state: state, cubit: cubit),
                   _PersonalInfoSection(cubit: cubit, state: state),
                   _SportSection(state: state, cubit: cubit),
-                  _DynamicSection(state: state, cubit: cubit),
+                  if (state.hasDynamicField)
+                    _DynamicSection(state: state, cubit: cubit)
+                  else if (state.sportIds.isNotEmpty)
+                    _SportPositionsSection(state: state, cubit: cubit),
                   SizedBox(height: 20.h),
                 ],
               ),
@@ -137,7 +142,10 @@ class _Header extends StatelessWidget {
               style: AppTextTheme.headingSmall(context)
                   .copyWith(fontWeight: FontWeight.w900, color: AppColors.textDark),
             ),
-            _IconButton(icon: FontAwesomeIcons.circleQuestion),
+            GestureDetector(
+              onTap: () => _showHelpDialog(context),
+              child: _IconButton(icon: FontAwesomeIcons.circleQuestion),
+            ),
           ],
         ),
       ),
@@ -234,7 +242,7 @@ class _TypeSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionTitle(title: LocaleKeys.registerRoleLabel.tr(), icon: FontAwesomeIcons.idBadge),
+          _SectionTitle(title: LocaleKeys.helpRole.tr(), icon: FontAwesomeIcons.idBadge),
           Wrap(
             spacing: 10.w,
             runSpacing: 10.h,
@@ -335,8 +343,11 @@ class _SportSection extends StatelessWidget {
                 .map((s) => _NetworkChip(
                       iconUrl: s.icon ?? '',
                       label: s.title ?? '',
-                      isSelected: state.sportId == s.id,
-                      onTap: () => cubit.selectSport(s.id ?? 0),
+                      isSelected: state.sportIds.contains(s.id),
+                      // Sports are multi-select — the tick tells the two apart
+                      // from the single-choice role chips above.
+                      showCheck: true,
+                      onTap: () => cubit.toggleSport(s.id ?? 0),
                     ))
                 .toList(),
           ),
@@ -354,7 +365,58 @@ class _SportSection extends StatelessWidget {
   }
 }
 
-// ─── Dynamic Section (position / referee role / coach specialization) ────
+// ─── Per-Sport Positions (players) ──────────────────────────────────────
+/// One position dropdown per selected activity — a player can keep a different
+/// position in each sport they practise.
+class _SportPositionsSection extends StatelessWidget {
+  final RegisterState state;
+  final RegisterCubit cubit;
+  const _SportPositionsSection({required this.state, required this.cubit});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: LocaleKeys.registerPositionLabel.tr(),
+            icon: FontAwesomeIcons.peopleArrows,
+          ),
+          for (final sport in state.selectedSports) ...[
+            // Sports with no positions are de-selected by the cubit, so every
+            // row here has something to choose from.
+            if (state.loadingPositionSportIds.contains(sport.sportId))
+              ShimmerWidget.rectangular(width: double.infinity, height: 52.h)
+            else
+              _IdTitleDropdown(
+                label: sport.title,
+                icon: FontAwesomeIcons.listCheck,
+                value: sport.positionId,
+                items: (state.positionsBySport[sport.sportId] ?? [])
+                    .map((e) => (id: e.id ?? 0, title: e.title ?? ''))
+                    .toList(),
+                onChanged: (v) => cubit.selectSportPosition(
+                  sportId: sport.sportId,
+                  positionId: v,
+                ),
+              ),
+            16.h.sizedHeight,
+          ],
+          if (state.sportPositionError != null)
+            Text(
+              state.sportPositionError!,
+              style: AppTextTheme.bodyXSmall(context)
+                  .copyWith(color: AppColors.error, fontWeight: FontWeight.w600),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Dynamic Section (referee role / coach specialization) ───────────────
 class _DynamicSection extends StatelessWidget {
   final RegisterState state;
   final RegisterCubit cubit;
@@ -425,6 +487,7 @@ class _NetworkChip extends StatelessWidget {
   final String iconUrl;
   final String label;
   final bool isSelected;
+  final bool showCheck;
   final VoidCallback onTap;
 
   const _NetworkChip({
@@ -432,6 +495,7 @@ class _NetworkChip extends StatelessWidget {
     required this.label,
     required this.isSelected,
     required this.onTap,
+    this.showCheck = false,
   });
 
   @override
@@ -463,6 +527,10 @@ class _NetworkChip extends StatelessWidget {
                   color: isSelected ? AppColors.primary : AppColors.textMuted,
                 ),
               ),
+              if (showCheck && isSelected) ...[
+                8.w.sizedWidth,
+                FaIcon(FontAwesomeIcons.circleCheck, size: 14.sp, color: AppColors.primary),
+              ],
             ],
           ),
         ),
@@ -868,6 +936,108 @@ class _BottomActionButton extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+// ─── HELP DIALOG ──────────────────────────────────────────────────────────────
+/// Explains the form — mirrors the cancellation-policy sheet in booking history.
+void _showHelpDialog(BuildContext context) {
+  // Players are the only type with a position per activity; there is no point
+  // telling a referee about it.
+  final isPlayer = !context.read<RegisterCubit>().state.hasDynamicField;
+
+  showDialog(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      backgroundColor: AppColors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
+      title: Row(
+        children: [
+          const FaIcon(FontAwesomeIcons.circleQuestion, color: AppColors.primaryLight),
+          12.w.sizedWidth,
+          Expanded(
+            child: Text(
+              LocaleKeys.registerHelpTitle.tr(),
+              style: AppTextTheme.bodyLargeSemiBold(context).copyWith(
+                fontWeight: FontWeight.w900,
+                color: AppColors.textDark,
+              ),
+            ),
+          ),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _HelpLine(
+            icon: FontAwesomeIcons.idBadge,
+            color: AppColors.primary,
+            text: LocaleKeys.registerHelpRole.tr(),
+          ),
+          12.h.sizedHeight,
+          _HelpLine(
+            icon: FontAwesomeIcons.circleCheck,
+            color: AppColors.success,
+            text: LocaleKeys.registerHelpSports.tr(),
+          ),
+          if (isPlayer) ...[
+            12.h.sizedHeight,
+            _HelpLine(
+              icon: FontAwesomeIcons.peopleArrows,
+              color: AppColors.primaryLight,
+              text: LocaleKeys.registerHelpPositions.tr(),
+            ),
+          ],
+          12.h.sizedHeight,
+          _HelpLine(
+            icon: FontAwesomeIcons.circleExclamation,
+            color: AppColors.error,
+            text: LocaleKeys.registerHelpRequired.tr(),
+          ),
+        ],
+      ),
+      actions: [
+        ElevatedButton(
+          onPressed: () => Navigator.of(dialogContext).pop(),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: AppColors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+          ),
+          child: Text(LocaleKeys.policyUnderstand.tr()),
+        ),
+      ],
+    ),
+  );
+}
+
+class _HelpLine extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String text;
+
+  const _HelpLine({required this.icon, required this.color, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        FaIcon(icon, color: color, size: 15.sp),
+        8.w.sizedWidth,
+        Expanded(
+          child: Text(
+            text,
+            style: AppTextTheme.bodySmall(context).copyWith(
+              fontWeight: FontWeight.w600,
+              color: AppColors.textMuted,
+              height: 1.5,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

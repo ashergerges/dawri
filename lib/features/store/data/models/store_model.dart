@@ -12,7 +12,7 @@ class CategoryModel {
   @JsonKey(name: 'name_en')
   final String? nameEn;
   final String? image;
-  final bool? status;
+  final int? status;
 
   CategoryModel({this.id, this.name, this.nameAr, this.nameEn, this.image, this.status});
 
@@ -123,9 +123,11 @@ class PaginationModel {
 @JsonSerializable()
 class ProductsResponseModel {
   final List<ProductModel>? products;
+  @JsonKey(name: 'products_count')
+  final int? productsCount;
   final PaginationModel? pagination;
 
-  ProductsResponseModel({this.products, this.pagination});
+  ProductsResponseModel({this.products, this.productsCount, this.pagination});
 
   factory ProductsResponseModel.fromJson(Map<String, dynamic> json) =>
       _$ProductsResponseModelFromJson(json);

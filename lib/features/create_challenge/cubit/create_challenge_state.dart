@@ -17,6 +17,7 @@ abstract class CreateChallengeState with _$CreateChallengeState {
   DateTime? date,
   TimeOfDay? time,
   @Default(CreateChallengeStatus.initial()) CreateChallengeStatus status,
+  @Default(false) bool isLoadingStadiums,
   @Default(false) bool isSubmitting,
   @Default(false) bool showSuccessModal,
  }) = _CreateChallengeState;

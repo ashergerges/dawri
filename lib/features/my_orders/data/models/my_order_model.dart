@@ -47,11 +47,13 @@ class MyOrderModel {
   final String? createdAt;
 
   @JsonKey(name: 'items_count')
+  @JsonKey(name: 'total_amount')
   final int? itemsCount;
 
   final String? subtotal;
   final String? shipping;
   final String? discount;
+  @JsonKey(name: 'total_amount')
   final String? total;
   final String? currency;
 

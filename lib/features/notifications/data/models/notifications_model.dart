@@ -29,6 +29,21 @@ class NotificationModel {
 
   /// Matches a [NotificationTypeModel.id].
   final int? type;
+
+  /// Entity family this notification points at — `booking`, `wallet_operation`,
+  /// `contract`, `team_join_request`, `team_invitation`, `team`, `order`,
+  /// `championship`, `championship_match`, `challenge`. Null when the
+  /// notification is informational only and has nowhere to open.
+  @JsonKey(name: 'reference_type')
+  final String? referenceType;
+  @JsonKey(name: 'reference_type_id')
+  final int? referenceTypeId;
+
+  /// Id of the referenced record — the argument handed to the target screen.
+  @JsonKey(name: 'reference_id')
+  final int? referenceId;
+  @JsonKey(name: 'time_ago')
+  final String? timeAgo;
   @JsonKey(name: 'is_read')
   final bool? isRead;
   @JsonKey(name: 'created_at')
@@ -39,14 +54,27 @@ class NotificationModel {
     this.title,
     this.body,
     this.type,
+    this.referenceType,
+    this.referenceTypeId,
+    this.referenceId,
+    this.timeAgo,
     this.isRead,
     this.createdAt,
   });
 
   bool get isUnread => isRead != true;
 
-  /// `2026-08-02 17:41:10` → `2026-08-02 17:41` (seconds add nothing here).
+  /// Which screen this notification opens — null for an unknown/absent key.
+  NotificationReference? get reference =>
+      NotificationReference.fromKey(referenceType);
+
+  /// Tappable only when we know both *where* to go and *which* record to open.
+  bool get isTappable => reference != null && referenceId != null;
+
+  /// `time_ago` when the API sends it, otherwise a trimmed `created_at`.
   String get shortDate {
+    final ago = timeAgo ?? '';
+    if (ago.isNotEmpty) return ago;
     final value = createdAt ?? '';
     return value.length >= 16 ? value.substring(0, 16) : value;
   }
@@ -56,6 +84,10 @@ class NotificationModel {
         title: title,
         body: body,
         type: type,
+        referenceType: referenceType,
+        referenceTypeId: referenceTypeId,
+        referenceId: referenceId,
+        timeAgo: timeAgo,
         isRead: isRead ?? this.isRead,
         createdAt: createdAt,
       );
@@ -88,6 +120,54 @@ const Map<int, ({IconData icon, Color color})> kNotificationTypeStyles = {
   4: (icon: FontAwesomeIcons.bullhorn, color: AppColors.textMuted),
 };
 
+/// Icon / colour for a notification — the reference type wins when it is known,
+/// otherwise we fall back to the coarser `type` id.
+({IconData icon, Color color}) notificationStyle(NotificationModel n) =>
+    kNotificationReferenceStyles[n.reference] ?? notificationStyleFor(n.type);
+
 ({IconData icon, Color color}) notificationStyleFor(int? type) =>
     kNotificationTypeStyles[type] ??
     (icon: FontAwesomeIcons.bell, color: AppColors.textMuted);
+
+// ─── Reference types — GET api/app/notification/reference-types ───────────────
+/// The `reference_type` keys the backend can send. Modelled as an enum so an
+/// unknown or null key degrades into "not tappable" instead of crashing.
+enum NotificationReference {
+  booking('booking'),
+  walletOperation('wallet_operation'),
+  contract('contract'),
+  teamJoinRequest('team_join_request'),
+  teamInvitation('team_invitation'),
+  team('team'),
+  order('order'),
+  championship('championship'),
+  championshipMatch('championship_match'),
+  challenge('challenge');
+
+  const NotificationReference(this.key);
+
+  final String key;
+
+  static NotificationReference? fromKey(String? key) {
+    if (key == null || key.isEmpty) return null;
+    for (final value in NotificationReference.values) {
+      if (value.key == key) return value;
+    }
+    return null;
+  }
+}
+
+/// Icon / colour per reference type — richer than the `type` fallback below.
+const Map<NotificationReference, ({IconData icon, Color color})>
+    kNotificationReferenceStyles = {
+  NotificationReference.booking: (icon: FontAwesomeIcons.calendarCheck, color: AppColors.success),
+  NotificationReference.walletOperation: (icon: FontAwesomeIcons.wallet, color: AppColors.warning),
+  NotificationReference.contract: (icon: FontAwesomeIcons.fileSignature, color: AppColors.info),
+  NotificationReference.teamJoinRequest: (icon: FontAwesomeIcons.userPlus, color: AppColors.info),
+  NotificationReference.teamInvitation: (icon: FontAwesomeIcons.envelopeOpenText, color: AppColors.info),
+  NotificationReference.team: (icon: FontAwesomeIcons.peopleGroup, color: AppColors.primary),
+  NotificationReference.order: (icon: FontAwesomeIcons.bagShopping, color: AppColors.primary),
+  NotificationReference.championship: (icon: FontAwesomeIcons.trophy, color: AppColors.warning),
+  NotificationReference.championshipMatch: (icon: FontAwesomeIcons.futbol, color: AppColors.success),
+  NotificationReference.challenge: (icon: FontAwesomeIcons.handFist, color: AppColors.primary),
+};
